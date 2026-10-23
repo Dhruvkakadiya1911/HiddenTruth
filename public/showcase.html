@@ -1,0 +1,948 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HiddenTruth — 3D Models Direct Showcase</title>
+  <style>
+    :root {
+      --bg-void: #050507;
+      --bg-surface: #0e1018;
+      --border-glass: rgba(255, 255, 255, 0.08);
+      --border-subtle: rgba(255, 255, 255, 0.12);
+      --neon-cyan: #22d3ee;
+      --neon-red: #ff1744;
+      --neon-violet: #a855f7;
+      --neon-amber: #fbbf24;
+      --f-sans: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      --f-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--bg-void);
+      color: #f1f5f9;
+      font-family: var(--f-sans);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      padding: 2rem 1.5rem 3rem;
+      position: relative;
+      overflow-x: hidden;
+    }
+
+    /* Ambient background grid */
+    .bg-grid {
+      position: fixed;
+      inset: 0;
+      background-image:
+        linear-gradient(to right, rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+      background-size: 50px 50px;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .bg-glow {
+      position: fixed;
+      width: 600px;
+      height: 600px;
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 0;
+      filter: blur(100px);
+    }
+    .glow-cyan { top: -200px; left: -150px; background: radial-gradient(circle, rgba(34, 211, 238, 0.14) 0%, transparent 70%); }
+    .glow-crimson { bottom: -200px; right: -150px; background: radial-gradient(circle, rgba(255, 23, 68, 0.14) 0%, transparent 70%); }
+
+    /* Top Bar */
+    header {
+      position: relative;
+      z-index: 1;
+      max-width: 1300px;
+      width: 100%;
+      margin: 0 auto 1.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 1.5rem;
+      padding-bottom: 1.25rem;
+      border-bottom: 1px solid var(--border-glass);
+    }
+
+    .badge {
+      font-family: var(--f-mono);
+      font-size: 0.7rem;
+      font-weight: 800;
+      letter-spacing: 0.15em;
+      color: var(--neon-cyan);
+      text-transform: uppercase;
+      margin-bottom: 0.25rem;
+      display: inline-block;
+    }
+
+    h1 {
+      font-size: 2rem;
+      font-weight: 900;
+      letter-spacing: -0.02em;
+      color: #fff;
+    }
+
+    .controls {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .btn {
+      font-family: var(--f-mono);
+      font-size: 0.78rem;
+      font-weight: 700;
+      padding: 0.55rem 1.25rem;
+      border-radius: 9999px;
+      border: 1px solid var(--border-subtle);
+      background: rgba(255, 255, 255, 0.08);
+      color: #fff;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      text-decoration: none;
+    }
+    .btn:hover {
+      background: rgba(255, 255, 255, 0.15);
+      border-color: rgba(255, 255, 255, 0.3);
+      transform: translateY(-1px);
+    }
+
+    .tip-banner {
+      position: relative;
+      z-index: 1;
+      max-width: 1300px;
+      width: 100%;
+      margin: 0 auto 2rem;
+      padding: 0.85rem 1.25rem;
+      background: rgba(34, 211, 238, 0.06);
+      border: 1px solid rgba(34, 211, 238, 0.25);
+      border-radius: 12px;
+      font-size: 0.85rem;
+      color: #cffafe;
+      line-height: 1.5;
+    }
+
+    /* 4 Models Grid */
+    .grid {
+      position: relative;
+      z-index: 1;
+      max-width: 1300px;
+      width: 100%;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1.5rem;
+    }
+
+    .card {
+      background: rgba(14, 16, 24, 0.75);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid var(--border-glass);
+      border-radius: 20px;
+      padding: 1.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
+      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.6);
+      transition: border-color 0.3s ease, box-shadow 0.3s ease, transform 0.2s ease;
+    }
+    .card:hover {
+      border-color: var(--accent);
+      box-shadow: 0 20px 45px rgba(0, 0, 0, 0.8), 0 0 25px rgba(255, 255, 255, 0.05);
+      transform: translateY(-2px);
+    }
+
+    .card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .role-tag {
+      font-family: var(--f-mono);
+      font-size: 0.68rem;
+      font-weight: 800;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      padding: 0.2rem 0.6rem;
+      border: 1px solid var(--accent);
+      color: var(--accent);
+      border-radius: 9999px;
+      background: rgba(0, 0, 0, 0.4);
+    }
+
+    .canvas-wrap {
+      position: relative;
+      width: 100%;
+      height: 260px;
+      overflow: hidden;
+      border-radius: 14px;
+      background: radial-gradient(
+        circle at 50% 40%,
+        rgba(255, 255, 255, 0.04) 0%,
+        rgba(0, 0, 0, 0.35) 75%,
+        rgba(0, 0, 0, 0.6) 100%
+      );
+      border: 1px solid rgba(255, 255, 255, 0.07);
+      touch-action: none;
+      cursor: grab;
+      user-select: none;
+    }
+    .canvas-wrap:active {
+      cursor: grabbing;
+    }
+
+    .canvas-wrap canvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100% !important;
+      height: 100% !important;
+    }
+
+    .drag-hint {
+      position: absolute;
+      bottom: 8px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-family: var(--f-mono);
+      font-size: 0.6rem;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: rgba(255, 255, 255, 0.5);
+      background: rgba(8, 9, 14, 0.75);
+      padding: 0.15rem 0.55rem;
+      border-radius: 9999px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      pointer-events: none;
+    }
+
+    .card-body {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      border-top: 1px solid var(--border-glass);
+      padding-top: 1rem;
+    }
+
+    .role-title {
+      font-size: 1.35rem;
+      font-weight: 800;
+      letter-spacing: -0.01em;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      color: var(--accent);
+    }
+
+    .role-desc {
+      font-size: 0.85rem;
+      line-height: 1.5;
+      color: #94a3b8;
+    }
+  </style>
+</head>
+<body>
+  <div class="bg-grid"></div>
+  <div class="bg-glow glow-cyan"></div>
+  <div class="bg-glow glow-crimson"></div>
+
+  <header>
+    <div>
+      <span class="badge">DIRECT 3D INSPECTOR (STANDALONE)</span>
+      <h1>Role Avatars Showcase</h1>
+    </div>
+    <div class="controls">
+      <button class="btn" id="btnRevealAll">⚡ Re-Trigger Reveal Flash</button>
+      <a href="/" class="btn">← Back to App</a>
+    </div>
+  </header>
+
+  <div class="tip-banner">
+    ✨ <strong>Interactive Controls:</strong> Click & drag horizontally across any figurine to spin it in 360°! All 4 models run procedurally with physical glass materials, lighting, and idle animations.
+  </div>
+
+  <div class="grid">
+    <!-- Detective -->
+    <div class="card" style="--accent: var(--neon-cyan)">
+      <div class="card-header">
+        <span class="role-tag">Investigation Lead</span>
+      </div>
+      <div class="canvas-wrap" id="canvas-detective">
+        <span class="drag-hint">Drag to Inspect</span>
+      </div>
+      <div class="card-body">
+        <div class="role-title"><span>🔍</span> The Detective</div>
+        <p class="role-desc">Camel trench coat with popped collar, tilted fedora hat with cyan band, brass magnifying glass with an optical transmission glass lens, and floating 3D beveled Forensic Star Badge (★).</p>
+      </div>
+    </div>
+
+    <!-- Killer -->
+    <div class="card" style="--accent: var(--neon-red)">
+      <div class="card-header">
+        <span class="role-tag">Secret Culprit</span>
+      </div>
+      <div class="canvas-wrap" id="canvas-killer">
+        <span class="drag-hint">Drag to Inspect</span>
+      </div>
+      <div class="card-body">
+        <div class="role-title"><span>🩸</span> The Killer</div>
+        <p class="role-desc">Obsidian hooded cloak shrouded in shadow, two piercing glowing red slit eyes, bloodied steel stiletto dagger, and menacing breathing animation.</p>
+      </div>
+    </div>
+
+    <!-- Suspect -->
+    <div class="card" style="--accent: var(--neon-violet)">
+      <div class="card-header">
+        <span class="role-tag">Person of Interest</span>
+      </div>
+      <div class="canvas-wrap" id="canvas-suspect">
+        <span class="drag-hint">Drag to Inspect</span>
+      </div>
+      <div class="card-body">
+        <div class="role-title"><span>🎭</span> Prime Suspect</div>
+        <p class="role-desc">Tailored midnight suit with loosened necktie, translucent 3D crystal sweat drop, floating 3D beveled question mark ("?"), and shifty eye glances.</p>
+      </div>
+    </div>
+
+    <!-- Witness -->
+    <div class="card" style="--accent: var(--neon-amber)">
+      <div class="card-header">
+        <span class="role-tag">Key Eyewitness</span>
+      </div>
+      <div class="canvas-wrap" id="canvas-witness">
+        <span class="drag-hint">Drag to Inspect</span>
+      </div>
+      <div class="card-body">
+        <div class="role-title"><span>👁️</span> The Witness</div>
+        <p class="role-desc">Chibi silhouette in a sunny yellow raincoat with toggle buttons, two wide curious eyes, glowing vintage brass storm lantern, and floating 3D beveled exclamation mark ("!").</p>
+      </div>
+    </div>
+  </div>
+
+  <script type="module">
+    import * as THREE from './three.module.js';
+
+    // Soft Contact Shadow Plane Texture
+    function createShadowTexture() {
+      const canvas = document.createElement('canvas');
+      canvas.width = 128;
+      canvas.height = 128;
+      const ctx = canvas.getContext('2d');
+      const gradient = ctx.createRadialGradient(64, 64, 0, 64, 64, 64);
+      gradient.addColorStop(0, 'rgba(0, 0, 0, 0.72)');
+      gradient.addColorStop(0.35, 'rgba(0, 0, 0, 0.42)');
+      gradient.addColorStop(0.7, 'rgba(0, 0, 0, 0.12)');
+      gradient.addColorStop(1, 'rgba(0, 0, 0, 0)');
+      ctx.fillStyle = gradient;
+      ctx.fillRect(0, 0, 128, 128);
+      const texture = new THREE.CanvasTexture(canvas);
+      texture.needsUpdate = true;
+      return texture;
+    }
+
+    const shadowTex = createShadowTexture();
+
+    // Eye Rig
+    function createEyes({ irisColor, eyeSpacing = 0.13, eyeY = 0.03, eyeZ = 0.35, eyeScale = 1.0, isPredator = false, browAngle = 0 }) {
+      const group = new THREE.Group();
+      const whiteMat = new THREE.MeshStandardMaterial({ color: 0xfafafa, roughness: 0.15 });
+      const irisMat = new THREE.MeshStandardMaterial({
+        color: irisColor,
+        roughness: 0.2,
+        ...(isPredator ? { emissive: irisColor, emissiveIntensity: 2.2 } : {})
+      });
+      const pupilMat = new THREE.MeshStandardMaterial({ color: 0x050508, roughness: 0.1 });
+      const specMat = new THREE.MeshBasicMaterial({ color: 0xffffff });
+      const browMat = new THREE.MeshStandardMaterial({ color: 0x242430, roughness: 0.6 });
+
+      function buildEye(side) {
+        const anchor = new THREE.Group();
+        anchor.position.set(side * eyeSpacing, eyeY, eyeZ);
+
+        if (isPredator) {
+          const slit = new THREE.Mesh(new THREE.BoxGeometry(0.08 * eyeScale, 0.022 * eyeScale, 0.02), irisMat);
+          slit.rotation.z = side * -0.22;
+          anchor.add(slit);
+          return { anchor, pupils: [] };
+        }
+
+        const sclera = new THREE.Mesh(new THREE.SphereGeometry(0.065 * eyeScale, 16, 14), whiteMat);
+        sclera.scale.set(1, 1.2, 0.6);
+        anchor.add(sclera);
+
+        const iris = new THREE.Mesh(new THREE.CylinderGeometry(0.042 * eyeScale, 0.042 * eyeScale, 0.015, 16), irisMat);
+        iris.rotation.x = Math.PI / 2;
+        iris.position.set(0, 0, 0.035 * eyeScale);
+        anchor.add(iris);
+
+        const pupil = new THREE.Mesh(new THREE.CylinderGeometry(0.024 * eyeScale, 0.024 * eyeScale, 0.018, 14), pupilMat);
+        pupil.rotation.x = Math.PI / 2;
+        pupil.position.set(0, 0, 0.038 * eyeScale);
+        anchor.add(pupil);
+
+        const gleam1 = new THREE.Mesh(new THREE.SphereGeometry(0.012 * eyeScale, 8, 8), specMat);
+        gleam1.position.set(0.014 * eyeScale, 0.018 * eyeScale, 0.046 * eyeScale);
+        anchor.add(gleam1);
+
+        return { anchor, pupils: [pupil, iris] };
+      }
+
+      const left = buildEye(-1);
+      const right = buildEye(1);
+      group.add(left.anchor, right.anchor);
+
+      const browGeo = new THREE.BoxGeometry(0.09 * eyeScale, 0.024, 0.025);
+      const lBrow = new THREE.Mesh(browGeo, browMat);
+      lBrow.position.set(-eyeSpacing, eyeY + 0.1, eyeZ + 0.03);
+      lBrow.rotation.z = browAngle;
+      group.add(lBrow);
+
+      const rBrow = new THREE.Mesh(browGeo, browMat);
+      rBrow.position.set(eyeSpacing, eyeY + 0.1, eyeZ + 0.03);
+      rBrow.rotation.z = -browAngle;
+      group.add(rBrow);
+
+      return {
+        group,
+        setBlink(val) {
+          left.anchor.scale.y = val;
+          right.anchor.scale.y = val;
+        },
+        setPupilShift(x) {
+          left.pupils.forEach(p => p.position.x = x * 0.015);
+          right.pupils.forEach(p => p.position.x = x * 0.015);
+        }
+      };
+    }
+
+    // Base Figurine
+    function createBase(accentHex) {
+      const root = new THREE.Group();
+      const body = new THREE.Group();
+      root.add(body);
+
+      // Shadow
+      const shadow = new THREE.Mesh(
+        new THREE.PlaneGeometry(1.6, 1.6),
+        new THREE.MeshBasicMaterial({ map: shadowTex, transparent: true, opacity: 0.85, depthWrite: false })
+      );
+      shadow.rotation.x = -Math.PI / 2;
+      shadow.position.y = -0.84;
+      root.add(shadow);
+
+      // Plinth
+      const plinth = new THREE.Mesh(
+        new THREE.CylinderGeometry(0.56, 0.6, 0.07, 32),
+        new THREE.MeshStandardMaterial({ color: 0x0c0e16, roughness: 0.35, metalness: 0.25 })
+      );
+      plinth.position.y = -0.81;
+      root.add(plinth);
+
+      const trim = new THREE.Mesh(
+        new THREE.TorusGeometry(0.58, 0.012, 16, 36),
+        new THREE.MeshStandardMaterial({ color: accentHex, roughness: 0.25, metalness: 0.85, emissive: accentHex, emissiveIntensity: 0.2 })
+      );
+      trim.rotation.x = Math.PI / 2;
+      trim.position.y = -0.78;
+      root.add(trim);
+
+      const skinMat = new THREE.MeshStandardMaterial({ color: 0xf1cbab, roughness: 0.45, metalness: 0.05 });
+
+      const headGroup = new THREE.Group();
+      headGroup.position.set(0, 0.42, 0);
+      body.add(headGroup);
+
+      const head = new THREE.Mesh(new THREE.SphereGeometry(0.38, 28, 22), skinMat);
+      headGroup.add(head);
+
+      const legsGroup = new THREE.Group();
+      legsGroup.position.set(0, -0.42, 0);
+      body.add(legsGroup);
+
+      const torsoGroup = new THREE.Group();
+      body.add(torsoGroup);
+
+      const leftArm = new THREE.Group();
+      leftArm.position.set(-0.32, 0.24, 0);
+      body.add(leftArm);
+
+      const rightArm = new THREE.Group();
+      rightArm.position.set(0.32, 0.24, 0);
+      body.add(rightArm);
+
+      return { root, body, headGroup, legsGroup, torsoGroup, leftArm, rightArm, skinMat };
+    }
+
+    // Single Character Viewer Setup
+    function setupFigurineViewer(containerId, roleType, accentColor) {
+      const container = document.getElementById(containerId);
+      const scene = new THREE.Scene();
+      const camera = new THREE.PerspectiveCamera(38, container.clientWidth / container.clientHeight, 0.1, 50);
+      camera.position.set(0, 0.12, 3.8);
+
+      const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+      renderer.setSize(container.clientWidth, container.clientHeight);
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+      renderer.toneMapping = THREE.ACESFilmicToneMapping;
+      renderer.toneMappingExposure = 1.15;
+      container.appendChild(renderer.domElement);
+
+      // Lights
+      scene.add(new THREE.AmbientLight(0x1a1c28, 0.6));
+      const keyLight = new THREE.DirectionalLight(0xfff8ee, 1.8);
+      keyLight.position.set(2.5, 3.5, 3.0);
+      scene.add(keyLight);
+      const fillLight = new THREE.DirectionalLight(0xd8e4f0, 0.75);
+      fillLight.position.set(-2.5, 1.5, 2.0);
+      scene.add(fillLight);
+      const rimLight = new THREE.DirectionalLight(accentColor, 4.0);
+      rimLight.position.set(-2.2, 2.8, -2.5);
+      scene.add(rimLight);
+      const underGlow = new THREE.PointLight(accentColor, 2.0, 3.0);
+      underGlow.position.set(0, -0.7, 0.8);
+      scene.add(underGlow);
+
+      const base = createBase(accentColor);
+      scene.add(base.root);
+
+      let updateFn = null;
+
+      // 1. Detective
+      if (roleType === 'detective') {
+        const trenchMat = new THREE.MeshStandardMaterial({ color: 0xb5895c, roughness: 0.45 });
+        const bootMat = new THREE.MeshStandardMaterial({ color: 0x2a1a12, roughness: 0.35 });
+        const brassMat = new THREE.MeshStandardMaterial({ color: 0xd4af37, roughness: 0.22, metalness: 0.88 });
+        const glassMat = new THREE.MeshPhysicalMaterial({ color: 0xe0f7fa, transmission: 0.95, roughness: 0.06, ior: 1.52, transparent: true });
+
+        // Legs
+        [-0.14, 0.14].forEach(x => {
+          const l = new THREE.Mesh(new THREE.CylinderGeometry(0.08, 0.085, 0.36, 16), new THREE.MeshStandardMaterial({ color: 0x222633 }));
+          l.position.set(x, -0.06, 0); base.legsGroup.add(l);
+          const b = new THREE.Mesh(new THREE.BoxGeometry(0.12, 0.11, 0.22), bootMat);
+          b.position.set(x, -0.28, 0.03); base.legsGroup.add(b);
+        });
+
+        // Torso
+        const torso = new THREE.Mesh(new THREE.CylinderGeometry(0.28, 0.36, 0.45, 20), trenchMat);
+        base.torsoGroup.add(torso);
+        const skirt = new THREE.Mesh(new THREE.CylinderGeometry(0.35, 0.46, 0.32, 22), trenchMat);
+        skirt.position.set(0, -0.25, 0); base.torsoGroup.add(skirt);
+
+        // Fedora
+        const fedora = new THREE.Group();
+        const fedoraMat = new THREE.MeshStandardMaterial({ color: 0x222633, roughness: 0.42 });
+        const crown = new THREE.Mesh(new THREE.CylinderGeometry(0.32, 0.37, 0.28, 24), fedoraMat);
+        crown.position.y = 0.14; fedora.add(crown);
+        const brimPoints = [new THREE.Vector2(0.34, -0.03), new THREE.Vector2(0.48, 0.01), new THREE.Vector2(0.52, 0.03), new THREE.Vector2(0.48, 0.04), new THREE.Vector2(0.34, 0.02)];
+        fedora.add(new THREE.Mesh(new THREE.LatheGeometry(brimPoints, 28), fedoraMat));
+        fedora.position.set(0, 0.24, -0.02);
+        fedora.rotation.set(0.14, 0.08, -0.06);
+        base.headGroup.add(fedora);
+
+        // Magnifying glass
+        const glass = new THREE.Group();
+        glass.add(new THREE.Mesh(new THREE.TorusGeometry(0.17, 0.02, 16, 28), brassMat));
+        const lens = new THREE.Mesh(new THREE.CylinderGeometry(0.155, 0.155, 0.02, 28), glassMat);
+        lens.rotation.x = Math.PI / 2; glass.add(lens);
+        const handle = new THREE.Mesh(new THREE.CylinderGeometry(0.018, 0.022, 0.26, 12), brassMat);
+        handle.position.set(0, -0.13, 0); glass.add(handle);
+        glass.position.set(0.12, -0.22, 0.28);
+        base.rightArm.add(glass);
+
+        const eyes = createEyes({ irisColor: 0x0ea5e9, browAngle: 0.14 });
+        base.headGroup.add(eyes.group);
+
+        // Floating 3D Beveled Forensic Star Badge Overhead
+        const starGroup = new THREE.Group();
+        starGroup.position.set(0, 0.74, 0);
+
+        const starShape = new THREE.Shape();
+        const numPoints = 5;
+        const outerR = 0.17;
+        const innerR = 0.082;
+        for (let i = 0; i < numPoints * 2; i++) {
+          const r = i % 2 === 0 ? outerR : innerR;
+          const a = (i / (numPoints * 2)) * Math.PI * 2 - Math.PI / 2;
+          const x = Math.cos(a) * r;
+          const y = Math.sin(a) * r;
+          if (i === 0) starShape.moveTo(x, y);
+          else starShape.lineTo(x, y);
+        }
+        starShape.closePath();
+
+        const centerHole = new THREE.Path();
+        centerHole.absarc(0, 0, 0.035, 0, Math.PI * 2, true);
+        starShape.holes.push(centerHole);
+
+        const starGeom = new THREE.ExtrudeGeometry(starShape, {
+          depth: 0.06,
+          bevelEnabled: true,
+          bevelSegments: 3,
+          steps: 1,
+          bevelSize: 0.015,
+          bevelThickness: 0.015,
+        });
+        starGeom.center();
+
+        const starMat = new THREE.MeshStandardMaterial({
+          color: accentColor,
+          roughness: 0.2,
+          metalness: 0.55,
+          emissive: 0x0ea5e9,
+          emissiveIntensity: 0.75,
+        });
+        starGroup.add(new THREE.Mesh(starGeom, starMat));
+
+        const jewel = new THREE.Mesh(
+          new THREE.SphereGeometry(0.038, 12, 12),
+          new THREE.MeshStandardMaterial({ color: 0xffffff, emissive: accentColor, emissiveIntensity: 1.8, roughness: 0.1 })
+        );
+        starGroup.add(jewel);
+
+        base.headGroup.add(starGroup);
+
+        updateFn = (time) => {
+          starGroup.position.y = 0.74 + Math.sin(time * 2.2) * 0.05;
+          starGroup.rotation.y = Math.sin(time * 1.5) * 0.35;
+          glass.rotation.x = -0.4 + Math.sin(time * 1.6) * 0.18;
+          base.headGroup.rotation.z = Math.sin(time * 1.2) * 0.06;
+          const blink = (time % 3.6) < 0.15 ? Math.sin(((time % 3.6) / 0.15) * Math.PI) : 0;
+          eyes.setBlink(1 - blink * 0.92);
+        };
+      }
+
+      // 2. Killer (Upgraded Noir Phantom Assassin)
+      else if (roleType === 'killer') {
+        const cloakMat = new THREE.MeshStandardMaterial({ color: 0x0a0b12, roughness: 0.55, metalness: 0.18 });
+        const innerVelvetMat = new THREE.MeshStandardMaterial({ color: 0x881337, roughness: 0.35, metalness: 0.25 });
+        const maskMat = new THREE.MeshStandardMaterial({ color: 0xf1f5f9, roughness: 0.22, metalness: 0.12 });
+        const silverMat = new THREE.MeshStandardMaterial({ color: 0xc8d1dc, roughness: 0.18, metalness: 0.9 });
+        const leatherMat = new THREE.MeshStandardMaterial({ color: 0x141622, roughness: 0.35, metalness: 0.25 });
+        const steelBladeMat = new THREE.MeshStandardMaterial({ color: 0xe2e8f0, roughness: 0.08, metalness: 0.96 });
+        const bloodMat = new THREE.MeshStandardMaterial({ color: 0xdc2626, roughness: 0.18, metalness: 0.25, emissive: 0x991b1b, emissiveIntensity: 0.85 });
+        const poisonMat = new THREE.MeshStandardMaterial({ color: 0xff1744, roughness: 0.15, metalness: 0.2, emissive: 0xdc2626, emissiveIntensity: 1.6 });
+        const glassMat = new THREE.MeshPhysicalMaterial({ color: 0xffffff, transmission: 0.95, roughness: 0.05, ior: 1.5, transparent: true });
+        const rubyMat = new THREE.MeshStandardMaterial({ color: 0xff1744, roughness: 0.15, metalness: 0.3, emissive: 0xff1744, emissiveIntensity: 1.8 });
+        const skullEmblemMat = new THREE.MeshStandardMaterial({ color: 0xff1744, roughness: 0.2, metalness: 0.5, emissive: 0x991b1b, emissiveIntensity: 0.75 });
+
+        // Legs & Boots
+        [-0.14, 0.14].forEach((x) => {
+          const l = new THREE.Mesh(new THREE.CylinderGeometry(0.08, 0.085, 0.36, 16), cloakMat);
+          l.position.set(x, -0.06, 0); base.legsGroup.add(l);
+          const b = new THREE.Mesh(new THREE.BoxGeometry(0.13, 0.12, 0.24), leatherMat);
+          b.position.set(x, -0.28, 0.03); base.legsGroup.add(b);
+          const buckle = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.025, 0.015), silverMat);
+          buckle.position.set(x, -0.24, 0.15); base.legsGroup.add(buckle);
+        });
+
+        // Torso & Inner Velvet Lapels
+        const torso = new THREE.Mesh(new THREE.CylinderGeometry(0.3, 0.38, 0.5, 20), cloakMat);
+        torso.position.set(0, 0.04, 0); base.torsoGroup.add(torso);
+
+        const lLapel = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.44, 0.04), innerVelvetMat);
+        lLapel.position.set(-0.11, 0.03, 0.26); lLapel.rotation.y = 0.25; base.torsoGroup.add(lLapel);
+        const rLapel = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.44, 0.04), innerVelvetMat);
+        rLapel.position.set(0.11, 0.03, 0.26); rLapel.rotation.y = -0.25; base.torsoGroup.add(rLapel);
+
+        const hem = new THREE.Mesh(new THREE.CylinderGeometry(0.38, 0.54, 0.38, 24), cloakMat);
+        hem.position.set(0, -0.26, 0); base.torsoGroup.add(hem);
+
+        // Shoulder Mantle & Armor Plates with Silver Studs
+        const mantle = new THREE.Group();
+        mantle.position.set(0, 0.26, 0);
+        mantle.add(new THREE.Mesh(new THREE.CylinderGeometry(0.24, 0.44, 0.16, 22), cloakMat));
+        [-0.32, 0.32].forEach((sx, i) => {
+          const sp = new THREE.Mesh(new THREE.CylinderGeometry(0.14, 0.18, 0.08, 16), cloakMat);
+          sp.position.set(sx, -0.04, 0); sp.rotation.z = i === 0 ? 0.35 : -0.35; mantle.add(sp);
+          const stud = new THREE.Mesh(new THREE.SphereGeometry(0.02, 8, 8), silverMat);
+          stud.position.set(sx * 1.15, 0.02, 0.08); mantle.add(stud);
+        });
+        base.torsoGroup.add(mantle);
+
+        // Silver Chest Chain & Ruby Talisman
+        const chain = new THREE.Mesh(new THREE.TorusGeometry(0.19, 0.015, 10, 24, Math.PI * 0.9), silverMat);
+        chain.rotation.x = Math.PI / 1.7; chain.position.set(0, 0.15, 0.24); base.torsoGroup.add(chain);
+        const ruby = new THREE.Mesh(new THREE.SphereGeometry(0.04, 12, 12), rubyMat);
+        ruby.position.set(0, 0.17, 0.3); ruby.scale.set(1.2, 1.2, 0.7); base.torsoGroup.add(ruby);
+
+        // Belt & Buckle
+        const belt = new THREE.Mesh(new THREE.CylinderGeometry(0.37, 0.375, 0.055, 22), leatherMat);
+        belt.position.set(0, -0.1, 0); base.torsoGroup.add(belt);
+        const bkl = new THREE.Mesh(new THREE.BoxGeometry(0.09, 0.07, 0.03), silverMat);
+        bkl.position.set(0, -0.1, 0.37); base.torsoGroup.add(bkl);
+
+        // Right Arm: Ornate Curved Stiletto Dagger
+        const dagger = new THREE.Group();
+        dagger.add(new THREE.Mesh(new THREE.SphereGeometry(0.032, 10, 10), silverMat)); // Pommel
+        const dGrip = new THREE.Mesh(new THREE.CylinderGeometry(0.018, 0.02, 0.14, 12), leatherMat);
+        dGrip.position.y = 0.07; dagger.add(dGrip);
+        const dGuard = new THREE.Mesh(new THREE.BoxGeometry(0.16, 0.028, 0.038), silverMat);
+        dGuard.position.y = 0.15; dagger.add(dGuard);
+
+        const bladePoints = [
+          new THREE.Vector2(0, 0), new THREE.Vector2(0.032, 0.08), new THREE.Vector2(0.038, 0.2),
+          new THREE.Vector2(0.022, 0.32), new THREE.Vector2(0, 0.4), new THREE.Vector2(-0.014, 0.32),
+          new THREE.Vector2(-0.02, 0.2), new THREE.Vector2(-0.014, 0.08)
+        ];
+        const bladeGeom = new THREE.ExtrudeGeometry(new THREE.Shape(bladePoints), { depth: 0.01, bevelEnabled: true, bevelSegments: 2, bevelSize: 0.005, bevelThickness: 0.005 });
+        bladeGeom.center();
+        const blade = new THREE.Mesh(bladeGeom, steelBladeMat);
+        blade.position.y = 0.35; dagger.add(blade);
+        const bloodTip = new THREE.Mesh(new THREE.ConeGeometry(0.032, 0.15, 4), bloodMat);
+        bloodTip.position.y = 0.52; bloodTip.rotation.y = Math.PI / 4; dagger.add(bloodTip);
+
+        dagger.position.set(0.12, -0.2, 0.28);
+        dagger.rotation.set(0.4, 0.1, -0.2);
+        base.rightArm.add(dagger);
+
+        // Left Arm: Glowing Lethal Poison Phial
+        const vial = new THREE.Group();
+        vial.add(new THREE.Mesh(new THREE.CylinderGeometry(0.04, 0.04, 0.15, 16), glassMat));
+        const liquid = new THREE.Mesh(new THREE.CylinderGeometry(0.035, 0.035, 0.11, 16), poisonMat);
+        liquid.position.y = -0.015; vial.add(liquid);
+        const stopper = new THREE.Mesh(new THREE.CylinderGeometry(0.025, 0.038, 0.035, 12), silverMat);
+        stopper.position.y = 0.09; vial.add(stopper);
+        const poisonLight = new THREE.PointLight(0xff1744, 1.4, 0.9);
+        vial.add(poisonLight);
+        vial.position.set(-0.12, -0.22, 0.26);
+        base.leftArm.add(vial);
+
+        // Head: Peaked Assassin Cowl & Porcelain Phantom Skull Mask
+        const hood = new THREE.Group();
+        const hoodMesh = new THREE.Mesh(new THREE.SphereGeometry(0.48, 24, 20), cloakMat);
+        hoodMesh.scale.set(1.02, 1.15, 1.18); hood.add(hoodMesh);
+        const cowlPeak = new THREE.Mesh(new THREE.ConeGeometry(0.14, 0.24, 4), cloakMat);
+        cowlPeak.position.set(0, 0.32, 0.42); cowlPeak.rotation.set(-1.15, 0, 0); cowlPeak.scale.set(1.5, 0.7, 0.8); hood.add(cowlPeak);
+        hood.position.set(0, 0.06, -0.02);
+        base.headGroup.add(hood);
+
+        // Porcelain Skull Half-Mask
+        const mask = new THREE.Group();
+        const maskCranium = new THREE.Mesh(new THREE.SphereGeometry(0.32, 18, 16), maskMat);
+        maskCranium.scale.set(0.9, 0.95, 0.65); mask.add(maskCranium);
+        const jaw = new THREE.Mesh(new THREE.BoxGeometry(0.18, 0.16, 0.14), maskMat);
+        jaw.position.set(0, -0.16, 0.08); mask.add(jaw);
+        [-0.14, 0.14].forEach(cx => {
+          const chk = new THREE.Mesh(new THREE.SphereGeometry(0.08, 10, 10), maskMat);
+          chk.position.set(cx, -0.02, 0.15); chk.scale.set(0.7, 1.2, 0.8); mask.add(chk);
+        });
+        mask.position.set(0, 0.02, 0.18);
+        base.headGroup.add(mask);
+
+        // Piercing Glowing Ruby Eyes
+        const eyes = createEyes({ irisColor: 0xff1744, browAngle: 0.24, eyeScale: 1.05 });
+        base.headGroup.add(eyes.group);
+
+        const innerLight = new THREE.PointLight(0xff1744, 2.5, 1.4);
+        innerLight.position.set(0, 0.06, 0.38);
+        base.headGroup.add(innerLight);
+
+        // Floating 3D Beveled Skull Emblem Overhead
+        const skullGroup = new THREE.Group();
+        const skullShape = new THREE.Shape();
+        skullShape.moveTo(-0.15, 0.08); skullShape.bezierCurveTo(-0.15, 0.36, 0.15, 0.36, 0.15, 0.08);
+        skullShape.bezierCurveTo(0.17, -0.02, 0.11, -0.08, 0.09, -0.15); skullShape.lineTo(-0.09, -0.15);
+        skullShape.bezierCurveTo(-0.11, -0.08, -0.17, -0.02, -0.15, 0.08); skullShape.closePath();
+        const lHole = new THREE.Path(); lHole.absellipse(-0.055, 0.075, 0.032, 0.042, 0, Math.PI * 2, true); skullShape.holes.push(lHole);
+        const rHole = new THREE.Path(); rHole.absellipse(0.055, 0.075, 0.032, 0.042, 0, Math.PI * 2, true); skullShape.holes.push(rHole);
+        const skullGeom = new THREE.ExtrudeGeometry(skullShape, { depth: 0.06, bevelEnabled: true, bevelSegments: 3, steps: 1, bevelSize: 0.015, bevelThickness: 0.015 });
+        skullGeom.center();
+        skullGroup.add(new THREE.Mesh(skullGeom, skullEmblemMat));
+        skullGroup.position.set(0, 0.74, 0);
+        base.headGroup.add(skullGroup);
+
+        updateFn = (time) => {
+          const breath = Math.sin(time * 2.0);
+          torso.scale.set(1 + breath * 0.035, 1 + breath * 0.02, 1 + breath * 0.035);
+          mantle.position.y = 0.26 + breath * 0.012;
+          dagger.rotation.x = 0.4 + Math.sin(time * 1.8) * 0.14;
+          vial.rotation.z = Math.sin(time * 2.2) * 0.12;
+          innerLight.intensity = 2.0 + Math.sin(time * 2.8) * 0.9;
+          ruby.material.emissiveIntensity = 1.4 + Math.sin(time * 2.8) * 0.6;
+          skullGroup.position.y = 0.74 + Math.sin(time * 2.2) * 0.05;
+          skullGroup.rotation.y = Math.sin(time * 1.5) * 0.35;
+          base.headGroup.rotation.y = Math.sin(time * 0.8) * 0.08;
+        };
+      }
+
+      // 3. Suspect
+      else if (roleType === 'suspect') {
+        const suitMat = new THREE.MeshStandardMaterial({ color: 0x1b1828, roughness: 0.45 });
+        const qMat = new THREE.MeshStandardMaterial({ color: 0xc084fc, emissive: 0x7e22ce, emissiveIntensity: 0.65, roughness: 0.2 });
+
+        [-0.14, 0.14].forEach(x => {
+          const l = new THREE.Mesh(new THREE.CylinderGeometry(0.08, 0.085, 0.36, 16), suitMat);
+          l.position.set(x, -0.06, 0); base.legsGroup.add(l);
+          const b = new THREE.Mesh(new THREE.BoxGeometry(0.12, 0.11, 0.22), suitMat);
+          b.position.set(x, -0.28, 0.03); base.legsGroup.add(b);
+        });
+
+        const torso = new THREE.Mesh(new THREE.CylinderGeometry(0.28, 0.35, 0.46, 20), suitMat);
+        base.torsoGroup.add(torso);
+
+        // Floating "?"
+        const qGroup = new THREE.Group();
+        const qShape = new THREE.Shape();
+        qShape.moveTo(-0.12, 0.34);
+        qShape.bezierCurveTo(-0.12, 0.6, 0.3, 0.6, 0.3, 0.34);
+        qShape.bezierCurveTo(0.3, 0.18, 0.07, 0.14, 0.07, -0.04);
+        qShape.lineTo(-0.04, -0.04);
+        qShape.bezierCurveTo(-0.04, 0.16, 0.18, 0.2, 0.18, 0.32);
+        qShape.bezierCurveTo(0.18, 0.48, -0.02, 0.48, -0.02, 0.34);
+        qShape.closePath();
+        const qGeom = new THREE.ExtrudeGeometry(qShape, { depth: 0.07, bevelEnabled: true, bevelSegments: 3, steps: 1, bevelSize: 0.018, bevelThickness: 0.018 });
+        qGeom.center();
+        qGroup.add(new THREE.Mesh(qGeom, qMat));
+        const dot = new THREE.Mesh(new THREE.SphereGeometry(0.045, 14, 14), qMat);
+        dot.position.y = -0.28; qGroup.add(dot);
+        qGroup.position.set(0, 0.72, 0);
+        base.headGroup.add(qGroup);
+
+        const eyes = createEyes({ irisColor: 0x3d281a, browAngle: -0.22, eyeScale: 1.05 });
+        base.headGroup.add(eyes.group);
+
+        updateFn = (time) => {
+          qGroup.position.y = 0.72 + Math.sin(time * 2.2) * 0.05;
+          qGroup.rotation.y = Math.sin(time * 1.5) * 0.35;
+          const glance = Math.sin(time * 1.8);
+          eyes.setPupilShift(glance > 0.6 ? 1 : glance < -0.6 ? -1 : 0);
+          const blink = (time % 2.8) < 0.12 ? Math.sin(((time % 2.8) / 0.12) * Math.PI) : 0;
+          eyes.setBlink(1 - blink * 0.95);
+        };
+      }
+
+      // 4. Witness
+      else if (roleType === 'witness') {
+        base.body.scale.set(0.94, 0.94, 0.94);
+        const coatMat = new THREE.MeshStandardMaterial({ color: 0xfacc15, roughness: 0.35 });
+        const brassMat = new THREE.MeshStandardMaterial({ color: 0xb45309, roughness: 0.28, metalness: 0.85 });
+
+        [-0.13, 0.13].forEach(x => {
+          const l = new THREE.Mesh(new THREE.CylinderGeometry(0.075, 0.08, 0.36, 16), new THREE.MeshStandardMaterial({ color: 0x1e2238 }));
+          l.position.set(x, -0.06, 0); base.legsGroup.add(l);
+          const b = new THREE.Mesh(new THREE.BoxGeometry(0.12, 0.12, 0.22), new THREE.MeshStandardMaterial({ color: 0xe11d48, roughness: 0.2 }));
+          b.position.set(x, -0.28, 0.03); base.legsGroup.add(b);
+        });
+
+        const torso = new THREE.Mesh(new THREE.CylinderGeometry(0.28, 0.38, 0.48, 20), coatMat);
+        base.torsoGroup.add(torso);
+
+        // Lantern
+        const lantern = new THREE.Group();
+        lantern.add(new THREE.Mesh(new THREE.CylinderGeometry(0.07, 0.09, 0.04, 16), brassMat));
+        const lBase = new THREE.Mesh(new THREE.CylinderGeometry(0.09, 0.08, 0.04, 16), brassMat);
+        lBase.position.y = -0.18; lantern.add(lBase);
+        const lLight = new THREE.PointLight(0xfbbf24, 2.0, 1.8);
+        lantern.add(lLight);
+        lantern.position.set(0.12, -0.32, 0.24);
+        base.rightArm.add(lantern);
+
+        // Floating "!"
+        const exclGroup = new THREE.Group();
+        const exclShape = new THREE.Shape();
+        exclShape.moveTo(-0.055, 0.42); exclShape.lineTo(0.055, 0.42); exclShape.lineTo(0.03, 0.06); exclShape.lineTo(-0.03, 0.06); exclShape.closePath();
+        const exclGeom = new THREE.ExtrudeGeometry(exclShape, { depth: 0.07, bevelEnabled: true, bevelSegments: 3, steps: 1, bevelSize: 0.016, bevelThickness: 0.016 });
+        exclGeom.center();
+        const exclMat = new THREE.MeshStandardMaterial({ color: 0xfbbf24, emissive: 0xd97706, emissiveIntensity: 0.7, roughness: 0.2 });
+        exclGroup.add(new THREE.Mesh(exclGeom, exclMat));
+        const dot = new THREE.Mesh(new THREE.SphereGeometry(0.045, 14, 14), exclMat);
+        dot.position.y = -0.26; exclGroup.add(dot);
+        exclGroup.position.set(0, 0.72, 0);
+        base.headGroup.add(exclGroup);
+
+        const eyes = createEyes({ irisColor: 0xf59e0b, browAngle: 0.1, eyeScale: 1.15 });
+        base.headGroup.add(eyes.group);
+
+        updateFn = (time) => {
+          base.headGroup.rotation.z = Math.sin(time * 1.8) * 0.08;
+          lantern.rotation.z = Math.sin(time * 2.2) * 0.22;
+          exclGroup.position.y = 0.72 + Math.sin(time * 2.4) * 0.06;
+          const blink = (time % 3.2) < 0.14 ? Math.sin(((time % 3.2) / 0.14) * Math.PI) : 0;
+          eyes.setBlink(1 - blink * 0.95);
+        };
+      }
+
+      // Drag to rotate with damping
+      let isDragging = false;
+      let lastX = 0;
+      let targetRotY = 0;
+      let currentRotY = 0;
+      let revealT = 0;
+
+      container.addEventListener('pointerdown', (e) => {
+        isDragging = true;
+        lastX = e.clientX;
+      });
+      window.addEventListener('pointermove', (e) => {
+        if (!isDragging) return;
+        targetRotY += (e.clientX - lastX) * 0.009;
+        lastX = e.clientX;
+      });
+      window.addEventListener('pointerup', () => { isDragging = false; });
+
+      function triggerReveal() {
+        revealT = 0;
+      }
+
+      const clock = new THREE.Clock();
+      function animate() {
+        requestAnimationFrame(animate);
+        const dt = clock.getDelta();
+        const elapsed = clock.getElapsedTime();
+
+        if (revealT < 1.0) {
+          revealT = Math.min(1.0, revealT + dt / 0.65);
+          const c4 = (2 * Math.PI) / 3;
+          const spring = revealT === 0 ? 0 : revealT === 1 ? 1 : Math.pow(2, -10 * revealT) * Math.sin((revealT * 10 - 0.75) * c4) + 1;
+          base.root.scale.set(spring, spring, spring);
+          base.root.rotation.y = currentRotY + (1 - revealT) * -Math.PI;
+          rimLight.intensity = 4.0 + (1 - revealT) * 5.0;
+        } else {
+          base.root.scale.set(1, 1, 1);
+          rimLight.intensity = 4.0;
+        }
+
+        if (!isDragging) {
+          targetRotY += 0.0035;
+        }
+        currentRotY += (targetRotY - currentRotY) * 0.08;
+        base.root.rotation.y = currentRotY;
+
+        if (updateFn) updateFn(elapsed);
+        renderer.render(scene, camera);
+      }
+      animate();
+
+      return { triggerReveal };
+    }
+
+    // Initialize all 4 viewers
+    const d = setupFigurineViewer('canvas-detective', 'detective', 0x22d3ee);
+    const k = setupFigurineViewer('canvas-killer', 'killer', 0xff1744);
+    const s = setupFigurineViewer('canvas-suspect', 'suspect', 0xa855f7);
+    const w = setupFigurineViewer('canvas-witness', 'witness', 0xfbbf24);
+
+    document.getElementById('btnRevealAll').addEventListener('click', () => {
+      d.triggerReveal();
+      k.triggerReveal();
+      s.triggerReveal();
+      w.triggerReveal();
+    });
+  </script>
+</body>
+</html>

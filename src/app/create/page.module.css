@@ -1,0 +1,291 @@
+/* Create Game Page — Responsive Neo-Noir Style */
+
+.page {
+  position: relative;
+  min-height: 100vh;
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.5rem 1rem 2rem;
+  overflow: hidden;
+}
+
+/* Background layers */
+.bgLayer {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.bgGrid {
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(to right, rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+  background-size: 50px 50px;
+  mask-image: radial-gradient(ellipse 70% 60% at 50% 50%, black, transparent);
+}
+
+.orbRed {
+  position: absolute;
+  width: 450px;
+  height: 450px;
+  border-radius: 50%;
+  top: -100px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: radial-gradient(circle, rgba(255, 42, 81, 0.22) 0%, transparent 65%);
+  filter: blur(60px);
+}
+
+.orbViolet {
+  position: absolute;
+  width: 380px;
+  height: 380px;
+  border-radius: 50%;
+  bottom: -50px;
+  right: -50px;
+  background: radial-gradient(circle, rgba(168, 85, 247, 0.16) 0%, transparent 65%);
+  filter: blur(70px);
+}
+
+/* Top Nav */
+.topNav {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: 520px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.backLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-family: var(--f-mono);
+  font-size: 0.78rem;
+  color: var(--text-secondary);
+  padding: 0.4rem 0.8rem;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--r-full);
+  transition: all 0.15s ease;
+}
+
+.backLink:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--text-primary);
+  border-color: var(--border-glass);
+}
+
+.badge {
+  font-family: var(--f-mono);
+  font-size: 0.7rem;
+  color: var(--neon-red-soft);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+/* Main Container */
+.container {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: 460px;
+  margin: auto 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+/* Header */
+.header {
+  text-align: center;
+}
+
+.tagline {
+  font-family: var(--f-mono);
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  margin-bottom: 0.4rem;
+}
+
+.title {
+  font-size: clamp(2rem, 6vw, 2.75rem);
+  font-weight: 900;
+  letter-spacing: -0.03em;
+  text-transform: uppercase;
+  line-height: 1.05;
+}
+
+.titleRed {
+  color: var(--neon-red);
+  text-shadow: 0 0 30px var(--neon-red-glow);
+}
+
+.subtitle {
+  color: var(--text-secondary);
+  font-size: 0.92rem;
+  margin-top: 0.5rem;
+}
+
+/* Form Card */
+.card {
+  position: relative;
+  padding: 2rem 1.6rem;
+  background: var(--bg-card);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--r-lg);
+  box-shadow:
+    0 25px 50px -12px rgba(0, 0, 0, 0.65),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  overflow: hidden;
+}
+
+.card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--neon-red), transparent);
+}
+
+/* Input Field */
+.fieldGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+}
+
+.label {
+  font-family: var(--f-mono);
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+  display: flex;
+  justify-content: space-between;
+}
+
+.charCount {
+  color: var(--text-muted);
+}
+
+.inputWrapper {
+  position: relative;
+}
+
+.input {
+  width: 100%;
+  padding: 1rem 1.2rem;
+  background: rgba(8, 9, 14, 0.85);
+  border: 1px solid var(--border-glass);
+  border-radius: var(--r-md);
+  color: var(--text-primary);
+  font-family: var(--f-display);
+  font-size: 1.15rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  outline: none;
+  transition: all 0.2s ease;
+}
+
+.input::placeholder {
+  color: var(--text-muted);
+  font-weight: 400;
+}
+
+.input:focus {
+  border-color: var(--neon-red);
+  box-shadow: 0 0 20px var(--neon-red-glow);
+  background: rgba(14, 16, 24, 0.95);
+}
+
+/* Error message */
+.errorMessage {
+  padding: 0.65rem 0.9rem;
+  background: rgba(255, 42, 81, 0.12);
+  border: 1px solid rgba(255, 42, 81, 0.35);
+  border-radius: var(--r-sm);
+  color: #ff8598;
+  font-size: 0.82rem;
+  font-family: var(--f-mono);
+}
+
+/* Submit Button */
+.btnSubmit {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.65rem;
+  width: 100%;
+  padding: 1.1rem;
+  background: linear-gradient(135deg, #ff2a51 0%, #cc1433 60%, #a855f7 140%);
+  color: #ffffff;
+  font-family: var(--f-display);
+  font-size: 1.05rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  border-radius: var(--r-md);
+  box-shadow: 0 12px 30px -6px var(--neon-red-glow);
+  cursor: pointer;
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+
+.btnSubmit:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 16px 36px -4px var(--neon-red-glow);
+}
+
+.btnSubmit:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Spinner */
+.spinner {
+  width: 18px;
+  height: 18px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top-color: #ffffff;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Info Note */
+.infoNote {
+  text-align: center;
+  font-size: 0.76rem;
+  color: var(--text-muted);
+  line-height: 1.5;
+}
+
+.footer {
+  position: relative;
+  z-index: 1;
+  font-family: var(--f-mono);
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  letter-spacing: 0.05em;
+}

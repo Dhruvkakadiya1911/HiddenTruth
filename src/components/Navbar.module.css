@@ -1,0 +1,259 @@
+.navbar {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  width: 100%;
+  height: 64px;
+  background: rgba(5, 5, 7, 0.85);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--border-glass);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 1.5rem;
+  transition: all 0.3s ease;
+}
+
+.left {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  text-decoration: none;
+}
+
+.brandLogo {
+  font-family: var(--f-display);
+  font-size: 1.25rem;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  color: #fff;
+}
+
+.brandDot {
+  width: 8px;
+  height: 8px;
+  border-radius: var(--r-full);
+  background: var(--neon-red);
+  box-shadow: 0 0 10px var(--neon-red-glow);
+}
+
+.brandSub {
+  font-family: var(--f-mono);
+  font-size: 0.68rem;
+  color: var(--text-muted);
+  letter-spacing: 0.1em;
+  display: none;
+}
+
+@media (min-width: 640px) {
+  .brandSub {
+    display: inline;
+  }
+}
+
+/* Center Status Badge */
+.center {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.roomPill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.3rem 0.75rem;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--r-full);
+  font-family: var(--f-mono);
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+}
+
+.roomCode {
+  font-weight: 800;
+  color: var(--neon-cyan);
+  letter-spacing: 0.05em;
+}
+
+.phaseBadge {
+  padding: 0.25rem 0.6rem;
+  border-radius: var(--r-full);
+  font-family: var(--f-mono);
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  display: none;
+}
+
+@media (min-width: 768px) {
+  .phaseBadge {
+    display: inline-block;
+  }
+}
+
+.phaseLobby {
+  background: rgba(251, 191, 36, 0.12);
+  border: 1px solid rgba(251, 191, 36, 0.4);
+  color: var(--neon-amber);
+}
+
+.phaseGame {
+  background: rgba(34, 211, 238, 0.12);
+  border: 1px solid rgba(34, 211, 238, 0.4);
+  color: var(--neon-cyan);
+}
+
+.phaseVote {
+  background: rgba(255, 42, 81, 0.12);
+  border: 1px solid rgba(255, 42, 81, 0.4);
+  color: var(--neon-red);
+}
+
+.phaseReveal {
+  background: rgba(168, 85, 247, 0.12);
+  border: 1px solid rgba(168, 85, 247, 0.4);
+  color: var(--neon-violet);
+}
+
+/* Right Area */
+.right {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.playerChip {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.3rem 0.75rem;
+  background: rgba(18, 20, 32, 0.8);
+  border: 1px solid var(--border-glass);
+  border-radius: var(--r-full);
+  font-size: 0.78rem;
+  color: var(--text-primary);
+  font-family: var(--f-display);
+  font-weight: 600;
+}
+
+.playerAvatar {
+  width: 20px;
+  height: 20px;
+  border-radius: var(--r-full);
+  background: linear-gradient(135deg, var(--neon-red), var(--neon-violet));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.65rem;
+  font-weight: 800;
+  color: #fff;
+}
+
+.hostCrown {
+  color: var(--neon-amber);
+  font-size: 0.75rem;
+}
+
+.btnLeave {
+  padding: 0.35rem 0.75rem;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--border-glass);
+  border-radius: var(--r-md);
+  color: var(--text-muted);
+  font-family: var(--f-mono);
+  font-size: 0.72rem;
+  text-decoration: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btnLeave:hover {
+  background: rgba(239, 68, 68, 0.15);
+  border-color: var(--neon-red);
+  color: #ff8598;
+}
+
+.navLink {
+  padding: 0.35rem 0.75rem;
+  background: transparent;
+  color: var(--text-secondary);
+  font-family: var(--f-display);
+  font-size: 0.82rem;
+  font-weight: 600;
+  text-decoration: none;
+  border-radius: var(--r-md);
+  transition: all 0.2s ease;
+}
+
+.navLink:hover {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.statusBeacon {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-family: var(--f-mono);
+  font-size: 0.68rem;
+  font-weight: 700;
+  color: var(--neon-emerald);
+  letter-spacing: 0.08em;
+}
+
+.beaconDot {
+  width: 6px;
+  height: 6px;
+  border-radius: var(--r-full);
+  background: var(--neon-emerald);
+  box-shadow: 0 0 8px rgba(16, 185, 129, 0.6);
+  animation: beaconPulse 2s infinite ease-in-out;
+}
+
+.resumePill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.35rem 0.8rem;
+  background: rgba(34, 211, 238, 0.12);
+  border: 1px solid var(--neon-cyan);
+  border-radius: var(--r-full);
+  color: var(--neon-cyan);
+  font-family: var(--f-mono);
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-decoration: none;
+  letter-spacing: 0.05em;
+  transition: all 0.2s ease;
+  box-shadow: 0 0 14px rgba(34, 211, 238, 0.25);
+}
+
+.resumePill:hover {
+  background: rgba(34, 211, 238, 0.22);
+  transform: translateY(-1px);
+  box-shadow: 0 0 20px rgba(34, 211, 238, 0.4);
+}
+
+.resumeDot {
+  width: 7px;
+  height: 7px;
+  border-radius: var(--r-full);
+  background: var(--neon-cyan);
+  box-shadow: 0 0 8px var(--neon-cyan);
+  animation: beaconPulse 1.5s infinite ease-in-out;
+}
+
+@keyframes beaconPulse {
+  0%, 100% { opacity: 0.4; }
+  50% { opacity: 1; }
+}

@@ -1,0 +1,54 @@
+/* Clue Card — Neo-Noir Evidence Snippet */
+
+.card {
+  position: relative;
+  padding: 1.1rem 1.25rem;
+  background: rgba(18, 20, 32, 0.75);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--border-subtle);
+  border-left: 3px solid var(--neon-cyan);
+  border-radius: var(--r-md);
+  box-shadow: 0 10px 24px -6px rgba(0, 0, 0, 0.5), 0 0 15px rgba(34, 211, 238, 0.1);
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  transition: all 0.2s ease;
+}
+
+.card:hover {
+  border-color: var(--border-glass);
+  border-left-color: var(--neon-cyan);
+  background: rgba(22, 25, 40, 0.85);
+  box-shadow: 0 12px 28px -4px rgba(0, 0, 0, 0.6), 0 0 20px rgba(34, 211, 238, 0.2);
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-family: var(--f-mono);
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--neon-cyan);
+}
+
+.timestamp {
+  font-family: var(--f-mono);
+  font-size: 0.65rem;
+  color: var(--text-muted);
+}
+
+.content {
+  font-size: 0.9rem;
+  line-height: 1.55;
+  color: var(--text-primary);
+}
