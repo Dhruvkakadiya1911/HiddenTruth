@@ -1,11 +1,12 @@
 import { NextResponse } from 'next/server';
 import { supabaseServer } from '@/lib/supabaseServer';
+import { generateDefenseEvaluation } from '@/lib/ai';
 
 // POST: Send chat message in game
 export async function POST(request) {
   try {
     const body = await request.json();
-    const { roomId, playerId, sender, content, round } = body;
+    const { roomId, playerId, sender, content, round, type = 'chat' } = body;
 
     const cleanContent = (content || '').trim();
 
@@ -21,15 +22,20 @@ export async function POST(request) {
       return NextResponse.json({ error: 'Message exceeds 300 characters.' }, { status: 400 });
     }
 
+    // Anonymize witness tips
+    const isAnonymous = type === 'anonymous';
+    const finalSender = isAnonymous ? '🕶️ Anonymous Tip' : (sender || 'Unknown');
+    const finalPlayerId = isAnonymous ? null : (playerId || null);
+
     const { data: message, error } = await supabaseServer
       .from('messages')
       .insert({
         room_id: roomId,
-        player_id: playerId || null,
-        sender: sender || 'Unknown',
+        player_id: finalPlayerId,
+        sender: finalSender,
         content: cleanContent,
         round: round || 1,
-        type: 'chat',
+        type: type || 'chat',
       })
       .select()
       .single();
@@ -37,6 +43,24 @@ export async function POST(request) {
     if (error || !message) {
       console.error('Chat insert error:', error);
       return NextResponse.json({ error: error?.message || 'Failed to send message.' }, { status: 500 });
+    }
+
+    // If this message was a defense on the Hot Seat, trigger dramatic AI Narrator evaluation
+    if (type === 'defense') {
+      try {
+        const { data: room } = await supabaseServer.from('rooms').select('scenario').eq('id', roomId).single();
+        const narratorReaction = await generateDefenseEvaluation(room?.scenario || {}, sender, cleanContent);
+        await supabaseServer.from('messages').insert({
+          room_id: roomId,
+          player_id: null,
+          sender: 'narrator',
+          content: narratorReaction,
+          round: round || 1,
+          type: 'narrator',
+        });
+      } catch (e) {
+        console.warn('Defense AI evaluation notice:', e);
+      }
     }
 
     return NextResponse.json({ success: true, message });

@@ -462,4 +462,103 @@ export async function generateRevealMonologue(scenario, killerName, mostVotedNam
   return defaultFallback;
 }
 
+// Generate confidential forensic scan for Detective's special ability
+export async function generateDetectiveScan(scenario, suspectName, suspectRole, isKiller) {
+  const defaultFallback = isKiller
+    ? {
+        finding: `⚠️ FORENSIC ANOMALY: Microscopic traces consistent with the ${scenario.weapon || 'crime scene'} were identified. ${suspectName}'s stated timeline has a 20-minute gap around the time of the murder!`,
+        confidence: 'HIGHLY SUSPICIOUS',
+        isSuspicious: true,
+      }
+    : {
+        finding: `✓ FORENSIC SCAN CLEAN: No physical residue of the ${scenario.weapon || 'weapon'} found on ${suspectName}. Their attire and physical demeanor corroborate their presence away from the primary murder scene.`,
+        confidence: 'LIKELY INNOCENT',
+        isSuspicious: false,
+      };
+
+  if (!apiKey || apiKey === 'your-gemini-api-key-placeholder') {
+    return defaultFallback;
+  }
+
+  const candidateModels = ['gemini-2.0-flash', 'gemini-1.5-flash', 'gemini-1.5-flash-latest', 'gemini-1.5-pro'];
+
+  const prompt = `You are the lead forensic examiner in a gritty, high-stakes murder mystery party game.
+A detective is conducting a confidential forensic examination on suspect "${suspectName}".
+
+Case Scenario:
+- Title: ${scenario.title || 'The Case'}
+- Victim: ${scenario.victim || 'Victim'}
+- Weapon: ${scenario.weapon || 'Weapon'}
+- Setting: ${scenario.setting || 'Setting'}
+- Target Suspect is ${isKiller ? 'THE ACTUAL KILLER' : 'AN INNOCENT PERSON'}.
+
+Return JSON:
+{
+  "finding": "A punchy, atmospheric 1-2 sentence forensic observation. If killer, mention a subtle physical clue linking them to the crime. If innocent, mention a detail that supports their alibi.",
+  "confidence": "${isKiller ? 'HIGHLY SUSPICIOUS' : 'CLEARED OF WEAPON TRACES'}",
+  "isSuspicious": ${isKiller}
+}`;
+
+  for (const modelName of candidateModels) {
+    try {
+      const genAI = new GoogleGenerativeAI(apiKey);
+      const model = genAI.getGenerativeModel({
+        model: modelName,
+        generationConfig: {
+          responseMimeType: 'application/json',
+          temperature: 0.75,
+        },
+      });
+
+      const result = await model.generateContent(prompt);
+      const responseText = result.response.text();
+      const cleanedJson = responseText.replace(/^```json\s*/i, '').replace(/^```\s*/i, '').replace(/```$/i, '').trim();
+      const parsed = JSON.parse(cleanedJson);
+      if (parsed.finding) return parsed;
+    } catch (err) {
+      console.warn(`Detective scan with ${modelName} failed (${err.message}). Trying next...`);
+    }
+  }
+
+  return defaultFallback;
+}
+
+// Generate AI reaction to a Hot Seat defense
+export async function generateDefenseEvaluation(scenario, suspectName, defenseText) {
+  const defaultFallback = `🎙️ AI Narrator: "${suspectName} passionately pleaded their defense: '${defenseText}'. The room goes dead quiet — do you believe them or is it a calculated lie?"`;
+
+  if (!apiKey || apiKey === 'your-gemini-api-key-placeholder' || !defenseText) {
+    return defaultFallback;
+  }
+
+  const candidateModels = ['gemini-2.0-flash', 'gemini-1.5-flash', 'gemini-1.5-flash-latest', 'gemini-1.5-pro'];
+  const prompt = `You are a dramatic, witty party game narrator.
+Suspect "${suspectName}" was just put on the HOT SEAT and gave this defense:
+"${defenseText}"
+
+Scenario:
+- Victim: ${scenario.victim || 'Victim'}
+- Crime Scene: ${scenario.setting || 'Crime Scene'}
+
+Respond with ONE single dramatic, thrilling sentence (under 25 words) evaluating how the room feels about this defense. Start with: 🎙️ AI Narrator:`;
+
+  for (const modelName of candidateModels) {
+    try {
+      const genAI = new GoogleGenerativeAI(apiKey);
+      const model = genAI.getGenerativeModel({
+        model: modelName,
+        generationConfig: { temperature: 0.8 },
+      });
+
+      const result = await model.generateContent(prompt);
+      const text = result.response.text().trim();
+      if (text) return text;
+    } catch (err) {
+      console.warn(`Defense evaluation with ${modelName} failed (${err.message}). Trying next...`);
+    }
+  }
+
+  return defaultFallback;
+}
+
 
