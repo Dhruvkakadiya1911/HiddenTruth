@@ -1,11 +1,12 @@
 'use client';
 
-import { useState, useEffect, useRef, useMemo } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { usePlayer } from '@/hooks/usePlayer';
 import { useGameState } from '@/hooks/useGameState';
+import NarratorBubble from '@/components/NarratorBubble';
 import ClueCard from '@/components/ClueCard';
 import Timer from '@/components/Timer';
 import LoadingSpinner from '@/components/LoadingSpinner';
@@ -41,10 +42,6 @@ export default function GamePage({ params }) {
   const [accuseReason, setAccuseReason] = useState('');
   const [submittingAccusation, setSubmittingAccusation] = useState(false);
   const [accuseError, setAccuseError] = useState('');
-
-  // ─── NEW INTERACTIVE INVESTIGATION FEATURES ───
-  // Special ability chat modes: 'chat' | 'anonymous' | 'rumor' | 'alibi'
-  const [chatMode, setChatMode] = useState('chat');
 
   const chatBottomRef = useRef(null);
   const chatMessagesRef = useRef(null);
@@ -86,57 +83,6 @@ export default function GamePage({ params }) {
       chatMessagesRef.current.scrollTop = chatMessagesRef.current.scrollHeight;
     }
   }, [messages]);
-
-  // ─── SUSPICION THERMOMETER SCORES ───
-  const suspicionScores = useMemo(() => {
-    const scores = {};
-    messages.filter((m) => m.type === 'reaction').forEach((m) => {
-      try {
-        const data = JSON.parse(m.content);
-        if (!data.targetId) return;
-        if (!scores[data.targetId]) {
-          scores[data.targetId] = { sus: 0, lie: 0, trust: 0, total: 0 };
-        }
-        if (data.reaction === 'sus') {
-          scores[data.targetId].sus += 1;
-          scores[data.targetId].total += 1;
-        } else if (data.reaction === 'lie') {
-          scores[data.targetId].lie += 1;
-          scores[data.targetId].total += 1;
-        } else if (data.reaction === 'trust') {
-          scores[data.targetId].trust += 1;
-          scores[data.targetId].total -= 1;
-        }
-      } catch {}
-    });
-    return scores;
-  }, [messages]);
-
-  const getSuspicionMeta = (targetId) => {
-    const net = suspicionScores[targetId]?.total || 0;
-    if (net <= 0) return { label: '🟢 Clean', badgeClass: s.susClean, score: net };
-    if (net <= 2) return { label: '🟡 Questionable', badgeClass: s.susQuestionable, score: net };
-    return { label: '🔴 Prime Suspect', badgeClass: s.susHigh, score: net };
-  };
-
-  const handleReactToSuspect = async (targetId, reaction) => {
-    if (!room || !player?.id) return;
-    try {
-      await fetch('/api/game/react', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          roomId: room.id,
-          playerId: player.id,
-          sender: player.name,
-          targetId,
-          reaction,
-        }),
-      });
-    } catch (err) {
-      console.error('Failed to react:', err);
-    }
-  };
 
   // Auto-advance countdown state
   const [autoAdvanceSeconds, setAutoAdvanceSeconds] = useState(null);
@@ -240,7 +186,6 @@ export default function GamePage({ params }) {
           sender: player?.name || 'Anonymous',
           content: clean,
           round: room.current_round || 1,
-          type: chatMode,
         }),
       });
 
@@ -250,9 +195,6 @@ export default function GamePage({ params }) {
       }
 
       setChatText('');
-      if (chatMode === 'alibi' || chatMode === 'rumor') {
-        setChatMode('chat');
-      }
     } catch (err) {
       console.error('Error sending chat:', err);
     } finally {
@@ -389,48 +331,7 @@ export default function GamePage({ params }) {
 
   const roundStartedAt = getRoundStartTime();
 
-  // Compute top suspect with highest net suspicion
-  let topSuspectId = null;
-  let maxSusScore = 0;
-  Object.entries(suspicionScores).forEach(([id, scores]) => {
-    if (scores.total > maxSusScore) {
-      maxSusScore = scores.total;
-      topSuspectId = id;
-    }
-  });
-
-  // Contextual one-tap question starters tailored to role
-  const rRole = (currentRole || '').toLowerCase();
-  const victimName = scenario?.victim || 'Julian';
-  let quickQuestionStarters = [];
-  if (rRole.includes('detec')) {
-    quickQuestionStarters = [
-      { icon: '⏱️', label: 'Where were you?', text: `Where was everyone when ${victimName} was killed? Can everyone state their exact location?` },
-      { icon: '🍸', label: 'Who was at the bar?', text: `Who was near the wet bar right before the lights flickered?` },
-      { icon: '👀', label: 'Anyone acting weird?', text: `Did anyone notice a guest whispering or acting unusually nervous earlier?` },
-      { icon: '💼', label: 'Check the timeline!', text: `Someone's story contradicts the crime scene evidence. Speak up now!` },
-    ];
-  } else if (rRole.includes('witn')) {
-    quickQuestionStarters = [
-      { icon: '🕶️', label: 'Saw someone running', text: `I noticed someone wearing dark sleeves hurrying away right around the time of the death.` },
-      { icon: '❓', label: 'Who poured drinks?', text: `Did anyone actually see who served that drink to ${victimName}?` },
-      { icon: '🚨', label: 'Check the bar!', text: `Look closely at who was standing next to the cocktail shaker before the toast!` },
-    ];
-  } else if (rRole.includes('kill')) {
-    quickQuestionStarters = [
-      { icon: '🤷', label: 'I was in the lounge', text: `I was in the lounge chatting with other guests the entire time. Many people saw me!` },
-      { icon: '🤔', label: 'Marcus seems nervous', text: `Wait, why is everyone ignoring the fact that someone walked away from the bar right before?` },
-      { icon: '⚡', label: 'Anyone had a motive', text: `${victimName} made a lot of enemies at this party. Anyone could have done this!` },
-    ];
-  } else {
-    quickQuestionStarters = [
-      { icon: '🛡️', label: 'I am innocent!', text: `I am completely innocent! I was nowhere near the murder scene when it happened.` },
-      { icon: '❓', label: 'Who had the shaker?', text: `Who had access to the silver cocktail shaker? Let's trace it back.` },
-      { icon: '🤝', label: 'Check my alibi', text: `You can corroborate my timeline with anyone who was in the main room with me.` },
-    ];
-  }
-
-  // Role details with case-insensitive normalization & clear gameplay objectives
+  // Role details with case-insensitive normalization
   const getRoleBadge = (role) => {
     const r = (role || '').toLowerCase();
     if (r.includes('kill')) {
@@ -439,8 +340,6 @@ export default function GamePage({ params }) {
         icon: '🩸',
         cardClass: s.roleCardKiller,
         titleClass: s.roleKiller,
-        missionTitle: 'Misdirect the Room',
-        missionGoal: 'Deflect suspicion onto someone else! Agree with false theories, plant rumors, and make sure an innocent suspect takes the blame.',
       };
     }
     if (r.includes('detec')) {
@@ -449,8 +348,6 @@ export default function GamePage({ params }) {
         icon: '🔍',
         cardClass: s.roleCardDetective,
         titleClass: s.roleDetective,
-        missionTitle: 'Find the Real Killer',
-        missionGoal: 'Interrogate suspects in chat! Ask where everyone was around the time of the murder, look for contradictions in their timelines, and point the finger.',
       };
     }
     if (r.includes('witn')) {
@@ -459,8 +356,6 @@ export default function GamePage({ params }) {
         icon: '👁️',
         cardClass: s.roleCardWitness,
         titleClass: s.roleWitness,
-        missionTitle: 'Help the Detective Secretly',
-        missionGoal: 'Drop subtle hints or send Anonymous Tips in chat about what you witnessed without exposing yourself to the killer!',
       };
     }
     return {
@@ -468,8 +363,6 @@ export default function GamePage({ params }) {
       icon: '🎭',
       cardClass: s.roleCardSuspect,
       titleClass: s.roleSuspect,
-      missionTitle: 'Defend Your Innocence',
-      missionGoal: 'Explain your alibi, challenge false accusations, and cooperate with other players to uncover the real culprit.',
     };
   };
 
@@ -484,11 +377,11 @@ export default function GamePage({ params }) {
         <div className={s.orbViolet} />
       </div>
 
-      {/* Game Status Sub-Bar */}
+      {/* Top Nav */}
       <header className={s.topNav}>
         <div className={s.navLeft}>
+          <span className={s.codeBadge}>ROOM {roomCode}</span>
           <span className={s.roundBadge}>ROUND {currentRound} OF {maxRounds}</span>
-          <span className={s.phaseTag}>💬 ACTIVE INVESTIGATION</span>
         </div>
         <Timer
           totalSeconds={TIMER_CONFIG.ROUND_DURATION_SECONDS}
@@ -497,17 +390,14 @@ export default function GamePage({ params }) {
           resetTrigger={currentRound}
           onTimeUp={handleRoundTimeUp}
           showExpiredBanner={false}
-          expiredText="Discussion Open"
         />
-        <div className={s.navRight}>
-          <button
-            type="button"
-            className={s.btnAccuseTriggerNav}
-            onClick={handleOpenAccuse}
-          >
-            🚨 Point Finger
-          </button>
-        </div>
+        <button
+          type="button"
+          onClick={handleLeaveGame}
+          className={s.leaveBtn}
+        >
+          Exit
+        </button>
       </header>
 
       {/* Auto-Advance Emergency Banner */}
@@ -573,35 +463,6 @@ export default function GamePage({ params }) {
             )}
           </motion.div>
 
-          {/* Revealed Evidence Clues */}
-          <motion.div
-            className={s.cluesContainer}
-            initial={{ opacity: 0, y: 15 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.1 }}
-          >
-            <div className={s.sectionTitle}>
-              <span>📁 Revealed Evidence</span>
-              <span style={{ fontSize: '0.75rem', fontFamily: 'var(--f-mono)', color: 'var(--neon-cyan)' }}>
-                {uniqueClues.length} Discovered
-              </span>
-            </div>
-
-            <div className={s.cluesList}>
-              <AnimatePresence>
-                {uniqueClues.length === 0 ? (
-                  <div style={{ color: 'var(--text-muted)', fontSize: '0.85rem' }}>
-                    Searching crime scene for initial clues...
-                  </div>
-                ) : (
-                  uniqueClues.map((c, idx) => (
-                    <ClueCard key={c.id || idx} clue={c} index={idx} />
-                  ))
-                )}
-              </AnimatePresence>
-            </div>
-          </motion.div>
-
           {/* Secret Role Reveal Card */}
           <motion.div
             className={`${s.roleCard} ${roleMeta.cardClass}`}
@@ -641,95 +502,7 @@ export default function GamePage({ params }) {
                 secretInfo
               )}
             </div>
-
-            {/* Clear Gameplay Mission Objective */}
-            <div className={s.missionBox}>
-              <div className={s.missionHeader}>
-                <span className={s.missionIcon}>🎯</span>
-                <span className={s.missionTitle}>CURRENT MISSION: {roleMeta.missionTitle}</span>
-              </div>
-              <p className={s.missionText}>{roleMeta.missionGoal}</p>
-            </div>
           </motion.div>
-
-          {/* Role Special Power Action Card */}
-          {currentRole.toLowerCase().includes('witn') && (
-            <motion.div
-              className={s.roleAbilityCard}
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              style={{ borderColor: 'rgba(168, 85, 247, 0.4)' }}
-            >
-              <div className={s.roleAbilityHeader}>
-                <span className={s.roleAbilityBadge} style={{ color: '#c084fc' }}>👁️ Witness Superpower</span>
-                <span style={{ fontSize: '0.72rem', color: '#c084fc', fontFamily: 'var(--f-mono)' }}>Anonymous</span>
-              </div>
-              <p style={{ fontSize: '0.78rem', color: 'var(--text-secondary)', margin: 0 }}>
-                You can send confidential whistleblower tips to the room without revealing your identity!
-              </p>
-              <button
-                type="button"
-                className={s.btnAbilityAction}
-                style={{ borderColor: '#a855f7', background: 'rgba(168, 85, 247, 0.2)' }}
-                onClick={() => setChatMode(chatMode === 'anonymous' ? 'chat' : 'anonymous')}
-              >
-                <span>🕶️</span>
-                <span>{chatMode === 'anonymous' ? '✓ Anonymous Tip Active' : 'Send Anonymous Tip 🕶️'}</span>
-              </button>
-            </motion.div>
-          )}
-
-          {currentRole.toLowerCase().includes('kill') && (
-            <motion.div
-              className={s.roleAbilityCard}
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              style={{ borderColor: 'rgba(239, 68, 68, 0.4)' }}
-            >
-              <div className={s.roleAbilityHeader}>
-                <span className={s.roleAbilityBadge} style={{ color: '#f87171' }}>🩸 Killer Mind Games</span>
-                <span style={{ fontSize: '0.72rem', color: '#f87171', fontFamily: 'var(--f-mono)' }}>Misdirection</span>
-              </div>
-              <p style={{ fontSize: '0.78rem', color: 'var(--text-secondary)', margin: 0 }}>
-                Plant deceptive rumors in the chat feed to deflect suspicion onto an innocent friend!
-              </p>
-              <button
-                type="button"
-                className={s.btnAbilityAction}
-                style={{ borderColor: '#ef4444', background: 'rgba(239, 68, 68, 0.2)' }}
-                onClick={() => setChatMode(chatMode === 'rumor' ? 'chat' : 'rumor')}
-              >
-                <span>🎭</span>
-                <span>{chatMode === 'rumor' ? '✓ Plant Rumor Active' : 'Plant Deceptive Rumor 🎭'}</span>
-              </button>
-            </motion.div>
-          )}
-
-          {!currentRole.toLowerCase().includes('kill') && !currentRole.toLowerCase().includes('detec') && !currentRole.toLowerCase().includes('witn') && (
-            <motion.div
-              className={s.roleAbilityCard}
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              style={{ borderColor: 'rgba(234, 179, 8, 0.4)' }}
-            >
-              <div className={s.roleAbilityHeader}>
-                <span className={s.roleAbilityBadge} style={{ color: '#fbbf24' }}>🛡️ Suspect Defense</span>
-                <span style={{ fontSize: '0.72rem', color: '#fbbf24', fontFamily: 'var(--f-mono)' }}>Self-Preservation</span>
-              </div>
-              <p style={{ fontSize: '0.78rem', color: 'var(--text-secondary)', margin: 0 }}>
-                Highlight your innocence with a formal verified alibi statement in the discussion thread.
-              </p>
-              <button
-                type="button"
-                className={s.btnAbilityAction}
-                style={{ borderColor: '#eab308', background: 'rgba(234, 179, 8, 0.2)' }}
-                onClick={() => setChatMode(chatMode === 'alibi' ? 'chat' : 'alibi')}
-              >
-                <span>🛡️</span>
-                <span>{chatMode === 'alibi' ? '✓ Alibi Mode Active' : 'Declare Verified Alibi 🛡️'}</span>
-              </button>
-            </motion.div>
-          )}
 
           {/* Host Round Controls */}
           {isHost && (
@@ -767,86 +540,42 @@ export default function GamePage({ params }) {
               </button>
             </motion.div>
           )}
+
+          {/* AI Narrator Monologue */}
+          <NarratorBubble
+            message={scenario.intro}
+            round={currentRound}
+          />
         </div>
 
-        {/* Right Column: Suspects Roster & Live Interrogation Chat */}
+        {/* Right Column: Evidence, Chat Discussion & Suspects Roster */}
         <div className={s.rightCol}>
-          {/* Suspects Roster with Live Suspicion Thermometer & Quick Reactions */}
+          {/* Active Clues */}
           <motion.div
-            className={s.rosterContainer}
+            className={s.cluesContainer}
             initial={{ opacity: 0, y: 15 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.2 }}
+            transition={{ duration: 0.5, delay: 0.25 }}
           >
             <div className={s.sectionTitle}>
-              <span>👥 Suspects Present ({players.length})</span>
-              <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', fontFamily: 'var(--f-mono)' }}>
-                Live Suspicion Meter
+              <span>📁 Revealed Evidence</span>
+              <span style={{ fontSize: '0.75rem', fontFamily: 'var(--f-mono)', color: 'var(--neon-cyan)' }}>
+                {uniqueClues.length} Discovered
               </span>
             </div>
 
-            <div className={s.suspectListGame}>
-              {players.map((p) => {
-                const isMe = p.id === player?.id;
-                const susMeta = getSuspicionMeta(p.id);
-                const isTopSuspect = topSuspectId === p.id && !isMe;
-
-                return (
-                  <div key={p.id} className={`${s.suspectRowCard} ${isTopSuspect ? s.topSuspectCard : ''}`}>
-                    <div className={s.suspectRowLeft}>
-                      <div className={s.suspectAvatarSmall}>
-                        {p.name.charAt(0).toUpperCase()}
-                      </div>
-                      <div className={s.suspectNameMeta}>
-                        <div className={s.suspectNameText}>
-                          <span>{p.name}</span>
-                          {p.is_host && <span>👑</span>}
-                          {isMe && <span style={{ color: 'var(--neon-cyan)', fontSize: '0.75rem' }}>(You)</span>}
-                          {isTopSuspect && <span className={s.topSuspectBadge}>🔥 PRIME SUSPECT</span>}
-                        </div>
-                        <div className={`${s.susMeterPill} ${susMeta.badgeClass}`}>
-                          <span>{susMeta.label}</span>
-                          {susMeta.score !== 0 && (
-                            <span style={{ opacity: 0.8 }}>({susMeta.score > 0 ? `+${susMeta.score}` : susMeta.score})</span>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-
-                    {!isMe && (
-                      <div className={s.reactionGroup}>
-                        <button
-                          type="button"
-                          className={`${s.btnReactIcon} ${s.btnReactSus}`}
-                          onClick={() => handleReactToSuspect(p.id, 'sus')}
-                          title="Flag as Suspicious (+1 Sus)"
-                        >
-                          <span>🚨</span>
-                          <span className={s.reactBtnLabel}>Sus</span>
-                        </button>
-                        <button
-                          type="button"
-                          className={`${s.btnReactIcon} ${s.btnReactLie}`}
-                          onClick={() => handleReactToSuspect(p.id, 'lie')}
-                          title="Call out Lie (+1 Sus)"
-                        >
-                          <span>🤥</span>
-                          <span className={s.reactBtnLabel}>Lie</span>
-                        </button>
-                        <button
-                          type="button"
-                          className={`${s.btnReactIcon} ${s.btnReactTrust}`}
-                          onClick={() => handleReactToSuspect(p.id, 'trust')}
-                          title="Vouch / Trust (-1 Sus)"
-                        >
-                          <span>🤝</span>
-                          <span className={s.reactBtnLabel}>Trust</span>
-                        </button>
-                      </div>
-                    )}
+            <div className={s.cluesList}>
+              <AnimatePresence>
+                {uniqueClues.length === 0 ? (
+                  <div style={{ color: 'var(--text-muted)', fontSize: '0.85rem' }}>
+                    Searching crime scene for initial clues...
                   </div>
-                );
-              })}
+                ) : (
+                  uniqueClues.map((c, idx) => (
+                    <ClueCard key={c.id || idx} clue={c} index={idx} />
+                  ))
+                )}
+              </AnimatePresence>
             </div>
           </motion.div>
 
@@ -855,7 +584,7 @@ export default function GamePage({ params }) {
             className={s.chatContainer}
             initial={{ opacity: 0, y: 15 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.25 }}
+            transition={{ duration: 0.5, delay: 0.3 }}
           >
             <div className={s.sectionTitle}>
               <span>💬 Interrogation & Discussion</span>
@@ -869,50 +598,44 @@ export default function GamePage({ params }) {
             </div>
 
             <div ref={chatMessagesRef} className={s.chatFeed}>
-              {messages.filter((m) => m.type !== 'reaction').length === 0 ? (
+              {messages.length === 0 ? (
                 <div style={{ color: 'var(--text-muted)', fontSize: '0.82rem', textAlign: 'center', padding: '1rem' }}>
                   No messages yet. Ask someone where they were or defend yourself!
                 </div>
               ) : (
-                messages.filter((m) => m.type !== 'reaction').map((m) => {
+                messages.map((m) => {
                   const isNarrator = m.type === 'narrator' || m.sender === 'narrator';
                   const isAccusation = m.type === 'accusation';
-                  const isAnonymous = m.type === 'anonymous';
-                  const isRumor = m.type === 'rumor';
-                  const isAlibi = m.type === 'alibi';
-                  const isSystem = m.type === 'system';
                   const isMe = m.player_id === player?.id;
-
-                  let bubbleClass = s.bubbleOther;
-                  if (isAccusation) bubbleClass = s.bubbleAccusation;
-                  else if (isAnonymous) bubbleClass = s.bubbleAnonymous;
-                  else if (isRumor) bubbleClass = s.bubbleRumor;
-                  else if (isAlibi) bubbleClass = s.bubbleAlibi;
-                  else if (isSystem) bubbleClass = s.bubbleSystem;
-                  else if (isNarrator) bubbleClass = s.bubbleNarrator;
-                  else if (isMe) bubbleClass = s.bubbleMe;
 
                   return (
                     <div
                       key={m.id}
                       className={`${s.msgRow} ${
-                        isAccusation || isNarrator || isSystem
+                        isAccusation || isNarrator
                           ? s.msgRowNarrator
                           : isMe
                           ? s.msgRowMe
                           : s.msgRowOther
                       }`}
                     >
-                      {!isNarrator && !isAccusation && !isSystem && (
+                      {!isNarrator && !isAccusation && (
                         <span className={s.msgSender}>
                           {isMe ? 'You' : m.sender}
                         </span>
                       )}
-                      <div className={`${s.msgBubble} ${bubbleClass}`}>
+                      <div
+                        className={`${s.msgBubble} ${
+                          isAccusation
+                            ? s.bubbleAccusation
+                            : isNarrator
+                            ? s.bubbleNarrator
+                            : isMe
+                            ? s.bubbleMe
+                            : s.bubbleOther
+                        }`}
+                      >
                         {isNarrator && <strong>🎙️ AI Narrator: </strong>}
-                        {isAnonymous && <strong>🕶️ ANONYMOUS TIP: </strong>}
-                        {isRumor && <strong>🎭 PLANTED RUMOR: </strong>}
-                        {isAlibi && <strong>🛡️ VERIFIED ALIBI: </strong>}
                         {m.content}
                       </div>
                     </div>
@@ -922,54 +645,12 @@ export default function GamePage({ params }) {
               <div ref={chatBottomRef} />
             </div>
 
-            {/* Active Special Ability indicator pill */}
-            {chatMode !== 'chat' && (
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0.35rem 0.65rem', background: 'rgba(255,255,255,0.05)', borderRadius: '4px', fontSize: '0.75rem', fontFamily: 'var(--f-mono)' }}>
-                <span style={{ color: chatMode === 'anonymous' ? '#c084fc' : chatMode === 'rumor' ? '#f87171' : '#fbbf24' }}>
-                  Active Mode: <strong>{chatMode === 'anonymous' ? '🕶️ Anonymous Tip' : chatMode === 'rumor' ? '🎭 Plant Rumor' : '🛡️ Verified Alibi'}</strong>
-                </span>
-                <button
-                  type="button"
-                  onClick={() => setChatMode('chat')}
-                  style={{ background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', fontSize: '0.75rem' }}
-                >
-                  ✕ Normal Chat
-                </button>
-              </div>
-            )}
-
-            {/* Quick Question Starter Chips */}
-            <div className={s.quickChipsRow}>
-              <span className={s.quickChipsLabel}>💡 Quick Ask:</span>
-              <div className={s.quickChipsList}>
-                {quickQuestionStarters.map((q, idx) => (
-                  <button
-                    key={idx}
-                    type="button"
-                    className={s.quickChip}
-                    onClick={() => setChatText(q.text)}
-                    title={`Click to ask: "${q.text}"`}
-                  >
-                    <span>{q.icon}</span>
-                    <span>{q.label}</span>
-                  </button>
-                ))}
-              </div>
-            </div>
 
             <form onSubmit={handleSendMessage} className={s.chatInputForm}>
               <input
                 type="text"
                 className={s.chatInput}
-                placeholder={
-                  chatMode === 'anonymous'
-                    ? 'Type an anonymous whistleblower tip...'
-                    : chatMode === 'rumor'
-                    ? 'Plant a deceptive rumor into the discussion...'
-                    : chatMode === 'alibi'
-                    ? 'Declare your verified alibi...'
-                    : 'Ask someone where they were, or defend yourself...'
-                }
+                placeholder="Ask someone where they were, or defend yourself..."
                 value={chatText}
                 onChange={(e) => setChatText(e.target.value)}
                 maxLength={300}
@@ -983,6 +664,26 @@ export default function GamePage({ params }) {
                 Send
               </button>
             </form>
+          </motion.div>
+
+          {/* Suspects Roster */}
+          <motion.div
+            className={s.rosterContainer}
+            initial={{ opacity: 0, y: 15 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.35 }}
+          >
+            <div className={s.sectionTitle}>
+              <span>👥 Suspects Present</span>
+            </div>
+            <div className={s.rosterGrid}>
+              {players.map((p) => (
+                <div key={p.id} className={s.rosterChip}>
+                  {p.is_host && '👑 '}
+                  {p.name} {p.id === player?.id && '(You)'}
+                </div>
+              ))}
+            </div>
           </motion.div>
         </div>
       </main>
