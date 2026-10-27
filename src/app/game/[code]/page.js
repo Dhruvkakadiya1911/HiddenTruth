@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { usePlayer } from '@/hooks/usePlayer';
 import { useGameState } from '@/hooks/useGameState';
+import NarratorBubble from '@/components/NarratorBubble';
 import ClueCard from '@/components/ClueCard';
 import Timer from '@/components/Timer';
 import LoadingSpinner from '@/components/LoadingSpinner';
@@ -285,15 +286,7 @@ export default function GamePage({ params }) {
     : null;
 
   const currentRole = currentPlayer?.role || assignedFromScenario?.role || ROLES.SUSPECT;
-  const rawSecretInfo = currentPlayer?.secret_info || assignedFromScenario?.secretInfo || 'Await your confidential briefing...';
-  const cleanSecretInfo = (info) => {
-    if (!info) return 'Tap to reveal your private briefing...';
-    return info
-      .replace(/^YOU ARE THE (DETECTIVE|KILLER|WITNESS|PRIME SUSPECT|SUSPECT)[.:\s-]*/i, '')
-      .replace(/^ROLE:\s*[A-Za-z\s]+[.:\s-]*/i, '')
-      .trim();
-  };
-  const secretInfo = cleanSecretInfo(rawSecretInfo);
+  const secretInfo = currentPlayer?.secret_info || assignedFromScenario?.secretInfo || 'Await your confidential briefing...';
   const isHost = player?.isHost && (player?.roomId === room?.id || player?.roomCode === roomCode);
 
   const currentRound = room.current_round || 1;
@@ -460,13 +453,14 @@ export default function GamePage({ params }) {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
           >
-            <div className={s.scenarioMetaRow}>
-              <span className={s.settingTag}>📍 {scenario.setting || 'Classified Location'}</span>
-              {scenario.victim && (
-                <span className={s.victimPill}>💀 Victim: <strong>{scenario.victim}</strong></span>
-              )}
-            </div>
+            <span className={s.settingTag}>{scenario.setting || 'Classified Location'}</span>
             <h1 className={s.mysteryTitle}>{scenario.title || 'Murder Mystery Investigation'}</h1>
+            {scenario.victim && (
+              <div className={s.victimBar}>
+                <span className={s.victimIcon}>💀</span>
+                <span>Victim: <strong>{scenario.victim}</strong></span>
+              </div>
+            )}
           </motion.div>
 
           {/* Secret Role Reveal Card */}
@@ -547,6 +541,15 @@ export default function GamePage({ params }) {
             </motion.div>
           )}
 
+          {/* AI Narrator Monologue */}
+          <NarratorBubble
+            message={scenario.intro}
+            round={currentRound}
+          />
+        </div>
+
+        {/* Right Column: Evidence, Chat Discussion & Suspects Roster */}
+        <div className={s.rightCol}>
           {/* Active Clues */}
           <motion.div
             className={s.cluesContainer}
@@ -555,7 +558,7 @@ export default function GamePage({ params }) {
             transition={{ duration: 0.5, delay: 0.25 }}
           >
             <div className={s.sectionTitle}>
-              <span>📁 Evidence</span>
+              <span>📁 Revealed Evidence</span>
               <span style={{ fontSize: '0.75rem', fontFamily: 'var(--f-mono)', color: 'var(--neon-cyan)' }}>
                 {uniqueClues.length} Discovered
               </span>
@@ -584,7 +587,7 @@ export default function GamePage({ params }) {
             transition={{ duration: 0.5, delay: 0.3 }}
           >
             <div className={s.sectionTitle}>
-              <span>💬 Room Chat</span>
+              <span>💬 Interrogation & Discussion</span>
               <button
                 type="button"
                 className={s.btnAccuseTrigger}
@@ -597,7 +600,7 @@ export default function GamePage({ params }) {
             <div ref={chatMessagesRef} className={s.chatFeed}>
               {messages.length === 0 ? (
                 <div style={{ color: 'var(--text-muted)', fontSize: '0.82rem', textAlign: 'center', padding: '1rem' }}>
-                  No messages yet. Ask suspects about their alibi!
+                  No messages yet. Ask someone where they were or defend yourself!
                 </div>
               ) : (
                 messages.map((m) => {
@@ -642,11 +645,12 @@ export default function GamePage({ params }) {
               <div ref={chatBottomRef} />
             </div>
 
+
             <form onSubmit={handleSendMessage} className={s.chatInputForm}>
               <input
                 type="text"
                 className={s.chatInput}
-                placeholder="Send a message to the room..."
+                placeholder="Ask someone where they were, or defend yourself..."
                 value={chatText}
                 onChange={(e) => setChatText(e.target.value)}
                 maxLength={300}
@@ -670,7 +674,7 @@ export default function GamePage({ params }) {
             transition={{ duration: 0.5, delay: 0.35 }}
           >
             <div className={s.sectionTitle}>
-              <span>👥 Suspects ({players.length})</span>
+              <span>👥 Suspects Present</span>
             </div>
             <div className={s.rosterGrid}>
               {players.map((p) => (
