@@ -1,12 +1,11 @@
-/* Player Card — Cinematic Mystery Lobby Item */
-/* Palette: Charcoal, Earth Brown, Burnt Amber */
+/* Player Card — Neo-Noir Lobby Item */
 
 .card {
   display: flex;
   align-items: center;
   justify-content: space-between;
   padding: 0.9rem 1.1rem;
-  background: rgba(22, 19, 14, 0.85);
+  background: rgba(18, 20, 32, 0.7);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   border: 1px solid var(--border-subtle);
@@ -15,13 +14,13 @@
 }
 
 .card:hover {
-  border-color: var(--border-amber);
-  background: rgba(35, 29, 21, 0.95);
+  border-color: var(--border-glass);
+  background: rgba(22, 25, 40, 0.85);
 }
 
 .isCurrent {
-  border-color: var(--border-amber);
-  box-shadow: 0 0 15px var(--burnt-amber-soft);
+  border-color: rgba(34, 211, 238, 0.4);
+  box-shadow: 0 0 15px rgba(34, 211, 238, 0.15);
 }
 
 .left {
@@ -34,21 +33,21 @@
   width: 40px;
   height: 40px;
   border-radius: var(--r-sm);
-  background: linear-gradient(135deg, var(--color-burnt-amber), var(--color-earth-brown));
-  border: 1px solid var(--border-amber);
+  background: linear-gradient(135deg, rgba(255, 42, 81, 0.2), rgba(168, 85, 247, 0.3));
+  border: 1px solid var(--border-glass);
   display: flex;
   align-items: center;
   justify-content: center;
   font-family: var(--f-display);
   font-weight: 800;
   font-size: 1.1rem;
-  color: #090907;
+  color: var(--text-primary);
   text-transform: uppercase;
 }
 
 .avatarHost {
-  background: linear-gradient(135deg, var(--burnt-amber-bright), var(--color-burnt-amber));
-  border-color: var(--color-burnt-amber);
+  background: linear-gradient(135deg, rgba(251, 191, 36, 0.3), rgba(255, 42, 81, 0.3));
+  border-color: rgba(251, 191, 36, 0.5);
 }
 
 .info {
@@ -73,9 +72,9 @@
 .youTag {
   font-family: var(--f-mono);
   font-size: 0.65rem;
-  color: var(--color-burnt-amber);
+  color: var(--neon-cyan);
   padding: 0.1rem 0.4rem;
-  background: rgba(185, 157, 115, 0.15);
+  background: rgba(34, 211, 238, 0.12);
   border-radius: var(--r-full);
 }
 
@@ -96,10 +95,10 @@
   align-items: center;
   gap: 0.3rem;
   padding: 0.25rem 0.6rem;
-  background: rgba(108, 86, 54, 0.2);
-  border: 1px solid var(--border-amber);
+  background: rgba(251, 191, 36, 0.12);
+  border: 1px solid rgba(251, 191, 36, 0.35);
   border-radius: var(--r-full);
-  color: var(--color-burnt-amber);
+  color: var(--neon-amber);
   font-family: var(--f-mono);
   font-size: 0.65rem;
   font-weight: 700;
@@ -111,6 +110,6 @@
   width: 8px;
   height: 8px;
   border-radius: 50%;
-  background: var(--color-burnt-amber);
-  box-shadow: 0 0 8px var(--burnt-amber-glow);
+  background: #10b981;
+  box-shadow: 0 0 8px #10b981;
 }

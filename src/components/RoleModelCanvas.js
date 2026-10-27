@@ -9,26 +9,26 @@ import s from './RoleModelCanvas.module.css';
 /* ═══════════════════════════════════════════════════════════════════════════ */
 const ROLE_CONFIGS = {
   detective: {
-    accent: 0xB99D73,
-    accentHex: '#B99D73',
+    accent: 0x22d3ee,
+    accentHex: '#22d3ee',
     glowClass: s.glowDetective,
     label: 'The Detective',
   },
   killer: {
-    accent: 0xc94a4a,
-    accentHex: '#c94a4a',
+    accent: 0xff1744,
+    accentHex: '#ff1744',
     glowClass: s.glowKiller,
     label: 'The Killer',
   },
   suspect: {
-    accent: 0x856c46,
-    accentHex: '#856c46',
+    accent: 0xa855f7,
+    accentHex: '#a855f7',
     glowClass: s.glowSuspect,
     label: 'Prime Suspect',
   },
   witness: {
-    accent: 0xd6be96,
-    accentHex: '#d6be96',
+    accent: 0xfbbf24,
+    accentHex: '#fbbf24',
     glowClass: s.glowWitness,
     label: 'The Witness',
   },

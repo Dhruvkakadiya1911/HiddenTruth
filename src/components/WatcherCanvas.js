@@ -381,29 +381,29 @@ export default function WatcherCanvas() {
     rightLapel.rotation.y = -0.28;
     characterGroup.add(rightLapel);
 
-    // 3. Cinematic Detective Studio Lighting (Burnt Amber & Earth Brown)
-    const ambientLight = new THREE.AmbientLight(0x16130e, 1.6);
+    // 3. High-Contrast Neo-Noir Studio Lighting
+    const ambientLight = new THREE.AmbientLight(0x181c2e, 1.4);
     scene.add(ambientLight);
 
-    const keyLight = new THREE.DirectionalLight(0xfaf7f2, 2.5);
+    const keyLight = new THREE.DirectionalLight(0xdbeafe, 2.8);
     keyLight.position.set(0, 2.5, 3.5);
     scene.add(keyLight);
 
-    const topLight = new THREE.PointLight(0xB99D73, 4.0, 7);
+    const topLight = new THREE.PointLight(0x38bdf8, 4.2, 7);
     topLight.position.set(0, 3.0, 0.6);
     scene.add(topLight);
 
-    const amberRimLight = new THREE.PointLight(0xB99D73, 9.5, 9);
-    amberRimLight.position.set(-2.2, 0.6, 1.0);
-    scene.add(amberRimLight);
+    const redRimLight = new THREE.PointLight(0xff2a51, 9.5, 9);
+    redRimLight.position.set(-2.2, 0.6, 1.0);
+    scene.add(redRimLight);
 
-    const earthRimLight = new THREE.PointLight(0x856c46, 8.5, 9);
-    earthRimLight.position.set(2.2, 0.6, 1.0);
-    scene.add(earthRimLight);
+    const cyanRimLight = new THREE.PointLight(0x00f0ff, 9.0, 9);
+    cyanRimLight.position.set(2.2, 0.6, 1.0);
+    scene.add(cyanRimLight);
 
-    const warmBackLight = new THREE.PointLight(0xd6be96, 5.5, 8);
-    warmBackLight.position.set(0, 1.5, -2.0);
-    scene.add(warmBackLight);
+    const violetBackLight = new THREE.PointLight(0xa855f7, 6.0, 8);
+    violetBackLight.position.set(0, 1.5, -2.0);
+    scene.add(violetBackLight);
 
     // 4. Interactive Cursor Tracking & Animation Loop
     let targetRotY = 0;

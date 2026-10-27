@@ -1,5 +1,4 @@
-/* Game Screen Layout — Cinematic Mystery Dashboard */
-/* Palette: Charcoal, Earth Brown, Burnt Amber */
+/* Game Screen Layout — Neo-Noir Thriller Dashboard */
 
 .page {
   position: relative;
@@ -9,7 +8,6 @@
   flex-direction: column;
   padding: 1.25rem 1rem 2rem;
   overflow-x: hidden;
-  background: var(--bg-void);
 }
 
 /* Background layers */
@@ -24,8 +22,8 @@
   position: absolute;
   inset: 0;
   background-image:
-    linear-gradient(to right, rgba(185, 157, 115, 0.04) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(185, 157, 115, 0.04) 1px, transparent 1px);
+    linear-gradient(to right, rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
   background-size: 50px 50px;
   mask-image: radial-gradient(ellipse 70% 60% at 50% 50%, black, transparent);
 }
@@ -38,7 +36,7 @@
   top: -120px;
   left: 50%;
   transform: translateX(-50%);
-  background: radial-gradient(circle, rgba(185, 157, 115, 0.18) 0%, transparent 65%);
+  background: radial-gradient(circle, rgba(255, 42, 81, 0.2) 0%, transparent 65%);
   filter: blur(65px);
 }
 
@@ -49,7 +47,7 @@
   border-radius: 50%;
   bottom: -60px;
   right: -50px;
-  background: radial-gradient(circle, rgba(108, 86, 54, 0.22) 0%, transparent 65%);
+  background: radial-gradient(circle, rgba(168, 85, 247, 0.16) 0%, transparent 65%);
   filter: blur(70px);
 }
 
@@ -76,10 +74,10 @@
   font-size: 0.75rem;
   font-weight: 700;
   padding: 0.35rem 0.75rem;
-  background: rgba(108, 86, 54, 0.15);
+  background: rgba(255, 255, 255, 0.05);
   border: 1px solid var(--border-subtle);
   border-radius: var(--r-full);
-  color: var(--color-burnt-amber);
+  color: var(--text-primary);
   letter-spacing: 0.08em;
 }
 
@@ -88,10 +86,10 @@
   font-size: 0.75rem;
   font-weight: 700;
   padding: 0.35rem 0.75rem;
-  background: rgba(185, 157, 115, 0.15);
-  border: 1px solid var(--border-amber);
+  background: rgba(255, 42, 81, 0.12);
+  border: 1px solid rgba(255, 42, 81, 0.35);
   border-radius: var(--r-full);
-  color: var(--color-burnt-amber);
+  color: var(--neon-red-soft);
 }
 
 .leaveBtn {
@@ -107,8 +105,8 @@
 }
 
 .leaveBtn:hover {
-  color: var(--neon-red-soft);
-  background: rgba(201, 74, 74, 0.15);
+  color: var(--text-primary);
+  background: rgba(255, 255, 255, 0.05);
 }
 
 /* Auto-Advance Emergency Banner */
@@ -119,12 +117,12 @@
   max-width: 1200px;
   margin: 0 auto 1.5rem;
   padding: 0.85rem 1.25rem;
-  background: linear-gradient(135deg, rgba(108, 86, 54, 0.3), rgba(22, 19, 14, 0.95));
+  background: linear-gradient(135deg, rgba(255, 42, 81, 0.18), rgba(18, 20, 32, 0.95));
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
-  border: 1px solid var(--border-amber);
+  border: 1px solid var(--neon-red);
   border-radius: var(--r-lg);
-  box-shadow: 0 0 35px var(--burnt-amber-glow);
+  box-shadow: 0 0 35px rgba(255, 42, 81, 0.35);
   display: flex;
   align-items: center;
   gap: 1rem;
@@ -134,12 +132,12 @@
 
 @keyframes bannerPulse {
   0% {
-    box-shadow: 0 0 20px rgba(185, 157, 115, 0.25);
-    border-color: rgba(185, 157, 115, 0.5);
+    box-shadow: 0 0 20px rgba(255, 42, 81, 0.25);
+    border-color: rgba(255, 42, 81, 0.6);
   }
   100% {
-    box-shadow: 0 0 40px rgba(185, 157, 115, 0.55);
-    border-color: var(--color-burnt-amber);
+    box-shadow: 0 0 40px rgba(255, 42, 81, 0.55);
+    border-color: var(--neon-red);
   }
 }
 
@@ -149,7 +147,7 @@
   left: 0;
   right: 0;
   height: 2px;
-  background: linear-gradient(90deg, transparent, var(--color-burnt-amber), var(--color-earth-brown), transparent);
+  background: linear-gradient(90deg, transparent, var(--neon-red), var(--neon-amber), transparent);
 }
 
 .autoAdvanceIcon {
@@ -176,7 +174,7 @@
   font-weight: 800;
   letter-spacing: 0.08em;
   color: #fff;
-  text-shadow: 0 0 10px var(--burnt-amber-glow);
+  text-shadow: 0 0 10px rgba(255, 42, 81, 0.6);
 }
 
 .autoAdvanceSub {
@@ -191,23 +189,23 @@
   min-width: 44px;
   height: 44px;
   border-radius: var(--r-full);
-  background: rgba(185, 157, 115, 0.2);
-  border: 1px solid var(--border-amber);
+  background: rgba(255, 42, 81, 0.25);
+  border: 1px solid var(--neon-red);
   font-family: var(--f-mono);
   font-size: 1.15rem;
   font-weight: 900;
-  color: var(--color-burnt-amber);
-  text-shadow: 0 0 12px var(--color-burnt-amber);
-  box-shadow: 0 0 16px var(--burnt-amber-glow);
+  color: #ff8598;
+  text-shadow: 0 0 12px var(--neon-red);
+  box-shadow: 0 0 16px rgba(255, 42, 81, 0.4);
 }
 
 .btnAdvanceNow {
-  padding: 0.55rem 1.1rem;
-  background: linear-gradient(135deg, #B99D73, #8e734c);
-  color: #090907;
+  padding: 0.5rem 1rem;
+  background: var(--neon-red);
+  color: #fff;
   font-family: var(--f-mono);
   font-size: 0.75rem;
-  font-weight: 800;
+  font-weight: 700;
   border: none;
   border-radius: var(--r-md);
   cursor: pointer;
@@ -217,9 +215,9 @@
 }
 
 .btnAdvanceNow:hover:not(:disabled) {
+  background: #ff3b61;
   transform: translateY(-1px);
-  box-shadow: 0 0 20px var(--burnt-amber-glow);
-  color: #090907;
+  box-shadow: 0 0 20px rgba(255, 42, 81, 0.7);
 }
 
 .btnAdvanceNow:disabled {
@@ -260,9 +258,9 @@
   background: var(--bg-card);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
-  border: 1px solid var(--border-subtle);
+  border: 1px solid var(--border-glass);
   border-radius: var(--r-lg);
-  box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.7);
+  box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.6);
   display: flex;
   flex-direction: column;
   gap: 0.6rem;
@@ -290,12 +288,12 @@
   align-items: center;
   gap: 0.5rem;
   padding: 0.6rem 0.85rem;
-  background: rgba(108, 86, 54, 0.16);
-  border: 1px solid var(--border-subtle);
+  background: rgba(255, 42, 81, 0.08);
+  border: 1px solid rgba(255, 42, 81, 0.25);
   border-radius: var(--r-sm);
   font-family: var(--f-mono);
   font-size: 0.78rem;
-  color: var(--color-burnt-amber);
+  color: #ff8598;
 }
 
 .victimIcon {
@@ -307,9 +305,9 @@
   position: relative;
   padding: 1.75rem 1.5rem;
   background: var(--bg-surface);
-  border: 1px solid var(--border-subtle);
+  border: 1px solid var(--border-glass);
   border-radius: var(--r-lg);
-  box-shadow: 0 20px 45px -10px rgba(0, 0, 0, 0.75);
+  box-shadow: 0 20px 45px -10px rgba(0, 0, 0, 0.7);
   display: flex;
   flex-direction: column;
   gap: 1.25rem;
@@ -317,23 +315,23 @@
 }
 
 .roleCardKiller {
-  border-color: rgba(201, 74, 74, 0.55);
-  box-shadow: 0 0 35px rgba(201, 74, 74, 0.25);
+  border-color: rgba(255, 42, 81, 0.5);
+  box-shadow: 0 0 35px rgba(255, 42, 81, 0.25);
 }
 
 .roleCardDetective {
-  border-color: var(--border-amber);
-  box-shadow: 0 0 35px var(--burnt-amber-glow);
+  border-color: rgba(34, 211, 238, 0.5);
+  box-shadow: 0 0 35px rgba(34, 211, 238, 0.2);
 }
 
 .roleCardWitness {
-  border-color: rgba(108, 86, 54, 0.6);
-  box-shadow: 0 0 35px rgba(108, 86, 54, 0.25);
+  border-color: rgba(251, 191, 36, 0.5);
+  box-shadow: 0 0 35px rgba(251, 191, 36, 0.2);
 }
 
 .roleCardSuspect {
-  border-color: rgba(185, 157, 115, 0.4);
-  box-shadow: 0 0 35px var(--burnt-amber-soft);
+  border-color: rgba(168, 85, 247, 0.5);
+  box-shadow: 0 0 35px rgba(168, 85, 247, 0.2);
 }
 
 .roleHeader {
@@ -358,7 +356,7 @@
   font-family: var(--f-mono);
   font-size: 0.72rem;
   color: var(--text-secondary);
-  background: rgba(108, 86, 54, 0.15);
+  background: rgba(255, 255, 255, 0.05);
   padding: 0.3rem 0.7rem;
   border-radius: var(--r-full);
   border: 1px solid var(--border-subtle);
@@ -367,8 +365,7 @@
 }
 
 .peekToggle:hover {
-  background: rgba(108, 86, 54, 0.28);
-  border-color: var(--border-amber);
+  background: rgba(255, 255, 255, 0.1);
   color: var(--text-primary);
 }
 
@@ -404,28 +401,28 @@
 }
 
 .roleKiller {
-  color: var(--neon-red-soft);
-  text-shadow: 0 0 25px rgba(201, 74, 74, 0.5);
+  color: var(--neon-red);
+  text-shadow: 0 0 25px var(--neon-red-glow);
 }
 
 .roleDetective {
-  color: var(--color-burnt-amber);
-  text-shadow: 0 0 25px var(--burnt-amber-glow);
+  color: var(--neon-cyan);
+  text-shadow: 0 0 25px rgba(34, 211, 238, 0.4);
 }
 
 .roleWitness {
-  color: var(--burnt-amber-bright);
-  text-shadow: 0 0 25px var(--burnt-amber-soft);
+  color: var(--neon-amber);
+  text-shadow: 0 0 25px rgba(251, 191, 36, 0.4);
 }
 
 .roleSuspect {
-  color: var(--earth-brown-light);
-  text-shadow: 0 0 25px rgba(108, 86, 54, 0.4);
+  color: var(--neon-violet);
+  text-shadow: 0 0 25px var(--neon-violet-glow);
 }
 
 .secretBox {
   padding: 1.1rem 1.2rem;
-  background: rgba(14, 12, 9, 0.9);
+  background: rgba(8, 9, 14, 0.85);
   border: 1px solid var(--border-subtle);
   border-radius: var(--r-md);
   font-size: 0.92rem;
@@ -478,11 +475,11 @@
 /* Host Round Controls Box */
 .hostControlBox {
   padding: 1.3rem 1.4rem;
-  background: rgba(22, 19, 14, 0.9);
+  background: rgba(18, 20, 32, 0.85);
   backdrop-filter: blur(20px);
-  border: 1px solid var(--border-amber);
+  border: 1px solid rgba(255, 42, 81, 0.35);
   border-radius: var(--r-lg);
-  box-shadow: 0 16px 36px -8px rgba(0, 0, 0, 0.75);
+  box-shadow: 0 16px 36px -8px rgba(0, 0, 0, 0.6);
   display: flex;
   flex-direction: column;
   gap: 0.85rem;
@@ -493,7 +490,7 @@
   font-size: 0.68rem;
   font-weight: 700;
   letter-spacing: 0.12em;
-  color: var(--color-burnt-amber);
+  color: var(--neon-amber);
   text-transform: uppercase;
   display: flex;
   align-items: center;
@@ -507,23 +504,22 @@
   gap: 0.65rem;
   width: 100%;
   padding: 1rem 1.4rem;
-  background: linear-gradient(135deg, #B99D73 0%, #a28357 55%, #6C5636 120%);
-  color: #090907;
+  background: linear-gradient(135deg, #ff2a51 0%, #cc1433 60%, #a855f7 140%);
+  color: #ffffff;
   font-family: var(--f-display);
   font-size: 0.95rem;
   font-weight: 800;
   letter-spacing: 0.04em;
   text-transform: uppercase;
   border-radius: var(--r-md);
-  box-shadow: 0 8px 24px -4px var(--burnt-amber-glow);
+  box-shadow: 0 8px 24px -4px var(--neon-red-glow);
   cursor: pointer;
   transition: transform 0.15s, box-shadow 0.15s;
 }
 
 .btnAdvance:hover:not(:disabled) {
   transform: translateY(-2px);
-  box-shadow: 0 12px 30px -2px var(--burnt-amber-glow);
-  color: #090907;
+  box-shadow: 0 12px 30px -2px var(--neon-red-glow);
 }
 
 .btnAdvance:disabled {
@@ -532,16 +528,15 @@
 }
 
 .btnVote {
-  background: linear-gradient(135deg, #B99D73 0%, #cfb388 60%, #8e734c 140%);
-  box-shadow: 0 8px 24px -4px var(--burnt-amber-glow);
-  color: #090907;
+  background: linear-gradient(135deg, #f59e0b 0%, #d97706 60%, #ef4444 140%);
+  box-shadow: 0 8px 24px -4px rgba(245, 158, 11, 0.4);
 }
 
 .spinner {
   width: 16px;
   height: 16px;
-  border: 2px solid rgba(9, 9, 7, 0.3);
-  border-top-color: #090907;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top-color: #ffffff;
   border-radius: 50%;
   animation: spin 0.8s linear infinite;
 }
@@ -612,42 +607,42 @@
 }
 
 .bubbleMe {
-  background: rgba(185, 157, 115, 0.2);
-  border: 1px solid var(--border-amber);
-  color: #FAF7F2;
+  background: linear-gradient(135deg, rgba(255, 42, 81, 0.25), rgba(168, 85, 247, 0.35));
+  border: 1px solid rgba(255, 42, 81, 0.35);
+  color: #fff;
   border-bottom-right-radius: 4px;
 }
 
 .bubbleOther {
-  background: rgba(108, 86, 54, 0.16);
+  background: rgba(22, 24, 38, 0.85);
   border: 1px solid var(--border-subtle);
   color: var(--text-primary);
   border-bottom-left-radius: 4px;
 }
 
 .bubbleNarrator {
-  background: rgba(108, 86, 54, 0.22);
-  border: 1px solid var(--border-glass);
-  border-left: 3px solid var(--color-burnt-amber);
-  color: var(--color-burnt-amber);
+  background: rgba(255, 42, 81, 0.1);
+  border: 1px solid rgba(255, 42, 81, 0.35);
+  border-left: 3px solid var(--neon-red);
+  color: #ff8598;
   font-style: italic;
   font-size: 0.85rem;
 }
 
 .bubbleAccusation {
-  background: linear-gradient(135deg, rgba(201, 74, 74, 0.25), rgba(108, 86, 54, 0.4));
+  background: linear-gradient(135deg, rgba(239, 68, 68, 0.25), rgba(185, 28, 28, 0.4));
   border: 1px solid var(--neon-red);
   border-left: 4px solid var(--neon-red);
-  color: #FAF7F2;
+  color: #fff;
   font-weight: 600;
-  box-shadow: 0 0 20px rgba(201, 74, 74, 0.25);
+  box-shadow: 0 0 20px rgba(239, 68, 68, 0.25);
 }
 
 .btnAccuseTrigger {
   padding: 0.4rem 0.8rem;
-  background: rgba(201, 74, 74, 0.15);
-  border: 1px solid rgba(201, 74, 74, 0.45);
-  color: var(--neon-red-soft);
+  background: rgba(239, 68, 68, 0.15);
+  border: 1px solid rgba(239, 68, 68, 0.5);
+  color: #ff8598;
   border-radius: var(--r-md);
   font-family: var(--f-mono);
   font-size: 0.72rem;
@@ -664,14 +659,14 @@
 .btnAccuseTrigger:hover {
   background: var(--neon-red);
   color: #fff;
-  box-shadow: 0 0 15px rgba(201, 74, 74, 0.5);
+  box-shadow: 0 0 15px rgba(239, 68, 68, 0.5);
 }
 
 /* Modal Overlay */
 .modalOverlay {
   position: fixed;
   inset: 0;
-  background: rgba(9, 9, 7, 0.85);
+  background: rgba(0, 0, 0, 0.8);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   z-index: 100;
@@ -684,9 +679,9 @@
 .modalContent {
   width: 100%;
   max-width: 480px;
-  background: rgba(22, 19, 14, 0.95);
-  border: 1px solid var(--border-amber);
-  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.85), 0 0 30px var(--burnt-amber-soft);
+  background: rgba(18, 20, 32, 0.95);
+  border: 1px solid rgba(239, 68, 68, 0.4);
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.8), 0 0 30px rgba(239, 68, 68, 0.25);
   border-radius: var(--r-xl);
   padding: 1.8rem;
   display: flex;
@@ -704,7 +699,7 @@
   font-family: var(--f-display);
   font-size: 1.25rem;
   font-weight: 800;
-  color: var(--color-burnt-amber);
+  color: var(--neon-red);
   display: flex;
   align-items: center;
   gap: 0.5rem;
@@ -742,7 +737,7 @@
 .accuseTextarea {
   width: 100%;
   padding: 0.85rem 1rem;
-  background: rgba(14, 12, 9, 0.9);
+  background: rgba(8, 9, 14, 0.9);
   border: 1px solid var(--border-glass);
   border-radius: var(--r-md);
   color: var(--text-primary);
@@ -754,8 +749,8 @@
 
 .accuseSelect:focus,
 .accuseTextarea:focus {
-  border-color: var(--color-burnt-amber);
-  box-shadow: 0 0 15px var(--burnt-amber-glow);
+  border-color: var(--neon-red);
+  box-shadow: 0 0 15px rgba(239, 68, 68, 0.25);
 }
 
 .modalActions {
@@ -767,7 +762,7 @@
 
 .btnCancel {
   padding: 0.75rem 1.2rem;
-  background: rgba(108, 86, 54, 0.15);
+  background: rgba(255, 255, 255, 0.05);
   border: 1px solid var(--border-glass);
   border-radius: var(--r-md);
   color: var(--text-secondary);
@@ -777,21 +772,20 @@
 }
 
 .btnCancel:hover {
-  background: rgba(108, 86, 54, 0.3);
-  color: var(--text-primary);
+  background: rgba(255, 255, 255, 0.1);
 }
 
 .btnSubmitAccuse {
   padding: 0.75rem 1.4rem;
-  background: linear-gradient(135deg, #B99D73, #8e734c);
+  background: linear-gradient(135deg, var(--neon-red), #b91c1c);
   border: none;
   border-radius: var(--r-md);
-  color: #090907;
+  color: #fff;
   font-family: var(--f-display);
   font-size: 0.9rem;
-  font-weight: 800;
+  font-weight: 700;
   cursor: pointer;
-  box-shadow: 0 0 20px var(--burnt-amber-glow);
+  box-shadow: 0 0 20px rgba(239, 68, 68, 0.4);
   transition: transform 0.15s ease;
 }
 
@@ -804,6 +798,7 @@
   cursor: not-allowed;
 }
 
+
 /* Chat Input Bar */
 .chatInputForm {
   display: flex;
@@ -814,7 +809,7 @@
 .chatInput {
   flex: 1;
   padding: 0.75rem 1rem;
-  background: rgba(14, 12, 9, 0.9);
+  background: rgba(8, 9, 14, 0.9);
   border: 1px solid var(--border-glass);
   border-radius: var(--r-md);
   color: var(--text-primary);
@@ -825,18 +820,18 @@
 }
 
 .chatInput:focus {
-  border-color: var(--color-burnt-amber);
-  box-shadow: 0 0 15px var(--burnt-amber-glow);
+  border-color: var(--neon-cyan);
+  box-shadow: 0 0 15px rgba(34, 211, 238, 0.25);
 }
 
 .btnSend {
   padding: 0.75rem 1.1rem;
-  background: linear-gradient(135deg, #B99D73, #8e734c);
-  color: #090907;
+  background: linear-gradient(135deg, #06b6d4, #8b5cf6);
+  color: #fff;
   border-radius: var(--r-md);
   font-family: var(--f-display);
   font-size: 0.85rem;
-  font-weight: 800;
+  font-weight: 700;
   letter-spacing: 0.05em;
   text-transform: uppercase;
   cursor: pointer;
@@ -872,7 +867,7 @@
 
 .rosterChip {
   padding: 0.4rem 0.8rem;
-  background: rgba(108, 86, 54, 0.14);
+  background: rgba(255, 255, 255, 0.04);
   border: 1px solid var(--border-subtle);
   border-radius: var(--r-full);
   font-size: 0.8rem;

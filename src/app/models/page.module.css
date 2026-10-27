@@ -1,6 +1,3 @@
-/* Models Showcase Page — Cinematic Mystery Style */
-/* Palette: Charcoal, Earth Brown, Burnt Amber */
-
 .page {
   position: relative;
   min-height: 100vh;
@@ -24,8 +21,8 @@
   position: absolute;
   inset: 0;
   background-image:
-    linear-gradient(to right, rgba(185, 157, 115, 0.04) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(185, 157, 115, 0.04) 1px, transparent 1px);
+    linear-gradient(to right, rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
   background-size: 50px 50px;
   mask-image: radial-gradient(ellipse 70% 60% at 50% 50%, black, transparent);
 }
@@ -37,7 +34,7 @@
   border-radius: 50%;
   top: -150px;
   left: -100px;
-  background: radial-gradient(circle, rgba(185, 157, 115, 0.16) 0%, transparent 70%);
+  background: radial-gradient(circle, rgba(34, 211, 238, 0.15) 0%, transparent 70%);
   filter: blur(80px);
 }
 
@@ -48,7 +45,7 @@
   border-radius: 50%;
   bottom: -150px;
   right: -100px;
-  background: radial-gradient(circle, rgba(108, 86, 54, 0.22) 0%, transparent 70%);
+  background: radial-gradient(circle, rgba(255, 23, 68, 0.15) 0%, transparent 70%);
   filter: blur(80px);
 }
 
@@ -65,7 +62,7 @@
   gap: 1.5rem;
   flex-wrap: wrap;
   padding-bottom: 1.25rem;
-  border-bottom: 1px solid var(--border-subtle);
+  border-bottom: 1px solid var(--border-glass);
 }
 
 .headerLeft {
@@ -80,7 +77,7 @@
   font-size: 0.8rem;
   font-weight: 700;
   color: var(--text-secondary);
-  background: rgba(108, 86, 54, 0.15);
+  background: rgba(255, 255, 255, 0.05);
   border: 1px solid var(--border-subtle);
   padding: 0.5rem 1rem;
   border-radius: var(--r-full);
@@ -89,9 +86,9 @@
 }
 
 .backBtn:hover {
-  background: rgba(108, 86, 54, 0.28);
-  color: var(--text-primary);
-  border-color: var(--border-amber);
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+  border-color: rgba(255, 255, 255, 0.2);
 }
 
 .badge {
@@ -101,7 +98,7 @@
   font-weight: 800;
   letter-spacing: 0.15em;
   text-transform: uppercase;
-  color: var(--color-burnt-amber);
+  color: var(--neon-cyan);
   margin-bottom: 0.2rem;
 }
 
@@ -123,7 +120,7 @@
 
 .btnGroup {
   display: flex;
-  background: rgba(14, 12, 9, 0.85);
+  background: rgba(8, 9, 14, 0.8);
   border: 1px solid var(--border-subtle);
   border-radius: var(--r-full);
   padding: 0.25rem;
@@ -148,8 +145,8 @@
 }
 
 .activeBtn {
-  background: rgba(185, 157, 115, 0.2);
-  color: var(--color-burnt-amber);
+  background: rgba(255, 255, 255, 0.12);
+  color: #fff;
 }
 
 .peekAllBtn {
@@ -160,23 +157,22 @@
   font-size: 0.78rem;
   font-weight: 700;
   padding: 0.55rem 1.1rem;
-  background: rgba(108, 86, 54, 0.18);
-  border: 1px solid var(--border-amber);
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid var(--border-subtle);
   border-radius: var(--r-full);
-  color: var(--color-burnt-amber);
+  color: #fff;
   cursor: pointer;
   transition: all 0.2s ease;
 }
 
 .peekAllBtn:hover {
-  background: rgba(185, 157, 115, 0.25);
-  color: #fff;
+  background: rgba(255, 255, 255, 0.15);
+  border-color: rgba(255, 255, 255, 0.3);
 }
 
 .peekActive {
-  background: rgba(201, 74, 74, 0.2);
+  background: rgba(255, 42, 81, 0.2);
   border-color: var(--neon-red);
-  color: var(--neon-red-soft);
 }
 
 .subText {
@@ -192,11 +188,11 @@
   max-width: 1300px;
   margin: 0 auto 1.75rem;
   padding: 0.75rem 1.25rem;
-  background: rgba(108, 86, 54, 0.15);
-  border: 1px solid var(--border-amber);
+  background: rgba(34, 211, 238, 0.06);
+  border: 1px solid rgba(34, 211, 238, 0.25);
   border-radius: var(--r-lg);
   font-size: 0.82rem;
-  color: var(--text-secondary);
+  color: #d1f4fa;
   line-height: 1.5;
 }
 
@@ -216,20 +212,20 @@
 .card {
   display: flex;
   flex-direction: column;
-  background: rgba(22, 19, 14, 0.85);
+  background: rgba(14, 16, 24, 0.75);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
-  border: 1px solid var(--border-subtle);
+  border: 1px solid var(--border-glass);
   border-radius: var(--r-xl);
   padding: 1.5rem;
   gap: 1.25rem;
-  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.7);
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.6);
   transition: border-color 0.3s ease, box-shadow 0.3s ease, transform 0.2s ease;
 }
 
 .card:hover {
-  border-color: var(--border-amber);
-  box-shadow: 0 20px 45px rgba(0, 0, 0, 0.85), 0 0 25px var(--burnt-amber-soft);
+  border-color: var(--role-accent);
+  box-shadow: 0 20px 45px rgba(0, 0, 0, 0.8), 0 0 25px rgba(255, 255, 255, 0.05);
   transform: translateY(-2px);
 }
 
@@ -255,7 +251,7 @@
   font-family: var(--f-mono);
   font-size: 0.72rem;
   color: var(--text-secondary);
-  background: rgba(108, 86, 54, 0.15);
+  background: rgba(255, 255, 255, 0.05);
   border: 1px solid var(--border-subtle);
   padding: 0.25rem 0.65rem;
   border-radius: var(--r-full);
@@ -264,9 +260,8 @@
 }
 
 .peekBtn:hover {
-  background: rgba(108, 86, 54, 0.3);
-  color: var(--text-primary);
-  border-color: var(--border-amber);
+  background: rgba(255, 255, 255, 0.12);
+  color: #fff;
 }
 
 /* 3D Canvas Box */
@@ -283,7 +278,7 @@
   display: flex;
   flex-direction: column;
   gap: 0.6rem;
-  border-top: 1px solid var(--border-subtle);
+  border-top: 1px solid var(--border-glass);
   padding-top: 1rem;
 }
 

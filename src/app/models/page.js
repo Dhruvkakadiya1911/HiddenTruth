@@ -9,16 +9,16 @@ const ROLES_LIST = [
   {
     id: 'detective',
     title: 'The Detective',
-    accentHex: '#B99D73',
+    accentHex: '#22d3ee',
     icon: '🔍',
     badge: 'Investigation Lead',
     description:
-      'Tan camel trench coat, popped collar, tilted fedora hat with amber band, brass magnifying glass with optical transmission glass lens, and floating 3D beveled Forensic Star Badge (★).',
+      'Tan camel trench coat, popped collar, tilted fedora hat with cyan band, brass magnifying glass with optical transmission glass lens, and floating 3D beveled Forensic Star Badge (★).',
   },
   {
     id: 'killer',
     title: 'The Killer',
-    accentHex: '#c94a4a',
+    accentHex: '#ff1744',
     icon: '🩸',
     badge: 'Secret Culprit',
     description:
@@ -27,7 +27,7 @@ const ROLES_LIST = [
   {
     id: 'suspect',
     title: 'Prime Suspect',
-    accentHex: '#856c46',
+    accentHex: '#a855f7',
     icon: '🎭',
     badge: 'Person of Interest',
     description:
@@ -36,11 +36,11 @@ const ROLES_LIST = [
   {
     id: 'witness',
     title: 'The Witness',
-    accentHex: '#d6be96',
+    accentHex: '#fbbf24',
     icon: '👁️',
     badge: 'Key Eyewitness',
     description:
-      'Chibi silhouette in a warm earth raincoat with toggle buttons, two wide curious eyes, glowing vintage brass storm lantern, and floating 3D beveled exclamation mark ("!").',
+      'Chibi silhouette in a sunny yellow raincoat with toggle buttons, two wide curious eyes, glowing vintage brass storm lantern, and floating 3D beveled exclamation mark ("!").',
   },
 ];
 

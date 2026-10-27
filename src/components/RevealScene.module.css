@@ -1,6 +1,3 @@
-/* Reveal Scene — Cinematic Mystery Style */
-/* Palette: Charcoal, Earth Brown, Burnt Amber */
-
 .container {
   display: flex;
   flex-direction: column;
@@ -22,15 +19,15 @@
 }
 
 .outcomeWon {
-  background: linear-gradient(135deg, rgba(98, 153, 109, 0.2), rgba(108, 86, 54, 0.3));
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.18), rgba(5, 150, 105, 0.3));
   border: 1px solid var(--neon-emerald);
-  box-shadow: 0 0 40px rgba(98, 153, 109, 0.25);
+  box-shadow: 0 0 40px rgba(16, 185, 129, 0.25);
 }
 
 .outcomeLost {
-  background: linear-gradient(135deg, rgba(201, 74, 74, 0.2), rgba(108, 86, 54, 0.35));
+  background: linear-gradient(135deg, rgba(239, 68, 68, 0.2), rgba(185, 28, 28, 0.35));
   border: 1px solid var(--neon-red);
-  box-shadow: 0 0 40px rgba(201, 74, 74, 0.3);
+  box-shadow: 0 0 40px rgba(239, 68, 68, 0.3);
 }
 
 .outcomeBadge {
@@ -46,7 +43,7 @@
 }
 
 .outcomeLost .outcomeBadge {
-  color: var(--neon-red-soft);
+  color: var(--neon-red);
 }
 
 .outcomeHeading {
@@ -67,12 +64,12 @@
 /* Killer Reveal Card */
 .killerCard {
   padding: 2.2rem;
-  background: rgba(22, 19, 14, 0.95);
+  background: rgba(18, 20, 32, 0.9);
   backdrop-filter: blur(25px);
   -webkit-backdrop-filter: blur(25px);
-  border: 2px solid rgba(201, 74, 74, 0.6);
+  border: 2px solid var(--neon-red);
   border-radius: var(--r-2xl);
-  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.85), 0 0 45px rgba(201, 74, 74, 0.3);
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.8), 0 0 45px rgba(255, 42, 81, 0.3);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -92,8 +89,8 @@
   width: 80px;
   height: 80px;
   border-radius: var(--r-full);
-  background: linear-gradient(135deg, #c94a4a, #6C5636);
-  border: 3px solid rgba(185, 157, 115, 0.3);
+  background: linear-gradient(135deg, #ef4444, #7f1d1d);
+  border: 3px solid rgba(255, 255, 255, 0.2);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -101,7 +98,7 @@
   font-size: 2.2rem;
   font-weight: 900;
   color: #fff;
-  box-shadow: 0 0 30px rgba(201, 74, 74, 0.5);
+  box-shadow: 0 0 30px rgba(239, 68, 68, 0.6);
 }
 
 .killerLabel {
@@ -109,7 +106,7 @@
   font-size: 0.8rem;
   font-weight: 800;
   letter-spacing: 0.15em;
-  color: var(--neon-red-soft);
+  color: var(--neon-red);
   text-transform: uppercase;
 }
 
@@ -127,13 +124,13 @@
   gap: 1rem;
   width: 100%;
   padding-top: 1.25rem;
-  border-top: 1px solid var(--border-subtle);
+  border-top: 1px solid var(--border-glass);
   text-align: left;
 }
 
 .detailItem {
   padding: 1rem;
-  background: rgba(14, 12, 9, 0.8);
+  background: rgba(8, 9, 14, 0.7);
   border: 1px solid var(--border-subtle);
   border-radius: var(--r-lg);
   display: flex;
@@ -146,7 +143,7 @@
   font-size: 0.68rem;
   font-weight: 700;
   letter-spacing: 0.1em;
-  color: var(--color-burnt-amber);
+  color: var(--neon-amber);
   text-transform: uppercase;
 }
 
@@ -160,8 +157,8 @@
 .solutionBox {
   width: 100%;
   padding: 1.25rem 1.5rem;
-  background: rgba(108, 86, 54, 0.15);
-  border: 1px solid var(--border-amber);
+  background: rgba(255, 42, 81, 0.08);
+  border: 1px solid rgba(255, 42, 81, 0.3);
   border-radius: var(--r-lg);
   text-align: left;
   display: flex;
@@ -174,7 +171,7 @@
   font-size: 0.72rem;
   font-weight: 800;
   letter-spacing: 0.12em;
-  color: var(--color-burnt-amber);
+  color: var(--neon-red);
   text-transform: uppercase;
 }
 
@@ -187,11 +184,11 @@
 /* Narrator Monologue Box */
 .monologueBox {
   padding: 1.8rem 2rem;
-  background: rgba(22, 19, 14, 0.85);
+  background: rgba(18, 20, 32, 0.7);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
-  border: 1px solid var(--border-subtle);
-  border-left: 4px solid var(--color-burnt-amber);
+  border: 1px solid var(--border-glass);
+  border-left: 4px solid var(--neon-cyan);
   border-radius: var(--r-xl);
   display: flex;
   flex-direction: column;
@@ -206,7 +203,7 @@
   font-size: 0.78rem;
   font-weight: 700;
   letter-spacing: 0.1em;
-  color: var(--color-burnt-amber);
+  color: var(--neon-cyan);
   text-transform: uppercase;
 }
 
@@ -220,7 +217,7 @@
 /* Voting Breakdown Section */
 .sectionCard {
   padding: 1.8rem;
-  background: rgba(22, 19, 14, 0.85);
+  background: rgba(18, 20, 32, 0.75);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
   border: 1px solid var(--border-subtle);
@@ -251,7 +248,7 @@
   flex-direction: column;
   gap: 0.4rem;
   padding: 1rem 1.2rem;
-  background: rgba(14, 12, 9, 0.75);
+  background: rgba(8, 9, 14, 0.6);
   border: 1px solid var(--border-subtle);
   border-radius: var(--r-lg);
 }
@@ -274,9 +271,9 @@
 
 .tallyBadgeKiller {
   padding: 0.15rem 0.5rem;
-  background: rgba(201, 74, 74, 0.2);
+  background: rgba(239, 68, 68, 0.2);
   border: 1px solid var(--neon-red);
-  color: var(--neon-red-soft);
+  color: var(--neon-red);
   border-radius: var(--r-full);
   font-family: var(--f-mono);
   font-size: 0.68rem;
@@ -287,7 +284,7 @@
   font-family: var(--f-display);
   font-weight: 800;
   font-size: 0.95rem;
-  color: var(--color-burnt-amber);
+  color: var(--neon-amber);
 }
 
 .tallyVoters {
@@ -305,7 +302,7 @@
 
 .rosterCard {
   padding: 1rem 1.2rem;
-  background: rgba(14, 12, 9, 0.8);
+  background: rgba(8, 9, 14, 0.7);
   border: 1px solid var(--border-subtle);
   border-radius: var(--r-lg);
   display: flex;
@@ -327,18 +324,18 @@
 }
 
 .rosterRoleKiller {
-  border-color: rgba(201, 74, 74, 0.5);
-  background: rgba(201, 74, 74, 0.08);
+  border-color: rgba(239, 68, 68, 0.5);
+  background: rgba(239, 68, 68, 0.08);
 }
 
 .rosterRoleDetective {
-  border-color: var(--border-amber);
-  background: rgba(185, 157, 115, 0.1);
+  border-color: rgba(34, 211, 238, 0.5);
+  background: rgba(34, 211, 238, 0.08);
 }
 
 .rosterRoleWitness {
-  border-color: rgba(108, 86, 54, 0.6);
-  background: rgba(108, 86, 54, 0.12);
+  border-color: rgba(251, 191, 36, 0.5);
+  background: rgba(251, 191, 36, 0.08);
 }
 
 .rosterCardName {
@@ -356,19 +353,19 @@
 }
 
 .roleColorKiller {
-  color: var(--neon-red-soft);
+  color: var(--neon-red);
 }
 
 .roleColorDetective {
-  color: var(--color-burnt-amber);
+  color: var(--neon-cyan);
 }
 
 .roleColorWitness {
-  color: var(--burnt-amber-bright);
+  color: var(--neon-amber);
 }
 
 .roleColorSuspect {
-  color: var(--earth-brown-light);
+  color: var(--neon-violet);
 }
 
 .rosterCardSecret {
@@ -387,8 +384,8 @@
 
 .btnHome {
   padding: 1.1rem 2.5rem;
-  background: linear-gradient(135deg, #B99D73 0%, #a28357 55%, #6C5636 120%);
-  color: #090907;
+  background: linear-gradient(135deg, var(--neon-cyan), #8b5cf6);
+  color: #fff;
   font-family: var(--f-display);
   font-size: 1rem;
   font-weight: 800;
@@ -397,7 +394,7 @@
   border: none;
   border-radius: var(--r-lg);
   cursor: pointer;
-  box-shadow: 0 10px 30px var(--burnt-amber-glow);
+  box-shadow: 0 10px 30px rgba(34, 211, 238, 0.3);
   text-decoration: none;
   transition: all 0.2s ease;
   display: inline-flex;
@@ -407,6 +404,5 @@
 
 .btnHome:hover {
   transform: translateY(-2px);
-  box-shadow: 0 15px 40px var(--burnt-amber-glow);
-  color: #090907;
+  box-shadow: 0 15px 40px rgba(34, 211, 238, 0.5);
 }
