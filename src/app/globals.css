@@ -1,47 +1,71 @@
 /* ═══════════════════════════════════════════ */
 /*  HiddenTruth — Global Design System        */
-/*  Neo-noir thriller aesthetic               */
+/*  Cinematic Mystery Theme                   */
+/*  Palette: Charcoal, Earth Brown, Burnt Amber */
 /* ═══════════════════════════════════════════ */
 
-@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600;700&display=swap');
 
 :root {
-  /* Backgrounds */
-  --bg-void: #050507;
-  --bg-primary: #08090e;
-  --bg-surface: #0e1018;
-  --bg-elevated: #151722;
-  --bg-card: rgba(14, 16, 24, 0.65);
+  /* ── Core Theme Colors ── */
+  --color-charcoal: #090907;
+  --color-earth-brown: #6C5636;
+  --color-burnt-amber: #B99D73;
 
-  /* Borders */
-  --border-dim: rgba(255, 255, 255, 0.05);
-  --border-subtle: rgba(255, 255, 255, 0.08);
-  --border-glass: rgba(255, 255, 255, 0.12);
+  /* ── Backgrounds ── */
+  --bg-void: #090907;
+  --bg-primary: #0e0d0a;
+  --bg-surface: #16130e;
+  --bg-elevated: #221c14;
+  --bg-card: rgba(22, 19, 14, 0.82);
+  --bg-panel: rgba(108, 86, 54, 0.12);
 
-  /* Text */
-  --text-primary: #f1f5f9;
-  --text-secondary: #94a3b8;
-  --text-muted: #475569;
-  --text-ghost: #1e293b;
+  /* ── Earth Brown Variations ── */
+  --earth-brown-light: #856c46;
+  --earth-brown-dark: #4a3a23;
+  --earth-brown-dim: rgba(108, 86, 54, 0.16);
+  --earth-brown-glass: rgba(108, 86, 54, 0.28);
 
-  /* Neon Palette */
-  --neon-red: #ff2a51;
-  --neon-red-soft: #ff6b84;
-  --neon-red-glow: rgba(255, 42, 81, 0.5);
-  --neon-violet: #a855f7;
-  --neon-violet-glow: rgba(168, 85, 247, 0.35);
-  --neon-cyan: #22d3ee;
-  --neon-amber: #fbbf24;
+  /* ── Burnt Amber Variations ── */
+  --burnt-amber-bright: #ebd5b3;
+  --burnt-amber-light: #cfb388;
+  --burnt-amber-dark: #8e734c;
+  --burnt-amber-glow: rgba(185, 157, 115, 0.45);
+  --burnt-amber-soft: rgba(185, 157, 115, 0.16);
 
-  /* Radii */
+  /* ── Borders ── */
+  --border-dim: rgba(108, 86, 54, 0.22);
+  --border-subtle: rgba(108, 86, 54, 0.38);
+  --border-glass: rgba(185, 157, 115, 0.25);
+  --border-amber: rgba(185, 157, 115, 0.55);
+
+  /* ── Typography & Text ── */
+  --text-primary: #FAF7F2;     /* Warm ivory / parchment highlight */
+  --text-secondary: #D4C6B3;   /* Soft warm parchment */
+  --text-muted: #9E8D77;       /* Warm earthy muted */
+  --text-ghost: #5C4F3C;       /* Low-contrast label stamp */
+  --text-accent: #B99D73;      /* Burnt amber text */
+
+  /* ── Semantic Detective Palette ── */
+  --neon-amber: #B99D73;
+  --neon-cyan: #cfb388;
+  --neon-red: #c94a4a;
+  --neon-red-soft: #e27d7d;
+  --neon-red-glow: rgba(201, 74, 74, 0.4);
+  --neon-violet: #8e734c;
+  --neon-violet-glow: rgba(142, 115, 76, 0.3);
+  --neon-emerald: #62996d;
+
+  /* ── Radii ── */
   --r-xs: 6px;
   --r-sm: 10px;
   --r-md: 14px;
   --r-lg: 20px;
   --r-xl: 28px;
+  --r-2xl: 36px;
   --r-full: 9999px;
 
-  /* Fonts */
+  /* ── Fonts ── */
   --f-sans: 'Outfit', system-ui, -apple-system, sans-serif;
   --f-display: 'Space Grotesk', 'Outfit', sans-serif;
   --f-mono: 'JetBrains Mono', ui-monospace, monospace;
@@ -57,6 +81,7 @@
 html {
   font-size: 16px;
   scroll-behavior: auto;
+  background-color: var(--bg-void);
 }
 
 body {
@@ -72,12 +97,12 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* ── Noise texture overlay ── */
+/* ── Cinematic grain / noise texture overlay ── */
 body::before {
   content: '';
   position: fixed;
   inset: 0;
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E");
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.038'/%3E%3C/svg%3E");
   pointer-events: none;
   z-index: 9999;
 }
@@ -103,9 +128,16 @@ button {
 }
 
 /* ── Scrollbar ── */
-::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar { width: 6px; height: 6px; }
 ::-webkit-scrollbar-track { background: var(--bg-void); }
-::-webkit-scrollbar-thumb { background: var(--border-glass); border-radius: 999px; }
+::-webkit-scrollbar-thumb { background: rgba(108, 86, 54, 0.4); border-radius: 999px; }
+::-webkit-scrollbar-thumb:hover { background: var(--color-burnt-amber); }
+
+/* ── Selection ── */
+::selection {
+  background: rgba(185, 157, 115, 0.3);
+  color: #FAF7F2;
+}
 
 /* ── Keyframes ── */
 @keyframes ticker {
@@ -115,7 +147,7 @@ button {
 
 @keyframes float {
   0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-12px); }
+  50% { transform: translateY(-10px); }
 }
 
 @keyframes scan {

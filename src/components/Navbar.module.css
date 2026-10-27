@@ -4,10 +4,10 @@
   z-index: 50;
   width: 100%;
   height: 64px;
-  background: rgba(5, 5, 7, 0.85);
+  background: rgba(9, 9, 7, 0.92);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
-  border-bottom: 1px solid var(--border-glass);
+  border-bottom: 1px solid var(--border-subtle);
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -33,15 +33,15 @@
   font-size: 1.25rem;
   font-weight: 900;
   letter-spacing: 0.08em;
-  color: #fff;
+  color: var(--text-primary);
 }
 
 .brandDot {
   width: 8px;
   height: 8px;
   border-radius: var(--r-full);
-  background: var(--neon-red);
-  box-shadow: 0 0 10px var(--neon-red-glow);
+  background: var(--color-burnt-amber);
+  box-shadow: 0 0 10px var(--burnt-amber-glow);
 }
 
 .brandSub {
@@ -70,7 +70,7 @@
   align-items: center;
   gap: 0.4rem;
   padding: 0.3rem 0.75rem;
-  background: rgba(255, 255, 255, 0.04);
+  background: rgba(108, 86, 54, 0.14);
   border: 1px solid var(--border-subtle);
   border-radius: var(--r-full);
   font-family: var(--f-mono);
@@ -80,7 +80,7 @@
 
 .roomCode {
   font-weight: 800;
-  color: var(--neon-cyan);
+  color: var(--color-burnt-amber);
   letter-spacing: 0.05em;
 }
 
@@ -102,27 +102,27 @@
 }
 
 .phaseLobby {
-  background: rgba(251, 191, 36, 0.12);
-  border: 1px solid rgba(251, 191, 36, 0.4);
-  color: var(--neon-amber);
+  background: rgba(108, 86, 54, 0.2);
+  border: 1px solid var(--border-glass);
+  color: var(--color-burnt-amber);
 }
 
 .phaseGame {
-  background: rgba(34, 211, 238, 0.12);
-  border: 1px solid rgba(34, 211, 238, 0.4);
-  color: var(--neon-cyan);
+  background: rgba(185, 157, 115, 0.15);
+  border: 1px solid var(--border-amber);
+  color: var(--burnt-amber-bright);
 }
 
 .phaseVote {
-  background: rgba(255, 42, 81, 0.12);
-  border: 1px solid rgba(255, 42, 81, 0.4);
-  color: var(--neon-red);
+  background: rgba(201, 74, 74, 0.15);
+  border: 1px solid rgba(201, 74, 74, 0.45);
+  color: var(--neon-red-soft);
 }
 
 .phaseReveal {
-  background: rgba(168, 85, 247, 0.12);
-  border: 1px solid rgba(168, 85, 247, 0.4);
-  color: var(--neon-violet);
+  background: rgba(185, 157, 115, 0.2);
+  border: 1px solid var(--border-amber);
+  color: var(--color-burnt-amber);
 }
 
 /* Right Area */
@@ -137,8 +137,8 @@
   align-items: center;
   gap: 0.45rem;
   padding: 0.3rem 0.75rem;
-  background: rgba(18, 20, 32, 0.8);
-  border: 1px solid var(--border-glass);
+  background: rgba(22, 19, 14, 0.9);
+  border: 1px solid var(--border-subtle);
   border-radius: var(--r-full);
   font-size: 0.78rem;
   color: var(--text-primary);
@@ -150,26 +150,26 @@
   width: 20px;
   height: 20px;
   border-radius: var(--r-full);
-  background: linear-gradient(135deg, var(--neon-red), var(--neon-violet));
+  background: linear-gradient(135deg, var(--color-burnt-amber), var(--color-earth-brown));
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 0.65rem;
   font-weight: 800;
-  color: #fff;
+  color: #090907;
 }
 
 .hostCrown {
-  color: var(--neon-amber);
+  color: var(--color-burnt-amber);
   font-size: 0.75rem;
 }
 
 .btnLeave {
   padding: 0.35rem 0.75rem;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid var(--border-glass);
+  background: rgba(108, 86, 54, 0.15);
+  border: 1px solid var(--border-subtle);
   border-radius: var(--r-md);
-  color: var(--text-muted);
+  color: var(--text-secondary);
   font-family: var(--f-mono);
   font-size: 0.72rem;
   text-decoration: none;
@@ -178,9 +178,9 @@
 }
 
 .btnLeave:hover {
-  background: rgba(239, 68, 68, 0.15);
+  background: rgba(201, 74, 74, 0.2);
   border-color: var(--neon-red);
-  color: #ff8598;
+  color: var(--neon-red-soft);
 }
 
 .btnGuide {
@@ -188,10 +188,10 @@
   z-index: 10;
   pointer-events: auto;
   padding: 0.35rem 0.75rem;
-  background: rgba(34, 211, 238, 0.08);
-  border: 1px solid rgba(34, 211, 238, 0.3);
+  background: rgba(185, 157, 115, 0.12);
+  border: 1px solid var(--border-amber);
   border-radius: var(--r-md);
-  color: var(--neon-cyan);
+  color: var(--color-burnt-amber);
   font-family: var(--f-display);
   font-size: 0.82rem;
   font-weight: 700;
@@ -203,10 +203,10 @@
 }
 
 .btnGuide:hover {
-  background: rgba(34, 211, 238, 0.18);
-  border-color: var(--neon-cyan);
+  background: rgba(185, 157, 115, 0.24);
+  border-color: var(--color-burnt-amber);
   color: #fff;
-  box-shadow: 0 0 15px rgba(34, 211, 238, 0.3);
+  box-shadow: 0 0 15px var(--burnt-amber-glow);
 }
 
 .navLink {
@@ -222,8 +222,8 @@
 }
 
 .navLink:hover {
-  color: #fff;
-  background: rgba(255, 255, 255, 0.05);
+  color: var(--text-primary);
+  background: rgba(108, 86, 54, 0.18);
 }
 
 .statusBeacon {
@@ -233,7 +233,7 @@
   font-family: var(--f-mono);
   font-size: 0.68rem;
   font-weight: 700;
-  color: var(--neon-emerald);
+  color: var(--color-burnt-amber);
   letter-spacing: 0.08em;
 }
 
@@ -241,8 +241,8 @@
   width: 6px;
   height: 6px;
   border-radius: var(--r-full);
-  background: var(--neon-emerald);
-  box-shadow: 0 0 8px rgba(16, 185, 129, 0.6);
+  background: var(--color-burnt-amber);
+  box-shadow: 0 0 8px var(--burnt-amber-glow);
   animation: beaconPulse 2s infinite ease-in-out;
 }
 
@@ -251,31 +251,31 @@
   align-items: center;
   gap: 0.45rem;
   padding: 0.35rem 0.8rem;
-  background: rgba(34, 211, 238, 0.12);
-  border: 1px solid var(--neon-cyan);
+  background: rgba(185, 157, 115, 0.15);
+  border: 1px solid var(--border-amber);
   border-radius: var(--r-full);
-  color: var(--neon-cyan);
+  color: var(--color-burnt-amber);
   font-family: var(--f-mono);
   font-size: 0.72rem;
   font-weight: 700;
   text-decoration: none;
   letter-spacing: 0.05em;
   transition: all 0.2s ease;
-  box-shadow: 0 0 14px rgba(34, 211, 238, 0.25);
+  box-shadow: 0 0 14px var(--burnt-amber-glow);
 }
 
 .resumePill:hover {
-  background: rgba(34, 211, 238, 0.22);
+  background: rgba(185, 157, 115, 0.28);
   transform: translateY(-1px);
-  box-shadow: 0 0 20px rgba(34, 211, 238, 0.4);
+  box-shadow: 0 0 20px var(--burnt-amber-glow);
 }
 
 .resumeDot {
   width: 7px;
   height: 7px;
   border-radius: var(--r-full);
-  background: var(--neon-cyan);
-  box-shadow: 0 0 8px var(--neon-cyan);
+  background: var(--color-burnt-amber);
+  box-shadow: 0 0 8px var(--color-burnt-amber);
   animation: beaconPulse 1.5s infinite ease-in-out;
 }
 

@@ -12,11 +12,11 @@
   width: 54px;
   height: 54px;
   border-radius: 50%;
-  border: 2px solid rgba(255, 42, 81, 0.2);
-  border-top-color: var(--neon-red);
-  border-right-color: var(--neon-cyan);
+  border: 2px solid rgba(108, 86, 54, 0.35);
+  border-top-color: var(--color-burnt-amber);
+  border-right-color: var(--burnt-amber-bright);
   animation: radarSpin 0.9s cubic-bezier(0.5, 0, 0.5, 1) infinite;
-  box-shadow: 0 0 20px rgba(255, 42, 81, 0.35);
+  box-shadow: 0 0 20px var(--burnt-amber-glow);
 }
 
 @keyframes radarSpin {

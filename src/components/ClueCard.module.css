@@ -1,15 +1,16 @@
-/* Clue Card — Neo-Noir Evidence Snippet */
+/* Clue Card — Cinematic Mystery Evidence Snippet */
+/* Palette: Charcoal, Earth Brown, Burnt Amber */
 
 .card {
   position: relative;
   padding: 1.1rem 1.25rem;
-  background: rgba(18, 20, 32, 0.75);
+  background: rgba(22, 19, 14, 0.85);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
   border: 1px solid var(--border-subtle);
-  border-left: 3px solid var(--neon-cyan);
+  border-left: 3px solid var(--color-burnt-amber);
   border-radius: var(--r-md);
-  box-shadow: 0 10px 24px -6px rgba(0, 0, 0, 0.5), 0 0 15px rgba(34, 211, 238, 0.1);
+  box-shadow: 0 10px 24px -6px rgba(0, 0, 0, 0.6), 0 0 15px var(--burnt-amber-soft);
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
@@ -17,10 +18,10 @@
 }
 
 .card:hover {
-  border-color: var(--border-glass);
-  border-left-color: var(--neon-cyan);
-  background: rgba(22, 25, 40, 0.85);
-  box-shadow: 0 12px 28px -4px rgba(0, 0, 0, 0.6), 0 0 20px rgba(34, 211, 238, 0.2);
+  border-color: var(--border-amber);
+  border-left-color: var(--color-burnt-amber);
+  background: rgba(35, 29, 21, 0.95);
+  box-shadow: 0 12px 28px -4px rgba(0, 0, 0, 0.7), 0 0 20px var(--burnt-amber-glow);
 }
 
 .header {
@@ -38,7 +39,7 @@
   font-weight: 700;
   letter-spacing: 0.1em;
   text-transform: uppercase;
-  color: var(--neon-cyan);
+  color: var(--color-burnt-amber);
 }
 
 .timestamp {

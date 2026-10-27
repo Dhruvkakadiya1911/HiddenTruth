@@ -1,4 +1,4 @@
-/* Lobby Page — Responsive Neo-Noir Waiting Room */
+/* Lobby Page — Cinematic Mystery Waiting Room */
 
 .page {
   position: relative;
@@ -10,6 +10,7 @@
   align-items: center;
   padding: 1.5rem 1rem 2rem;
   overflow: hidden;
+  background: var(--bg-void);
 }
 
 /* Background layers */
@@ -24,8 +25,8 @@
   position: absolute;
   inset: 0;
   background-image:
-    linear-gradient(to right, rgba(255, 255, 255, 0.02) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+    linear-gradient(to right, rgba(185, 157, 115, 0.04) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(185, 157, 115, 0.04) 1px, transparent 1px);
   background-size: 50px 50px;
   mask-image: radial-gradient(ellipse 70% 60% at 50% 50%, black, transparent);
 }
@@ -38,7 +39,7 @@
   top: -100px;
   left: 50%;
   transform: translateX(-50%);
-  background: radial-gradient(circle, rgba(255, 42, 81, 0.18) 0%, transparent 65%);
+  background: radial-gradient(circle, rgba(185, 157, 115, 0.18) 0%, transparent 65%);
   filter: blur(65px);
 }
 
@@ -49,7 +50,7 @@
   border-radius: 50%;
   bottom: -60px;
   right: -60px;
-  background: radial-gradient(circle, rgba(168, 85, 247, 0.16) 0%, transparent 65%);
+  background: radial-gradient(circle, rgba(108, 86, 54, 0.22) 0%, transparent 65%);
   filter: blur(70px);
 }
 
@@ -72,16 +73,16 @@
   font-size: 0.78rem;
   color: var(--text-secondary);
   padding: 0.4rem 0.8rem;
-  background: rgba(255, 255, 255, 0.03);
+  background: rgba(108, 86, 54, 0.12);
   border: 1px solid var(--border-subtle);
   border-radius: var(--r-full);
   transition: all 0.15s ease;
 }
 
 .backLink:hover {
-  background: rgba(255, 255, 255, 0.08);
+  background: rgba(108, 86, 54, 0.25);
   color: var(--text-primary);
-  border-color: var(--border-glass);
+  border-color: var(--border-amber);
 }
 
 .liveBadge {
@@ -89,12 +90,12 @@
   align-items: center;
   gap: 0.5rem;
   padding: 0.35rem 0.85rem;
-  background: rgba(16, 185, 129, 0.12);
-  border: 1px solid rgba(16, 185, 129, 0.35);
+  background: rgba(108, 86, 54, 0.2);
+  border: 1px solid var(--border-amber);
   border-radius: var(--r-full);
   font-family: var(--f-mono);
   font-size: 0.7rem;
-  color: #34d399;
+  color: var(--color-burnt-amber);
   letter-spacing: 0.08em;
   text-transform: uppercase;
 }
@@ -103,8 +104,8 @@
   width: 6px;
   height: 6px;
   border-radius: 50%;
-  background: #10b981;
-  box-shadow: 0 0 8px #10b981;
+  background: var(--color-burnt-amber);
+  box-shadow: 0 0 8px var(--burnt-amber-glow);
 }
 
 /* Main Container */
@@ -127,9 +128,9 @@
   background: var(--bg-card);
   backdrop-filter: blur(24px);
   -webkit-backdrop-filter: blur(24px);
-  border: 1px solid var(--border-glass);
+  border: 1px solid var(--border-subtle);
   border-radius: var(--r-lg);
-  box-shadow: 0 20px 45px -10px rgba(0, 0, 0, 0.65);
+  box-shadow: 0 20px 45px -10px rgba(0, 0, 0, 0.75);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -144,7 +145,7 @@
   left: 0;
   right: 0;
   height: 2px;
-  background: linear-gradient(90deg, transparent, var(--neon-red), var(--neon-cyan), transparent);
+  background: linear-gradient(90deg, transparent, var(--color-burnt-amber), var(--color-earth-brown), transparent);
 }
 
 .codeLabel {
@@ -160,8 +161,8 @@
   font-size: clamp(2.8rem, 9vw, 3.8rem);
   font-weight: 900;
   letter-spacing: 0.35em;
-  color: var(--text-primary);
-  text-shadow: 0 0 30px var(--neon-red-glow);
+  color: var(--color-burnt-amber);
+  text-shadow: 0 0 30px var(--burnt-amber-glow);
   padding-left: 0.35em; /* compensates for letter-spacing offset */
 }
 
@@ -170,7 +171,7 @@
   align-items: center;
   gap: 0.5rem;
   padding: 0.45rem 1rem;
-  background: rgba(255, 255, 255, 0.05);
+  background: rgba(108, 86, 54, 0.15);
   border: 1px solid var(--border-glass);
   border-radius: var(--r-full);
   color: var(--text-secondary);
@@ -182,13 +183,14 @@
 }
 
 .copyBtn:hover {
-  background: rgba(255, 255, 255, 0.1);
+  background: rgba(108, 86, 54, 0.28);
+  border-color: var(--border-amber);
   color: var(--text-primary);
 }
 
 .copied {
-  color: var(--neon-cyan) !important;
-  border-color: rgba(34, 211, 238, 0.4) !important;
+  color: var(--color-burnt-amber) !important;
+  border-color: var(--color-burnt-amber) !important;
 }
 
 .codeHint {
@@ -223,8 +225,9 @@
 .countBadge {
   font-family: var(--f-mono);
   font-size: 0.75rem;
-  color: var(--neon-red-soft);
-  background: rgba(255, 42, 81, 0.12);
+  color: var(--color-burnt-amber);
+  background: rgba(108, 86, 54, 0.2);
+  border: 1px solid var(--border-glass);
   padding: 0.15rem 0.5rem;
   border-radius: var(--r-full);
 }
@@ -250,7 +253,7 @@
   align-items: center;
   gap: 0.8rem;
   padding: 0.75rem 1rem;
-  border: 1px dashed rgba(255, 255, 255, 0.08);
+  border: 1px dashed rgba(108, 86, 54, 0.35);
   border-radius: var(--r-md);
   color: var(--text-muted);
   font-size: 0.82rem;
@@ -276,22 +279,23 @@
   gap: 0.65rem;
   width: 100%;
   padding: 1.15rem;
-  background: linear-gradient(135deg, #ff2a51 0%, #cc1433 60%, #a855f7 140%);
-  color: #ffffff;
+  background: linear-gradient(135deg, #B99D73 0%, #a28357 55%, #6C5636 120%);
+  color: #090907;
   font-family: var(--f-display);
   font-size: 1.05rem;
   font-weight: 800;
   letter-spacing: 0.04em;
   text-transform: uppercase;
   border-radius: var(--r-md);
-  box-shadow: 0 12px 30px -6px var(--neon-red-glow);
+  box-shadow: 0 10px 25px -4px var(--burnt-amber-glow);
   cursor: pointer;
   transition: transform 0.15s, box-shadow 0.15s;
 }
 
 .btnStart:hover:not(:disabled) {
   transform: translateY(-2px);
-  box-shadow: 0 16px 36px -4px var(--neon-red-glow);
+  box-shadow: 0 14px 32px -4px var(--burnt-amber-glow);
+  color: #090907;
 }
 
 .btnStart:disabled {
@@ -307,7 +311,7 @@
   justify-content: center;
   gap: 0.75rem;
   padding: 1.1rem;
-  background: rgba(14, 16, 24, 0.75);
+  background: rgba(22, 19, 14, 0.85);
   border: 1px solid var(--border-subtle);
   border-radius: var(--r-md);
   color: var(--text-secondary);
@@ -320,8 +324,8 @@
   width: 12px;
   height: 12px;
   border-radius: 50%;
-  background: var(--neon-cyan);
-  box-shadow: 0 0 10px var(--neon-cyan);
+  background: var(--color-burnt-amber);
+  box-shadow: 0 0 10px var(--burnt-amber-glow);
   animation: radar 1.5s infinite;
 }
 
@@ -342,8 +346,8 @@
 .testDevBox {
   margin-top: 0.85rem;
   padding: 0.85rem 1rem;
-  background: rgba(34, 211, 238, 0.05);
-  border: 1px dashed rgba(34, 211, 238, 0.35);
+  background: rgba(108, 86, 54, 0.12);
+  border: 1px dashed var(--border-amber);
   border-radius: var(--r-md);
   display: flex;
   flex-direction: column;
@@ -359,9 +363,9 @@
   gap: 0.5rem;
   width: 100%;
   padding: 0.75rem 1.2rem;
-  background: rgba(34, 211, 238, 0.15);
-  border: 1px solid var(--neon-cyan);
-  color: var(--neon-cyan);
+  background: rgba(185, 157, 115, 0.16);
+  border: 1px solid var(--border-amber);
+  color: var(--color-burnt-amber);
   font-family: var(--f-mono);
   font-size: 0.82rem;
   font-weight: 700;
@@ -373,9 +377,10 @@
 }
 
 .btnTestBots:hover:not(:disabled) {
-  background: rgba(34, 211, 238, 0.25);
-  box-shadow: 0 0 15px rgba(34, 211, 238, 0.3);
+  background: rgba(185, 157, 115, 0.28);
+  box-shadow: 0 0 15px var(--burnt-amber-glow);
   transform: translateY(-1px);
+  color: #fff;
 }
 
 .btnTestBots:disabled {
@@ -392,7 +397,7 @@
 
 .testDevError {
   font-size: 0.75rem;
-  color: var(--neon-red);
+  color: var(--neon-red-soft);
   font-family: var(--f-mono);
 }
 

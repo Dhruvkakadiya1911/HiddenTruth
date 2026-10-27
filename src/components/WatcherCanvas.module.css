@@ -23,12 +23,12 @@
   max-height: 90vw;
   background: radial-gradient(
     circle,
-    rgba(255, 42, 81, 0.22) 0%,
-    rgba(34, 211, 238, 0.16) 35%,
-    rgba(168, 85, 247, 0.08) 60%,
+    rgba(185, 157, 115, 0.22) 0%,
+    rgba(108, 86, 54, 0.2) 38%,
+    rgba(14, 12, 9, 0.1) 65%,
     transparent 75%
   );
-  filter: blur(45px);
+  filter: blur(50px);
   pointer-events: none;
   z-index: -1;
   animation: pulseAura 5s ease-in-out infinite alternate;

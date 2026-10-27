@@ -1,3 +1,6 @@
+/* Vote Panel — Cinematic Mystery Style */
+/* Palette: Charcoal, Earth Brown, Burnt Amber */
+
 .container {
   display: flex;
   flex-direction: column;
@@ -16,7 +19,7 @@
   align-items: center;
   gap: 1rem;
   padding: 1.1rem 1.25rem;
-  background: rgba(18, 20, 32, 0.7);
+  background: rgba(22, 19, 14, 0.85);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
   border: 1px solid var(--border-subtle);
@@ -28,22 +31,22 @@
 }
 
 .suspectCard:hover:not(.cardDisabled) {
-  border-color: rgba(255, 42, 81, 0.5);
-  background: rgba(26, 28, 44, 0.9);
+  border-color: var(--border-amber);
+  background: rgba(35, 29, 21, 0.95);
   transform: translateY(-2px);
-  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.6);
 }
 
 .selectedCard {
-  border-color: var(--neon-red) !important;
-  background: rgba(255, 42, 81, 0.12) !important;
-  box-shadow: 0 0 25px rgba(255, 42, 81, 0.25) !important;
+  border-color: var(--color-burnt-amber) !important;
+  background: rgba(185, 157, 115, 0.18) !important;
+  box-shadow: 0 0 25px var(--burnt-amber-glow) !important;
 }
 
 .myVoteCard {
-  border-color: var(--neon-amber) !important;
-  background: rgba(251, 191, 36, 0.12) !important;
-  box-shadow: 0 0 25px rgba(251, 191, 36, 0.25) !important;
+  border-color: var(--color-burnt-amber) !important;
+  background: rgba(185, 157, 115, 0.22) !important;
+  box-shadow: 0 0 25px var(--burnt-amber-glow) !important;
 }
 
 .cardDisabled {
@@ -55,7 +58,7 @@
   cursor: not-allowed !important;
   opacity: 0.55;
   border-style: dashed;
-  background: rgba(18, 20, 32, 0.35) !important;
+  background: rgba(14, 12, 9, 0.45) !important;
 }
 
 .cardSelf:hover {
@@ -68,15 +71,15 @@
   width: 44px;
   height: 44px;
   border-radius: var(--r-full);
-  background: linear-gradient(135deg, rgba(255, 42, 81, 0.25), rgba(168, 85, 247, 0.3));
-  border: 1px solid rgba(255, 255, 255, 0.15);
+  background: linear-gradient(135deg, var(--color-burnt-amber), var(--color-earth-brown));
+  border: 1px solid var(--border-amber);
   display: flex;
   align-items: center;
   justify-content: center;
   font-family: var(--f-display);
   font-weight: 800;
   font-size: 1.1rem;
-  color: #fff;
+  color: #090907;
   flex-shrink: 0;
 }
 
@@ -101,12 +104,12 @@
 }
 
 .badgeYou {
-  color: var(--neon-cyan);
+  color: var(--color-burnt-amber);
   font-weight: 700;
 }
 
 .badgeVoteTarget {
-  color: var(--neon-amber);
+  color: var(--burnt-amber-bright);
   font-weight: 700;
 }
 
@@ -125,22 +128,22 @@
 }
 
 .checkMarkSelected {
-  background: var(--neon-red);
-  border-color: var(--neon-red);
-  color: #fff;
-  box-shadow: 0 0 10px var(--neon-red-glow);
+  background: var(--color-burnt-amber);
+  border-color: var(--color-burnt-amber);
+  color: #090907;
+  box-shadow: 0 0 10px var(--burnt-amber-glow);
 }
 
 .checkMarkMyVote {
-  background: var(--neon-amber);
-  border-color: var(--neon-amber);
-  color: #000;
-  box-shadow: 0 0 10px rgba(251, 191, 36, 0.5);
+  background: var(--color-burnt-amber);
+  border-color: var(--color-burnt-amber);
+  color: #090907;
+  box-shadow: 0 0 10px var(--burnt-amber-glow);
 }
 
 .checkMarkDisabled {
   background: transparent;
-  border-color: rgba(255, 255, 255, 0.1);
+  border-color: rgba(108, 86, 54, 0.3);
   color: var(--text-muted);
   font-size: 0.7rem;
 }
@@ -157,8 +160,8 @@
   width: 100%;
   max-width: 420px;
   padding: 1.1rem 2rem;
-  background: linear-gradient(135deg, var(--neon-red), #b91c1c);
-  color: #fff;
+  background: linear-gradient(135deg, #B99D73 0%, #a28357 55%, #6C5636 120%);
+  color: #090907;
   font-family: var(--f-display);
   font-size: 1.05rem;
   font-weight: 800;
@@ -167,7 +170,7 @@
   border: none;
   border-radius: var(--r-lg);
   cursor: pointer;
-  box-shadow: 0 10px 30px rgba(255, 42, 81, 0.4);
+  box-shadow: 0 10px 30px var(--burnt-amber-glow);
   transition: all 0.2s ease;
   display: flex;
   align-items: center;
@@ -177,7 +180,8 @@
 
 .btnLockVote:hover:not(:disabled) {
   transform: translateY(-2px);
-  box-shadow: 0 15px 40px rgba(255, 42, 81, 0.6);
+  box-shadow: 0 15px 40px var(--burnt-amber-glow);
+  color: #090907;
 }
 
 .btnLockVote:disabled {
@@ -188,8 +192,8 @@
 
 .lockedBanner {
   padding: 1.1rem 1.5rem;
-  background: rgba(251, 191, 36, 0.08);
-  border: 1px solid rgba(251, 191, 36, 0.35);
+  background: rgba(108, 86, 54, 0.18);
+  border: 1px solid var(--border-amber);
   border-radius: var(--r-lg);
   text-align: center;
   display: flex;
@@ -204,7 +208,7 @@
   font-family: var(--f-display);
   font-size: 1rem;
   font-weight: 800;
-  color: var(--neon-amber);
+  color: var(--color-burnt-amber);
   display: flex;
   align-items: center;
   justify-content: center;

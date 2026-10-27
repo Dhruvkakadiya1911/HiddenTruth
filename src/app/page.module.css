@@ -1,5 +1,6 @@
 /* ═══════════════════════════════════════════════ */
-/*  Landing Page — Full-screen responsive layout  */
+/*  Landing Page — Cinematic Mystery Layout       */
+/*  Palette: Charcoal, Earth Brown, Burnt Amber   */
 /* ═══════════════════════════════════════════════ */
 
 /* ── Page wrapper: fills entire viewport ── */
@@ -11,6 +12,7 @@
   display: flex;
   flex-direction: column;
   overflow: hidden;
+  background: var(--bg-void);
 }
 
 /* ── Background Layers ── */
@@ -26,13 +28,13 @@
   position: absolute;
   inset: 0;
   background-image:
-    linear-gradient(to right, rgba(255, 255, 255, 0.02) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+    linear-gradient(to right, rgba(185, 157, 115, 0.04) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(185, 157, 115, 0.04) 1px, transparent 1px);
   background-size: 60px 60px;
   mask-image: radial-gradient(ellipse 70% 60% at 50% 50%, black, transparent);
 }
 
-/* Glow orbs */
+/* Glow orbs - Warm Earth & Burnt Amber ambiance */
 .orbRed {
   position: absolute;
   width: 50vw;
@@ -42,20 +44,20 @@
   top: -12%;
   left: 50%;
   transform: translateX(-50%);
-  background: radial-gradient(circle, rgba(255, 42, 81, 0.22) 0%, transparent 65%);
-  filter: blur(60px);
+  background: radial-gradient(circle, rgba(185, 157, 115, 0.18) 0%, transparent 65%);
+  filter: blur(65px);
 }
 
 .orbViolet {
   position: absolute;
-  width: 35vw;
-  max-width: 450px;
+  width: 38vw;
+  max-width: 480px;
   aspect-ratio: 1;
   border-radius: 50%;
   bottom: 5%;
   right: -5%;
-  background: radial-gradient(circle, rgba(168, 85, 247, 0.18) 0%, transparent 65%);
-  filter: blur(70px);
+  background: radial-gradient(circle, rgba(108, 86, 54, 0.25) 0%, transparent 65%);
+  filter: blur(75px);
 }
 
 .orbCyan {
@@ -66,7 +68,7 @@
   border-radius: 50%;
   bottom: 15%;
   left: -5%;
-  background: radial-gradient(circle, rgba(34, 211, 238, 0.1) 0%, transparent 65%);
+  background: radial-gradient(circle, rgba(185, 157, 115, 0.1) 0%, transparent 65%);
   filter: blur(60px);
 }
 
@@ -76,8 +78,8 @@
   left: 0;
   right: 0;
   height: 2px;
-  background: linear-gradient(90deg, transparent, rgba(255, 42, 81, 0.12), transparent);
-  animation: scan 6s linear infinite;
+  background: linear-gradient(90deg, transparent, rgba(185, 157, 115, 0.15), transparent);
+  animation: scan 7s linear infinite;
   z-index: 1;
 }
 
@@ -86,17 +88,18 @@
   position: relative;
   z-index: 2;
   width: 100%;
-  background: var(--neon-red);
-  color: var(--bg-void);
+  background: linear-gradient(90deg, #6C5636, #856c46, #6C5636);
+  color: #FAF7F2;
   overflow: hidden;
   white-space: nowrap;
-  padding: 0.4rem 0;
+  padding: 0.45rem 0;
   font-family: var(--f-mono);
-  font-size: 0.7rem;
-  font-weight: 600;
-  letter-spacing: 0.12em;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
   text-transform: uppercase;
-  box-shadow: 0 4px 20px var(--neon-red-glow);
+  border-bottom: 1px solid var(--border-amber);
+  box-shadow: 0 4px 20px rgba(108, 86, 54, 0.35);
   flex-shrink: 0;
 }
 
@@ -157,8 +160,8 @@
   align-items: center;
   gap: 0.6rem;
   padding: 0.35rem 0.85rem;
-  background: rgba(255, 42, 81, 0.08);
-  border: 1px solid rgba(255, 42, 81, 0.25);
+  background: rgba(108, 86, 54, 0.2);
+  border: 1px solid var(--border-amber);
   border-radius: var(--r-full);
   width: fit-content;
 }
@@ -167,15 +170,15 @@
   width: 7px;
   height: 7px;
   border-radius: 50%;
-  background: var(--neon-red);
-  box-shadow: 0 0 8px var(--neon-red);
+  background: var(--color-burnt-amber);
+  box-shadow: 0 0 8px var(--color-burnt-amber);
 }
 
 .liveText {
   font-family: var(--f-mono);
   font-size: 0.7rem;
-  font-weight: 600;
-  color: var(--neon-red-soft);
+  font-weight: 700;
+  color: var(--color-burnt-amber);
   letter-spacing: 0.1em;
   text-transform: uppercase;
 }
@@ -190,7 +193,7 @@
 .titleSub {
   font-family: var(--f-mono);
   font-size: 0.75rem;
-  font-weight: 400;
+  font-weight: 500;
   color: var(--text-muted);
   letter-spacing: 0.18em;
   text-transform: uppercase;
@@ -206,16 +209,16 @@
 
 .titleWhite {
   display: block;
-  background: linear-gradient(180deg, #ffffff 20%, #64748b 100%);
+  background: linear-gradient(180deg, #FAF7F2 25%, #cfb388 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
 
 .titleRed {
   display: block;
-  color: var(--neon-red);
-  -webkit-text-fill-color: var(--neon-red);
-  text-shadow: 0 0 40px var(--neon-red-glow), 0 0 80px rgba(255, 42, 81, 0.2);
+  color: var(--color-burnt-amber);
+  -webkit-text-fill-color: var(--color-burnt-amber);
+  text-shadow: 0 0 35px var(--burnt-amber-glow), 0 0 70px rgba(185, 157, 115, 0.25);
 }
 
 /* Description */
@@ -243,19 +246,20 @@
   display: inline-flex;
   align-items: center;
   gap: 0.4rem;
-  padding: 0.3rem 0.75rem;
-  background: rgba(255, 255, 255, 0.03);
+  padding: 0.35rem 0.8rem;
+  background: rgba(108, 86, 54, 0.14);
   border: 1px solid var(--border-subtle);
   border-radius: var(--r-full);
   font-size: 0.78rem;
   font-weight: 500;
   color: var(--text-secondary);
-  transition: border-color 0.2s, background 0.2s;
+  transition: border-color 0.2s, background 0.2s, color 0.2s;
 }
 
 .tag:hover {
-  border-color: var(--border-glass);
-  background: rgba(255, 255, 255, 0.06);
+  border-color: var(--border-amber);
+  background: rgba(108, 86, 54, 0.25);
+  color: var(--text-primary);
 }
 
 .tagIcon {
@@ -283,12 +287,12 @@
 .resumeCard {
   position: relative;
   padding: 1.5rem;
-  background: linear-gradient(135deg, rgba(34, 211, 238, 0.08), rgba(18, 20, 32, 0.85));
+  background: linear-gradient(135deg, rgba(108, 86, 54, 0.22), rgba(22, 19, 14, 0.95));
   backdrop-filter: blur(24px);
   -webkit-backdrop-filter: blur(24px);
-  border: 1px solid rgba(34, 211, 238, 0.35);
+  border: 1px solid var(--border-amber);
   border-radius: var(--r-lg);
-  box-shadow: 0 8px 32px rgba(34, 211, 238, 0.15);
+  box-shadow: 0 8px 32px rgba(108, 86, 54, 0.3);
   display: flex;
   flex-direction: column;
   gap: 0.65rem;
@@ -302,7 +306,7 @@
   left: 0;
   right: 0;
   height: 2px;
-  background: linear-gradient(90deg, transparent, var(--neon-cyan), transparent);
+  background: linear-gradient(90deg, transparent, var(--color-burnt-amber), transparent);
 }
 
 .resumeHeader {
@@ -324,8 +328,8 @@
 }
 
 .btnDismissResume:hover {
-  color: #fff;
-  background: rgba(255, 255, 255, 0.1);
+  color: var(--text-primary);
+  background: rgba(108, 86, 54, 0.25);
 }
 
 .resumeActions {
@@ -337,7 +341,7 @@
 
 .btnLeaveSession {
   padding: 0.8rem 1rem;
-  background: rgba(255, 255, 255, 0.05);
+  background: rgba(108, 86, 54, 0.15);
   border: 1px solid var(--border-subtle);
   border-radius: var(--r-md);
   color: var(--text-muted);
@@ -349,8 +353,8 @@
 }
 
 .btnLeaveSession:hover {
-  color: #ff8598;
-  background: rgba(255, 42, 81, 0.15);
+  color: var(--neon-red-soft);
+  background: rgba(201, 74, 74, 0.2);
   border-color: var(--neon-red);
 }
 
@@ -358,8 +362,8 @@
   width: 7px;
   height: 7px;
   border-radius: var(--r-full);
-  background: var(--neon-cyan);
-  box-shadow: 0 0 10px var(--neon-cyan);
+  background: var(--color-burnt-amber);
+  box-shadow: 0 0 10px var(--color-burnt-amber);
   animation: beaconPulse 1.5s infinite ease-in-out;
 }
 
@@ -368,14 +372,14 @@
   font-size: 0.7rem;
   font-weight: 700;
   letter-spacing: 0.1em;
-  color: var(--neon-cyan);
+  color: var(--color-burnt-amber);
 }
 
 .resumeTitle {
   font-family: var(--f-display);
   font-size: 1.2rem;
   font-weight: 800;
-  color: #fff;
+  color: var(--text-primary);
   letter-spacing: -0.01em;
 }
 
@@ -387,7 +391,7 @@
 }
 
 .resumeText strong {
-  color: var(--neon-cyan);
+  color: var(--color-burnt-amber);
 }
 
 .btnResume {
@@ -396,24 +400,24 @@
   justify-content: center;
   gap: 0.5rem;
   width: 100%;
-  padding: 0.8rem 1.25rem;
-  background: linear-gradient(135deg, var(--neon-cyan), #0284c7);
-  color: #030712;
+  padding: 0.85rem 1.25rem;
+  background: linear-gradient(135deg, #B99D73, #8e734c);
+  color: #090907;
   font-family: var(--f-display);
   font-size: 0.92rem;
   font-weight: 800;
   letter-spacing: 0.02em;
   border-radius: var(--r-md);
   text-decoration: none;
-  box-shadow: 0 0 20px rgba(34, 211, 238, 0.4);
+  box-shadow: 0 0 20px var(--burnt-amber-glow);
   transition: all 0.2s ease;
   margin-top: 0.35rem;
 }
 
 .btnResume:hover {
   transform: translateY(-2px);
-  box-shadow: 0 0 28px rgba(34, 211, 238, 0.6);
-  color: #000;
+  box-shadow: 0 0 28px var(--burnt-amber-glow);
+  color: #090907;
 }
 
 /* Glass card */
@@ -430,11 +434,11 @@
   gap: 1rem;
   overflow: hidden;
   box-shadow:
-    0 25px 50px -12px rgba(0, 0, 0, 0.6),
-    inset 0 1px 0 rgba(255, 255, 255, 0.05);
+    0 25px 50px -12px rgba(0, 0, 0, 0.7),
+    inset 0 1px 0 rgba(185, 157, 115, 0.12);
 }
 
-/* Top holographic line */
+/* Top amber accent line */
 .card::before {
   content: '';
   position: absolute;
@@ -442,7 +446,7 @@
   left: 0;
   right: 0;
   height: 1px;
-  background: linear-gradient(90deg, transparent, var(--neon-red), var(--neon-violet), transparent);
+  background: linear-gradient(90deg, transparent, var(--color-burnt-amber), var(--color-earth-brown), transparent);
 }
 
 .cardLabel {
@@ -463,15 +467,15 @@
   gap: 0.65rem;
   width: 100%;
   padding: 1.1rem 1.5rem;
-  background: linear-gradient(135deg, #ff2a51 0%, #cc1433 50%, #a855f7 150%);
-  color: #ffffff;
+  background: linear-gradient(135deg, #B99D73 0%, #a28357 55%, #6C5636 120%);
+  color: #090907;
   font-family: var(--f-display);
   font-size: 1rem;
-  font-weight: 700;
+  font-weight: 800;
   letter-spacing: 0.04em;
   text-transform: uppercase;
   border-radius: var(--r-md);
-  box-shadow: 0 12px 30px -6px var(--neon-red-glow);
+  box-shadow: 0 10px 25px -4px var(--burnt-amber-glow);
   transition: transform 0.15s, box-shadow 0.15s;
   position: relative;
   overflow: hidden;
@@ -481,7 +485,7 @@
   content: '';
   position: absolute;
   inset: 0;
-  background: linear-gradient(135deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+  background: linear-gradient(135deg, transparent, rgba(255, 255, 255, 0.2), transparent);
   opacity: 0;
   transition: opacity 0.2s;
 }
@@ -492,7 +496,8 @@
 
 .btnPrimary:hover {
   transform: translateY(-2px);
-  box-shadow: 0 16px 40px -4px var(--neon-red-glow);
+  box-shadow: 0 14px 35px -4px var(--burnt-amber-glow);
+  color: #090907;
 }
 
 .btnPrimary:active {
@@ -506,7 +511,7 @@
   gap: 0.65rem;
   width: 100%;
   padding: 1.1rem 1.5rem;
-  background: var(--bg-elevated);
+  background: rgba(108, 86, 54, 0.16);
   color: var(--text-primary);
   font-family: var(--f-display);
   font-size: 1rem;
@@ -520,8 +525,8 @@
 
 .btnSecondary:hover {
   transform: translateY(-2px);
-  background: rgba(255, 255, 255, 0.06);
-  border-color: rgba(255, 255, 255, 0.2);
+  background: rgba(108, 86, 54, 0.3);
+  border-color: var(--border-amber);
 }
 
 .btnSecondary:active {
@@ -535,10 +540,10 @@
   gap: 0.5rem;
   width: 100%;
   padding: 0.75rem 1rem;
-  background: rgba(34, 211, 238, 0.06);
-  border: 1px dashed rgba(34, 211, 238, 0.35);
+  background: rgba(185, 157, 115, 0.1);
+  border: 1px dashed var(--border-amber);
   border-radius: var(--r-md);
-  color: var(--neon-cyan);
+  color: var(--color-burnt-amber);
   font-family: var(--f-display);
   font-size: 0.88rem;
   font-weight: 700;
@@ -548,10 +553,10 @@
 }
 
 .btnGuideLanding:hover {
-  background: rgba(34, 211, 238, 0.15);
-  border-color: var(--neon-cyan);
+  background: rgba(185, 157, 115, 0.2);
+  border-color: var(--color-burnt-amber);
   color: #fff;
-  box-shadow: 0 0 20px rgba(34, 211, 238, 0.25);
+  box-shadow: 0 0 20px var(--burnt-amber-glow);
 }
 
 .btnIcon {
@@ -589,7 +594,7 @@
 .stat {
   text-align: center;
   padding: 0.85rem 0.5rem;
-  background: rgba(255, 255, 255, 0.02);
+  background: rgba(108, 86, 54, 0.1);
   border: 1px solid var(--border-dim);
   border-radius: var(--r-sm);
 }
@@ -621,6 +626,7 @@
   gap: 2rem;
   padding: 1rem 1.5rem;
   border-top: 1px solid var(--border-dim);
+  background: rgba(9, 9, 7, 0.6);
   flex-shrink: 0;
 }
 
@@ -647,8 +653,8 @@
   z-index: 1;
   background: radial-gradient(
     650px circle at var(--mouse-x, 50%) var(--mouse-y, 50%),
-    rgba(255, 42, 81, 0.08) 0%,
-    rgba(34, 211, 238, 0.03) 40%,
+    rgba(185, 157, 115, 0.08) 0%,
+    rgba(108, 86, 54, 0.04) 40%,
     transparent 80%
   );
   transition: opacity 0.3s ease;
@@ -664,7 +670,7 @@
 
 .eqBar {
   width: 2.5px;
-  background: var(--neon-red);
+  background: var(--color-burnt-amber);
   border-radius: 1px;
 }
 
@@ -676,16 +682,16 @@
   font-family: var(--f-mono);
   font-size: 0.85rem;
   font-weight: 600;
-  color: var(--neon-cyan);
+  color: var(--color-burnt-amber);
   min-height: 1.5rem;
-  text-shadow: 0 0 12px rgba(34, 211, 238, 0.4);
+  text-shadow: 0 0 12px var(--burnt-amber-glow);
 }
 
 .cursorBlink {
   display: inline-block;
   width: 8px;
   height: 14px;
-  background: var(--neon-cyan);
+  background: var(--color-burnt-amber);
   vertical-align: middle;
   animation: cursorBlink 0.8s infinite;
 }
@@ -699,16 +705,16 @@
 .liveFeedCard {
   margin-top: 1rem;
   padding: 1.1rem 1.25rem;
-  background: rgba(14, 16, 26, 0.75);
+  background: rgba(22, 19, 14, 0.85);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-left: 3px solid var(--neon-red);
+  border: 1px solid var(--border-subtle);
+  border-left: 3px solid var(--color-burnt-amber);
   border-radius: var(--r-md);
   display: flex;
   flex-direction: column;
   gap: 0.6rem;
-  box-shadow: 0 15px 35px -10px rgba(0, 0, 0, 0.6);
+  box-shadow: 0 15px 35px -10px rgba(0, 0, 0, 0.7);
 }
 
 .liveFeedHeader {
@@ -722,7 +728,7 @@
   font-size: 0.68rem;
   font-weight: 700;
   letter-spacing: 0.12em;
-  color: var(--neon-red);
+  color: var(--color-burnt-amber);
   text-transform: uppercase;
   display: flex;
   align-items: center;
@@ -761,21 +767,21 @@
 .polaroid {
   position: relative;
   width: 175px;
-  background: rgba(20, 22, 34, 0.9);
+  background: rgba(26, 22, 16, 0.95);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(255, 255, 255, 0.12);
+  border: 1px solid var(--border-glass);
   border-radius: var(--r-md);
   padding: 0.75rem 0.75rem 1rem;
-  box-shadow: 0 15px 35px -5px rgba(0, 0, 0, 0.6), 0 0 20px rgba(0, 0, 0, 0.4);
+  box-shadow: 0 15px 35px -5px rgba(0, 0, 0, 0.7), 0 0 20px rgba(0, 0, 0, 0.5);
   cursor: pointer;
   user-select: none;
   transition: box-shadow 0.25s ease, border-color 0.25s ease;
 }
 
 .polaroid:hover {
-  border-color: rgba(255, 42, 81, 0.5);
-  box-shadow: 0 20px 45px -5px rgba(255, 42, 81, 0.3);
+  border-color: var(--color-burnt-amber);
+  box-shadow: 0 20px 45px -5px rgba(185, 157, 115, 0.35);
 }
 
 .tapeStrip {
@@ -785,9 +791,9 @@
   transform: translateX(-50%);
   width: 45px;
   height: 14px;
-  background: rgba(251, 191, 36, 0.35);
+  background: rgba(185, 157, 115, 0.35);
   backdrop-filter: blur(4px);
-  border: 1px dashed rgba(251, 191, 36, 0.6);
+  border: 1px dashed var(--border-amber);
   z-index: 2;
 }
 
@@ -795,8 +801,8 @@
   width: 100%;
   height: 110px;
   border-radius: var(--r-sm);
-  background: linear-gradient(135deg, rgba(239, 68, 68, 0.15), rgba(15, 23, 42, 0.9));
-  border: 1px solid rgba(255, 255, 255, 0.05);
+  background: linear-gradient(135deg, rgba(108, 86, 54, 0.3), rgba(14, 12, 9, 0.95));
+  border: 1px solid var(--border-dim);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -808,7 +814,7 @@
 
 .photoIcon {
   font-size: 2.2rem;
-  filter: drop-shadow(0 0 10px rgba(255, 42, 81, 0.5));
+  filter: drop-shadow(0 0 10px var(--burnt-amber-glow));
 }
 
 .photoCrosshair {
@@ -847,8 +853,8 @@
   bottom: 8px;
   right: 6px;
   padding: 0.15rem 0.4rem;
-  border: 1.5px solid var(--neon-red);
-  color: var(--neon-red);
+  border: 1.5px solid var(--color-burnt-amber);
+  color: var(--color-burnt-amber);
   border-radius: 2px;
   font-family: var(--f-mono);
   font-size: 0.55rem;
@@ -856,21 +862,19 @@
   letter-spacing: 0.08em;
   text-transform: uppercase;
   transform: rotate(-10deg);
-  background: rgba(239, 68, 68, 0.12);
+  background: rgba(185, 157, 115, 0.14);
 }
 
 .stampBadgeCyan {
-  border-color: var(--neon-cyan);
-  color: var(--neon-cyan);
-  background: rgba(34, 211, 238, 0.12);
+  border-color: var(--color-burnt-amber);
+  color: var(--color-burnt-amber);
+  background: rgba(185, 157, 115, 0.14);
   transform: rotate(6deg);
 }
 
 .stampBadgeAmber {
-  border-color: var(--neon-amber);
-  color: var(--neon-amber);
-  background: rgba(251, 191, 36, 0.12);
+  border-color: var(--color-earth-brown);
+  color: var(--burnt-amber-bright);
+  background: rgba(108, 86, 54, 0.25);
   transform: rotate(-6deg);
 }
-
-
