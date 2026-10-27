@@ -8,6 +8,7 @@ import { usePlayer } from '@/hooks/usePlayer';
 import { useSupabaseRoom } from '@/hooks/useSupabaseRoom';
 import PlayerCard from '@/components/PlayerCard';
 import LoadingSpinner from '@/components/LoadingSpinner';
+import HowToPlayModal from '@/components/HowToPlayModal';
 import { MIN_PLAYERS, MAX_PLAYERS, GAME_STATUS } from '@/lib/constants';
 import s from './page.module.css';
 
@@ -23,6 +24,7 @@ export default function LobbyPage({ params }) {
   const [addingBots, setAddingBots] = useState(false);
   const [botError, setBotError] = useState('');
   const [isTestEnv, setIsTestEnv] = useState(false);
+  const [showGuide, setShowGuide] = useState(false);
 
   // Detect test/local development environment (never displays in production)
   useEffect(() => {
@@ -181,9 +183,19 @@ export default function LobbyPage({ params }) {
         >
           ← Leave Room
         </button>
-        <div className={s.liveBadge}>
-          <span className={s.liveDot} />
-          Lobby Live
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
+          <button
+            type="button"
+            onClick={() => setShowGuide(true)}
+            className={s.backLink}
+            style={{ color: 'var(--neon-cyan)', borderColor: 'rgba(34, 211, 238, 0.35)', background: 'rgba(34, 211, 238, 0.08)', cursor: 'pointer' }}
+          >
+            📖 Guide
+          </button>
+          <div className={s.liveBadge}>
+            <span className={s.liveDot} />
+            Lobby Live
+          </div>
         </div>
       </header>
 
@@ -302,6 +314,9 @@ export default function LobbyPage({ params }) {
       <footer className={s.footer}>
         HiddenTruth // Realtime Party Sync
       </footer>
+
+      {/* Beginner Guide Modal */}
+      <HowToPlayModal isOpen={showGuide} onClose={() => setShowGuide(false)} />
     </div>
   );
 }

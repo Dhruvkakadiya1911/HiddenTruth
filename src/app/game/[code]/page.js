@@ -11,6 +11,7 @@ import ClueCard from '@/components/ClueCard';
 import Timer from '@/components/Timer';
 import LoadingSpinner from '@/components/LoadingSpinner';
 import RoleModelCanvas from '@/components/RoleModelCanvas';
+import HowToPlayModal from '@/components/HowToPlayModal';
 import { ROLES, GAME_STATUS, TIMER_CONFIG } from '@/lib/constants';
 import s from './page.module.css';
 
@@ -28,6 +29,7 @@ export default function GamePage({ params }) {
   const [chatText, setChatText] = useState('');
   const [sendingChat, setSendingChat] = useState(false);
   const [showAccuseModal, setShowAccuseModal] = useState(false);
+  const [showGuide, setShowGuide] = useState(false);
 
   const handleLeaveGame = (e) => {
     e.preventDefault();
@@ -391,13 +393,23 @@ export default function GamePage({ params }) {
           onTimeUp={handleRoundTimeUp}
           showExpiredBanner={false}
         />
-        <button
-          type="button"
-          onClick={handleLeaveGame}
-          className={s.leaveBtn}
-        >
-          Exit
-        </button>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+          <button
+            type="button"
+            onClick={() => setShowGuide(true)}
+            className={s.leaveBtn}
+            style={{ color: 'var(--neon-cyan)', border: '1px solid rgba(34, 211, 238, 0.35)', background: 'rgba(34, 211, 238, 0.08)' }}
+          >
+            📖 Guide
+          </button>
+          <button
+            type="button"
+            onClick={handleLeaveGame}
+            className={s.leaveBtn}
+          >
+            Exit
+          </button>
+        </div>
       </header>
 
       {/* Auto-Advance Emergency Banner */}
@@ -772,6 +784,8 @@ export default function GamePage({ params }) {
           </div>
         </div>
       )}
+      {/* Beginner Guide Modal */}
+      <HowToPlayModal isOpen={showGuide} onClose={() => setShowGuide(false)} />
     </div>
   );
 }
