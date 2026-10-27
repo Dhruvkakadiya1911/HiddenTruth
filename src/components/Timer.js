@@ -11,6 +11,7 @@ export default function Timer({
   onTimeUp,
   resetTrigger,
   showExpiredBanner = true,
+  expiredText = '00:00',
 }) {
   const computeRemaining = useCallback(() => {
     if (startedAt) {
@@ -87,7 +88,17 @@ export default function Timer({
   let digitsTheme = s.digitsNormal;
   let icon = '⏳';
 
-  if (isExpired || timeLeft <= 15) {
+  if (isExpired) {
+    if (expiredText !== '00:00') {
+      timerTheme = s.timerNormal;
+      digitsTheme = s.digitsNormal;
+      icon = '💬';
+    } else {
+      timerTheme = s.timerCritical;
+      digitsTheme = s.digitsCritical;
+      icon = '🚨';
+    }
+  } else if (timeLeft <= 15) {
     timerTheme = s.timerCritical;
     digitsTheme = s.digitsCritical;
     icon = '🚨';
@@ -103,7 +114,7 @@ export default function Timer({
         <span className={s.timerIcon}>{icon}</span>
         {label && <span className={s.timerLabel}>{label}</span>}
         <span className={`${s.timerDigits} ${digitsTheme}`}>
-          {isExpired ? '00:00' : formattedTime}
+          {isExpired ? expiredText : formattedTime}
         </span>
       </div>
 
