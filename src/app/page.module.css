@@ -528,6 +528,32 @@
   transform: scale(0.98) translateY(0);
 }
 
+.btnGuideLanding {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  width: 100%;
+  padding: 0.75rem 1rem;
+  background: rgba(34, 211, 238, 0.06);
+  border: 1px dashed rgba(34, 211, 238, 0.35);
+  border-radius: var(--r-md);
+  color: var(--neon-cyan);
+  font-family: var(--f-display);
+  font-size: 0.88rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  margin-top: 0.25rem;
+}
+
+.btnGuideLanding:hover {
+  background: rgba(34, 211, 238, 0.15);
+  border-color: var(--neon-cyan);
+  color: #fff;
+  box-shadow: 0 0 20px rgba(34, 211, 238, 0.25);
+}
+
 .btnIcon {
   font-size: 1.1rem;
 }

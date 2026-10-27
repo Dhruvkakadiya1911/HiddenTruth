@@ -6,6 +6,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { usePlayer } from '@/hooks/usePlayer';
 import { supabase } from '@/lib/supabase';
 import WatcherCanvas from '@/components/WatcherCanvas';
+import HowToPlayModal from '@/components/HowToPlayModal';
 import s from './page.module.css';
 
 
@@ -103,6 +104,7 @@ export default function HomePage() {
 
   // Secret card flip state
   const [secretFlipped, setSecretFlipped] = useState(false);
+  const [showGuide, setShowGuide] = useState(false);
 
 
   // Mouse spotlight coordinates
@@ -346,6 +348,17 @@ export default function HomePage() {
                 Enter Room Code
               </Link>
             </motion.div>
+
+            <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.97 }}>
+              <button
+                type="button"
+                onClick={() => setShowGuide(true)}
+                className={s.btnGuideLanding}
+              >
+                <span>📖</span>
+                <span>How to Play Guide</span>
+              </button>
+            </motion.div>
           </motion.div>
 
           {/* Stats row */}
@@ -401,6 +414,9 @@ export default function HomePage() {
         <span className={s.bottomDot} />
         <span className={s.bottomItem}>Free to play</span>
       </div>
+
+      {/* ── How to Play Beginner Guide Modal ── */}
+      <HowToPlayModal isOpen={showGuide} onClose={() => setShowGuide(false)} />
     </div>
   );
 }

@@ -183,6 +183,29 @@
   color: #ff8598;
 }
 
+.btnGuide {
+  padding: 0.35rem 0.75rem;
+  background: rgba(34, 211, 238, 0.08);
+  border: 1px solid rgba(34, 211, 238, 0.3);
+  border-radius: var(--r-md);
+  color: var(--neon-cyan);
+  font-family: var(--f-display);
+  font-size: 0.82rem;
+  font-weight: 700;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  transition: all 0.2s ease;
+}
+
+.btnGuide:hover {
+  background: rgba(34, 211, 238, 0.18);
+  border-color: var(--neon-cyan);
+  color: #fff;
+  box-shadow: 0 0 15px rgba(34, 211, 238, 0.3);
+}
+
 .navLink {
   padding: 0.35rem 0.75rem;
   background: transparent;

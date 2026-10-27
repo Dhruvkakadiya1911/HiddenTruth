@@ -1,14 +1,17 @@
 'use client';
 
+import { useState } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { usePlayer } from '@/hooks/usePlayer';
+import HowToPlayModal from '@/components/HowToPlayModal';
 import s from './Navbar.module.css';
 
 export default function Navbar() {
   const pathname = usePathname();
   const router = useRouter();
   const { player, clearPlayer } = usePlayer();
+  const [showGuide, setShowGuide] = useState(false);
 
   // Extract roomCode if present in URL
   const match = pathname.match(/\/(lobby|game|vote|reveal)\/([a-zA-Z0-9]+)/);
@@ -98,6 +101,15 @@ export default function Navbar() {
 
       {/* Right: Player Profile & Action */}
       <div className={s.right}>
+        <button
+          type="button"
+          onClick={() => setShowGuide(true)}
+          className={s.btnGuide}
+          title="Learn how to play"
+        >
+          📖 Guide
+        </button>
+
         {player?.name && activeCode ? (
           <>
             <div className={s.playerChip}>
@@ -144,6 +156,9 @@ export default function Navbar() {
           </>
         )}
       </div>
+
+      {/* Beginner Guide Modal */}
+      <HowToPlayModal isOpen={showGuide} onClose={() => setShowGuide(false)} />
     </nav>
   );
 }
