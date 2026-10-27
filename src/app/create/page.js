@@ -100,11 +100,12 @@ export default function CreateRoomPage() {
         transition={{ duration: 0.5, ease: 'easeOut' }}
       >
         <div className={s.header}>
+          <div className={s.tagline}>Create Investigation</div>
           <h1 className={s.title}>
-            HOST A <span className={s.titleRed}>GAME</span>
+            HOST A <span className={s.titleRed}>MYSTERY</span>
           </h1>
           <p className={s.subtitle}>
-            Enter your name to create a mystery room and invite your friends.
+            Create a room, get a 4-letter code, and invite your friends!
           </p>
         </div>
 
@@ -113,7 +114,7 @@ export default function CreateRoomPage() {
           <form onSubmit={handleSubmit} style={{ display: 'contents' }}>
             <div className={s.fieldGroup}>
               <label htmlFor="hostName" className={s.label}>
-                <span>Your Name</span>
+                <span>Your Name or Nickname</span>
                 <span className={s.charCount}>{hostName.length}/20</span>
               </label>
               <div className={s.inputWrapper}>
@@ -121,7 +122,7 @@ export default function CreateRoomPage() {
                   id="hostName"
                   type="text"
                   className={s.input}
-                  placeholder="e.g. Alex"
+                  placeholder="e.g. Alex or Sherlock"
                   value={hostName}
                   onChange={(e) => {
                     setHostName(e.target.value);
@@ -130,7 +131,6 @@ export default function CreateRoomPage() {
                   maxLength={20}
                   autoComplete="off"
                   disabled={loading}
-                  autoFocus
                 />
               </div>
             </div>
@@ -154,7 +154,7 @@ export default function CreateRoomPage() {
               {loading ? (
                 <>
                   <div className={s.spinner} />
-                  <span>Creating Room...</span>
+                  <span>Generating Crime Scene...</span>
                 </>
               ) : (
                 <>
@@ -164,6 +164,10 @@ export default function CreateRoomPage() {
               )}
             </motion.button>
           </form>
+
+          <p className={s.infoNote}>
+            Once created, a 4-letter room code will be generated for your friends to join on their phones.
+          </p>
         </div>
       </motion.main>
 

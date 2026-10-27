@@ -232,49 +232,34 @@
   }
 }
 
-/* How it works grid */
-.howItWorksGrid {
+/* Tags row */
+.tags {
   display: flex;
-  flex-direction: column;
-  gap: 0.85rem;
-  margin-top: 0.5rem;
+  flex-wrap: wrap;
+  gap: 0.5rem;
 }
 
-.howStep {
-  display: flex;
-  align-items: flex-start;
-  gap: 0.85rem;
-  padding: 0.75rem 1rem;
-  background: rgba(255, 255, 255, 0.025);
+.tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.3rem 0.75rem;
+  background: rgba(255, 255, 255, 0.03);
   border: 1px solid var(--border-subtle);
-  border-radius: var(--r-md);
-  transition: all 0.2s ease;
-}
-
-.howStep:hover {
-  background: rgba(255, 255, 255, 0.05);
-  border-color: var(--border-glass);
-}
-
-.stepIcon {
-  font-size: 1.25rem;
-  line-height: 1;
-  padding-top: 0.15rem;
-}
-
-.stepTitle {
-  display: block;
-  font-size: 0.88rem;
-  font-weight: 700;
-  color: var(--text-primary);
-  margin-bottom: 0.15rem;
-}
-
-.stepSub {
+  border-radius: var(--r-full);
   font-size: 0.78rem;
-  color: var(--text-muted);
-  line-height: 1.4;
-  margin: 0;
+  font-weight: 500;
+  color: var(--text-secondary);
+  transition: border-color 0.2s, background 0.2s;
+}
+
+.tag:hover {
+  border-color: var(--border-glass);
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.tagIcon {
+  font-size: 0.85rem;
 }
 
 /* ── Right side: Action card ── */

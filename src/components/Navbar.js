@@ -76,7 +76,7 @@ export default function Navbar() {
           <span className={s.brandLogo}>HiddenTruth</span>
           <span className={s.brandDot} />
           <span className={s.brandSub}>
-            {hasActiveGameInUrl ? 'ACTIVE CASE' : 'AI MURDER MYSTERY'}
+            {hasActiveGameInUrl ? 'CASE IN PROGRESS' : 'NOTHING IS WHAT IT SEEMS.'}
           </span>
         </Link>
       </div>

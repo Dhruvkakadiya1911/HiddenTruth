@@ -294,7 +294,7 @@
 
 /* Scenario Header Card */
 .scenarioHeader {
-  padding: 1.25rem 1.5rem;
+  padding: 1.5rem;
   background: var(--bg-card);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
@@ -303,51 +303,24 @@
   box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.6);
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
-}
-
-.scenarioMetaRow {
-  display: flex;
-  align-items: center;
-  flex-wrap: wrap;
   gap: 0.6rem;
 }
 
 .settingTag {
-  display: inline-flex;
-  align-items: center;
   font-family: var(--f-mono);
   font-size: 0.72rem;
-  font-weight: 600;
-  color: var(--neon-cyan);
-  background: rgba(34, 211, 238, 0.1);
-  border: 1px solid rgba(34, 211, 238, 0.25);
-  padding: 0.25rem 0.65rem;
-  border-radius: var(--r-full);
-  letter-spacing: 0.05em;
+  color: var(--text-muted);
+  letter-spacing: 0.12em;
   text-transform: uppercase;
-}
-
-.victimPill {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.35rem;
-  padding: 0.25rem 0.65rem;
-  background: rgba(255, 42, 81, 0.1);
-  border: 1px solid rgba(255, 42, 81, 0.3);
-  border-radius: var(--r-full);
-  font-family: var(--f-mono);
-  font-size: 0.75rem;
-  color: #ff8598;
 }
 
 .mysteryTitle {
   font-family: var(--f-display);
-  font-size: clamp(1.4rem, 4vw, 1.9rem);
+  font-size: clamp(1.6rem, 5vw, 2.3rem);
   font-weight: 900;
   letter-spacing: -0.02em;
   color: var(--text-primary);
-  line-height: 1.2;
+  line-height: 1.1;
 }
 
 .victimBar {

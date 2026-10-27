@@ -123,11 +123,12 @@ export default function JoinRoomPage() {
         transition={{ duration: 0.5, ease: 'easeOut' }}
       >
         <div className={s.header}>
+          <div className={s.tagline}>Join Ongoing Investigation</div>
           <h1 className={s.title}>
-            JOIN A <span className={s.titleCyan}>GAME</span>
+            ENTER <span className={s.titleCyan}>ROOM</span>
           </h1>
           <p className={s.subtitle}>
-            Enter the 4-letter room code and your name to jump in.
+            Enter the 4-letter code from the host to jump into the game.
           </p>
         </div>
 
@@ -149,20 +150,19 @@ export default function JoinRoomPage() {
                 maxLength={4}
                 autoComplete="off"
                 disabled={loading}
-                autoFocus={!code}
               />
             </div>
 
             <div className={s.fieldGroup}>
               <label htmlFor="playerName" className={s.label}>
-                <span>Your Name</span>
+                <span>Your Name or Nickname</span>
                 <span className={s.charCount}>{playerName.length}/20</span>
               </label>
               <input
                 id="playerName"
                 type="text"
                 className={s.input}
-                placeholder="e.g. Sam"
+                placeholder="e.g. Sam or Watson"
                 value={playerName}
                 onChange={(e) => {
                   setPlayerName(e.target.value);
@@ -171,7 +171,6 @@ export default function JoinRoomPage() {
                 maxLength={20}
                 autoComplete="off"
                 disabled={loading}
-                autoFocus={Boolean(code && code.length === 4)}
               />
             </div>
 
@@ -204,6 +203,10 @@ export default function JoinRoomPage() {
               )}
             </motion.button>
           </form>
+
+          <p className={s.infoNote}>
+            Ask the host for the 4-letter code shown on their screen.
+          </p>
         </div>
       </motion.main>
 
