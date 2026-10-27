@@ -18,7 +18,6 @@ export default function ClueCard({ clue, index = 0 }) {
           <span>🔍</span>
           <span>Clue #{index + 1} • Round {clue.round || 1}</span>
         </span>
-        <span className={s.timestamp}>Confidential Evidence</span>
       </div>
 
       <div className={s.content}>{clue.content}</div>
