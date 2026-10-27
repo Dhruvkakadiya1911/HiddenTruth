@@ -75,37 +75,6 @@ export async function POST(req) {
       });
     }
 
-    // ─── ACTION: HOT SEAT CHALLENGE ───
-    if (abilityType === 'hotseat') {
-      const cleanReason = (reason || 'Explain your whereabouts and timeline!').trim();
-
-      // Post Hot Seat announcement
-      await supabaseServer.from('messages').insert([
-        {
-          room_id: roomId,
-          player_id: actor.id,
-          sender: actor.name,
-          content: `🔥 HOT SEAT CHALLENGE against ${target.name}: "${cleanReason}"`,
-          round: round || room.current_round || 1,
-          type: 'hotseat',
-        },
-        {
-          room_id: roomId,
-          player_id: null,
-          sender: 'narrator',
-          content: `🎙️ AI Narrator: "${target.name} has been forced onto the HOT SEAT by ${actor.name}! The clock is ticking — plead your defense!"`,
-          round: round || room.current_round || 1,
-          type: 'narrator',
-        },
-      ]);
-
-      return NextResponse.json({
-        success: true,
-        targetId: target.id,
-        targetName: target.name,
-      });
-    }
-
     return NextResponse.json({ error: 'Unknown ability type.' }, { status: 400 });
   } catch (err) {
     console.error('Error in /api/game/ability:', err);

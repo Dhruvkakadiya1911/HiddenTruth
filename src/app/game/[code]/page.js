@@ -44,15 +44,8 @@ export default function GamePage({ params }) {
   const [accuseError, setAccuseError] = useState('');
 
   // ─── NEW INTERACTIVE INVESTIGATION FEATURES ───
-  // Special ability chat modes: 'chat' | 'anonymous' | 'rumor' | 'alibi' | 'defense'
+  // Special ability chat modes: 'chat' | 'anonymous' | 'rumor' | 'alibi'
   const [chatMode, setChatMode] = useState('chat');
-
-  // Hot Seat Rapid Defense Spotlight
-  const [showHotSeatModal, setShowHotSeatModal] = useState(false);
-  const [hotSeatTargetId, setHotSeatTargetId] = useState('');
-  const [hotSeatReason, setHotSeatReason] = useState('');
-  const [submittingHotSeat, setSubmittingHotSeat] = useState(false);
-  const [hotSeatSecondsLeft, setHotSeatSecondsLeft] = useState(0);
 
   // Detective Forensic Scan Ability
   const [showScanModal, setShowScanModal] = useState(false);
@@ -102,32 +95,6 @@ export default function GamePage({ params }) {
     }
   }, [messages]);
 
-  // ─── HOT SEAT TICKER & COMPUTATIONS ───
-  const latestHotSeat = useMemo(() => {
-    const hs = [...messages].reverse().find((m) => m.type === 'hotseat');
-    if (!hs) return null;
-    const createdAt = new Date(hs.created_at).getTime();
-    const elapsed = Math.floor((Date.now() - createdAt) / 1000);
-    if (elapsed > 45) return null;
-    return hs;
-  }, [messages]);
-
-  useEffect(() => {
-    if (!latestHotSeat) {
-      setHotSeatSecondsLeft(0);
-      return;
-    }
-    const createdAt = new Date(latestHotSeat.created_at).getTime();
-    const updateTicker = () => {
-      const elapsed = Math.floor((Date.now() - createdAt) / 1000);
-      const remaining = Math.max(0, 30 - elapsed);
-      setHotSeatSecondsLeft(remaining);
-    };
-    updateTicker();
-    const interval = setInterval(updateTicker, 1000);
-    return () => clearInterval(interval);
-  }, [latestHotSeat]);
-
   // ─── SUSPICION THERMOMETER SCORES ───
   const suspicionScores = useMemo(() => {
     const scores = {};
@@ -176,43 +143,6 @@ export default function GamePage({ params }) {
       });
     } catch (err) {
       console.error('Failed to react:', err);
-    }
-  };
-
-  const handleOpenHotSeat = (presetTargetId) => {
-    const otherPlayers = players.filter((p) => p.id !== player?.id);
-    const initialId = presetTargetId || (otherPlayers.length > 0 ? otherPlayers[0].id : '');
-    setHotSeatTargetId(initialId);
-    setHotSeatReason('');
-    setShowHotSeatModal(true);
-  };
-
-  const handleTriggerHotSeat = async (e) => {
-    e.preventDefault();
-    if (!hotSeatTargetId || submittingHotSeat || !room) return;
-    setSubmittingHotSeat(true);
-    try {
-      const res = await fetch('/api/game/ability', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          roomId: room.id,
-          playerId: player.id,
-          targetSuspectId: hotSeatTargetId,
-          abilityType: 'hotseat',
-          reason: hotSeatReason.trim() || 'Explain your whereabouts at the time of the murder!',
-          round: room.current_round || 1,
-        }),
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || 'Failed to challenge suspect.');
-      setShowHotSeatModal(false);
-      setHotSeatReason('');
-    } catch (err) {
-      console.error('Hot Seat error:', err);
-      alert(err.message || 'Could not place suspect on the Hot Seat.');
-    } finally {
-      setSubmittingHotSeat(false);
     }
   };
 
@@ -363,7 +293,7 @@ export default function GamePage({ params }) {
       }
 
       setChatText('');
-      if (chatMode === 'defense' || chatMode === 'alibi' || chatMode === 'rumor') {
+      if (chatMode === 'alibi' || chatMode === 'rumor') {
         setChatMode('chat');
       }
     } catch (err) {
@@ -871,45 +801,14 @@ export default function GamePage({ params }) {
           >
             <div className={s.sectionTitle}>
               <span>💬 Interrogation & Discussion</span>
-              <div style={{ display: 'flex', gap: '0.4rem', alignItems: 'center' }}>
-                <button
-                  type="button"
-                  className={s.btnHotSeatTrigger}
-                  onClick={() => handleOpenHotSeat()}
-                  title="Challenge a suspect to 30s rapid defense on the Hot Seat"
-                >
-                  🔥 Hot Seat
-                </button>
-                <button
-                  type="button"
-                  className={s.btnAccuseTrigger}
-                  onClick={handleOpenAccuse}
-                >
-                  🚨 Point Finger
-                </button>
-              </div>
-            </div>
-
-            {/* Live Hot Seat Active Banner */}
-            {latestHotSeat && hotSeatSecondsLeft > 0 && (
-              <motion.div
-                className={s.hotSeatBanner}
-                initial={{ opacity: 0, scale: 0.96 }}
-                animate={{ opacity: 1, scale: 1 }}
+              <button
+                type="button"
+                className={s.btnAccuseTrigger}
+                onClick={handleOpenAccuse}
               >
-                <div className={s.hotSeatInfo}>
-                  <span className={s.hotSeatTitle}>
-                    <span>🔥 HOT SEAT CHALLENGE!</span>
-                  </span>
-                  <span className={s.hotSeatSub}>
-                    {latestHotSeat.content}
-                  </span>
-                </div>
-                <div className={s.hotSeatCountdown}>
-                  {hotSeatSecondsLeft}s
-                </div>
-              </motion.div>
-            )}
+                🚨 Point Finger
+              </button>
+            </div>
 
             <div ref={chatMessagesRef} className={s.chatFeed}>
               {messages.filter((m) => m.type !== 'reaction').length === 0 ? (
@@ -920,8 +819,6 @@ export default function GamePage({ params }) {
                 messages.filter((m) => m.type !== 'reaction').map((m) => {
                   const isNarrator = m.type === 'narrator' || m.sender === 'narrator';
                   const isAccusation = m.type === 'accusation';
-                  const isHotSeat = m.type === 'hotseat';
-                  const isDefense = m.type === 'defense';
                   const isAnonymous = m.type === 'anonymous';
                   const isRumor = m.type === 'rumor';
                   const isAlibi = m.type === 'alibi';
@@ -930,8 +827,6 @@ export default function GamePage({ params }) {
 
                   let bubbleClass = s.bubbleOther;
                   if (isAccusation) bubbleClass = s.bubbleAccusation;
-                  else if (isHotSeat) bubbleClass = s.bubbleHotSeat;
-                  else if (isDefense) bubbleClass = s.bubbleDefense;
                   else if (isAnonymous) bubbleClass = s.bubbleAnonymous;
                   else if (isRumor) bubbleClass = s.bubbleRumor;
                   else if (isAlibi) bubbleClass = s.bubbleAlibi;
@@ -943,14 +838,14 @@ export default function GamePage({ params }) {
                     <div
                       key={m.id}
                       className={`${s.msgRow} ${
-                        isAccusation || isNarrator || isHotSeat || isSystem
+                        isAccusation || isNarrator || isSystem
                           ? s.msgRowNarrator
                           : isMe
                           ? s.msgRowMe
                           : s.msgRowOther
                       }`}
                     >
-                      {!isNarrator && !isAccusation && !isHotSeat && !isSystem && (
+                      {!isNarrator && !isAccusation && !isSystem && (
                         <span className={s.msgSender}>
                           {isMe ? 'You' : m.sender}
                         </span>
@@ -960,7 +855,6 @@ export default function GamePage({ params }) {
                         {isAnonymous && <strong>🕶️ ANONYMOUS TIP: </strong>}
                         {isRumor && <strong>🎭 PLANTED RUMOR: </strong>}
                         {isAlibi && <strong>🛡️ VERIFIED ALIBI: </strong>}
-                        {isDefense && <strong>🛡️ PLEA OF DEFENSE: </strong>}
                         {m.content}
                       </div>
                     </div>
@@ -1078,18 +972,10 @@ export default function GamePage({ params }) {
                         >
                           🤝
                         </button>
-                        <button
-                          type="button"
-                          className={s.btnRowHotSeat}
-                          onClick={() => handleOpenHotSeat(p.id)}
-                          title="Put on Hot Seat"
-                        >
-                          🔥
-                        </button>
                         {currentRole.toLowerCase().includes('detec') && (
                           <button
                             type="button"
-                            className={s.btnRowHotSeat}
+                            className={s.btnRowScan}
                             style={{ background: 'rgba(34,211,238,0.15)', borderColor: 'var(--neon-cyan)', color: 'var(--neon-cyan)' }}
                             onClick={() => handleOpenDetectiveScan(p.id)}
                             title="Forensic Scan"
@@ -1185,81 +1071,6 @@ export default function GamePage({ params }) {
                   disabled={submittingAccusation || !accuseReason.trim() || !accusedId}
                 >
                   {submittingAccusation ? 'Accusing...' : 'Declare Accusation 🚨'}
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
-
-      {/* Hot Seat Challenge Modal */}
-      {showHotSeatModal && (
-        <div
-          className={s.modalOverlay}
-          onClick={() => !submittingHotSeat && setShowHotSeatModal(false)}
-        >
-          <div className={s.modalContent} onClick={(e) => e.stopPropagation()} style={{ borderColor: '#f59e0b' }}>
-            <div className={s.modalHeader}>
-              <h3 className={s.modalTitle} style={{ color: '#fbbf24' }}>🔥 Challenge to Hot Seat</h3>
-              <button
-                type="button"
-                className={s.modalClose}
-                onClick={() => setShowHotSeatModal(false)}
-                disabled={submittingHotSeat}
-              >
-                ✕
-              </button>
-            </div>
-
-            <form onSubmit={handleTriggerHotSeat}>
-              <div className={s.formGroup} style={{ marginBottom: '1rem' }}>
-                <label className={s.formLabel}>Put on the Stand:</label>
-                <select
-                  className={s.accuseSelect}
-                  value={hotSeatTargetId}
-                  onChange={(e) => setHotSeatTargetId(e.target.value)}
-                  disabled={submittingHotSeat}
-                >
-                  {players
-                    .filter((p) => p.id !== player?.id)
-                    .map((p) => (
-                      <option key={p.id} value={p.id}>
-                        {p.name}
-                      </option>
-                    ))}
-                </select>
-              </div>
-
-              <div className={s.formGroup} style={{ marginBottom: '1rem' }}>
-                <label className={s.formLabel}>What must they answer for?</label>
-                <textarea
-                  className={s.accuseTextarea}
-                  placeholder="e.g. You claimed you were sleeping, but the clue says footsteps were heard near the gallery! Explain yourself!"
-                  rows={3}
-                  value={hotSeatReason}
-                  onChange={(e) => setHotSeatReason(e.target.value)}
-                  disabled={submittingHotSeat}
-                  maxLength={250}
-                  required
-                />
-              </div>
-
-              <div className={s.modalActions}>
-                <button
-                  type="button"
-                  className={s.btnCancel}
-                  onClick={() => setShowHotSeatModal(false)}
-                  disabled={submittingHotSeat}
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  className={s.btnSubmitAccuse}
-                  style={{ background: 'linear-gradient(135deg, #f59e0b, #d97706)', color: '#000' }}
-                  disabled={submittingHotSeat || !hotSeatReason.trim() || !hotSeatTargetId}
-                >
-                  {submittingHotSeat ? 'Calling Out...' : 'Start 30s Hot Seat 🔥'}
                 </button>
               </div>
             </form>

@@ -531,42 +531,4 @@ Return JSON:
   return defaultFallback;
 }
 
-// Generate AI reaction to a Hot Seat defense
-export async function generateDefenseEvaluation(scenario, suspectName, defenseText) {
-  const defaultFallback = `🎙️ AI Narrator: "${suspectName} passionately pleaded their defense: '${defenseText}'. The room goes dead quiet — do you believe them or is it a calculated lie?"`;
-
-  if (!apiKey || apiKey === 'your-gemini-api-key-placeholder' || !defenseText) {
-    return defaultFallback;
-  }
-
-  const candidateModels = CANDIDATE_MODELS;
-  const prompt = `You are a dramatic, witty party game narrator.
-Suspect "${suspectName}" was just put on the HOT SEAT and gave this defense:
-"${defenseText}"
-
-Scenario:
-- Victim: ${scenario.victim || 'Victim'}
-- Crime Scene: ${scenario.setting || 'Crime Scene'}
-
-Respond with ONE single dramatic, thrilling sentence (under 25 words) evaluating how the room feels about this defense. Start with: 🎙️ AI Narrator:`;
-
-  for (const modelName of candidateModels) {
-    try {
-      const genAI = new GoogleGenerativeAI(apiKey);
-      const model = genAI.getGenerativeModel({
-        model: modelName,
-        generationConfig: { temperature: 0.8 },
-      });
-
-      const result = await model.generateContent(prompt);
-      const text = result.response.text().trim();
-      if (text) return text;
-    } catch (err) {
-      console.warn(`Defense evaluation with ${modelName} failed (${err.message}). Trying next...`);
-    }
-  }
-
-  return defaultFallback;
-}
-
 

@@ -1,6 +1,5 @@
 import { NextResponse } from 'next/server';
 import { supabaseServer } from '@/lib/supabaseServer';
-import { generateDefenseEvaluation } from '@/lib/ai';
 
 // POST: Send chat message in game
 export async function POST(request) {
@@ -43,24 +42,6 @@ export async function POST(request) {
     if (error || !message) {
       console.error('Chat insert error:', error);
       return NextResponse.json({ error: error?.message || 'Failed to send message.' }, { status: 500 });
-    }
-
-    // If this message was a defense on the Hot Seat, trigger dramatic AI Narrator evaluation
-    if (type === 'defense') {
-      try {
-        const { data: room } = await supabaseServer.from('rooms').select('scenario').eq('id', roomId).single();
-        const narratorReaction = await generateDefenseEvaluation(room?.scenario || {}, sender, cleanContent);
-        await supabaseServer.from('messages').insert({
-          room_id: roomId,
-          player_id: null,
-          sender: 'narrator',
-          content: narratorReaction,
-          round: round || 1,
-          type: 'narrator',
-        });
-      } catch (e) {
-        console.warn('Defense AI evaluation notice:', e);
-      }
     }
 
     return NextResponse.json({ success: true, message });
