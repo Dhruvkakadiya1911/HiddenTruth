@@ -7,6 +7,14 @@ import { ROLES } from './constants.js';
 
 const apiKey = process.env.GEMINI_API_KEY || process.env.LLM_API_KEY;
 
+// Active Gemini model candidates supporting v1beta generateContent
+export const CANDIDATE_MODELS = [
+  'gemini-3.5-flash-lite',
+  'gemini-flash-lite-latest',
+  'gemini-3.5-flash',
+  'gemini-flash-latest',
+];
+
 // Fallback scenario generator for offline testing or API fallback — Natural, human party-game themes
 function generateFallbackScenario(players) {
   const PRESET_THEMES = [
@@ -265,7 +273,7 @@ export async function generateMysteryScenario(players) {
     return enforceRoleDistribution(generateFallbackScenario(players), players);
   }
 
-  const candidateModels = ['gemini-2.0-flash', 'gemini-1.5-flash', 'gemini-1.5-flash-latest', 'gemini-1.5-pro'];
+  const candidateModels = CANDIDATE_MODELS;
 
   for (const modelName of candidateModels) {
     try {
@@ -338,7 +346,7 @@ export async function generateRoundClue(scenario, round, existingClues = []) {
     return defaultFallback;
   }
 
-  const candidateModels = ['gemini-2.0-flash', 'gemini-1.5-flash', 'gemini-1.5-flash-latest', 'gemini-1.5-pro'];
+  const candidateModels = CANDIDATE_MODELS;
 
   for (const modelName of candidateModels) {
     try {
@@ -381,7 +389,7 @@ export async function generateAccusationReaction(scenario, accuserName, accusedN
     return defaultFallback;
   }
 
-  const candidateModels = ['gemini-2.0-flash', 'gemini-1.5-flash', 'gemini-1.5-flash-latest', 'gemini-1.5-pro'];
+  const candidateModels = CANDIDATE_MODELS;
 
   for (const modelName of candidateModels) {
     try {
@@ -429,7 +437,7 @@ export async function generateRevealMonologue(scenario, killerName, mostVotedNam
     return defaultFallback;
   }
 
-  const candidateModels = ['gemini-2.0-flash', 'gemini-1.5-flash', 'gemini-1.5-flash-latest', 'gemini-1.5-pro'];
+  const candidateModels = CANDIDATE_MODELS;
 
   for (const modelName of candidateModels) {
     try {
@@ -480,7 +488,7 @@ export async function generateDetectiveScan(scenario, suspectName, suspectRole, 
     return defaultFallback;
   }
 
-  const candidateModels = ['gemini-2.0-flash', 'gemini-1.5-flash', 'gemini-1.5-flash-latest', 'gemini-1.5-pro'];
+  const candidateModels = CANDIDATE_MODELS;
 
   const prompt = `You are the lead forensic examiner in a gritty, high-stakes murder mystery party game.
 A detective is conducting a confidential forensic examination on suspect "${suspectName}".
@@ -531,7 +539,7 @@ export async function generateDefenseEvaluation(scenario, suspectName, defenseTe
     return defaultFallback;
   }
 
-  const candidateModels = ['gemini-2.0-flash', 'gemini-1.5-flash', 'gemini-1.5-flash-latest', 'gemini-1.5-pro'];
+  const candidateModels = CANDIDATE_MODELS;
   const prompt = `You are a dramatic, witty party game narrator.
 Suspect "${suspectName}" was just put on the HOT SEAT and gave this defense:
 "${defenseText}"
