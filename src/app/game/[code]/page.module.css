@@ -927,24 +927,6 @@
   transform: scale(0.92);
 }
 
-.btnRowScan {
-  background: rgba(34, 211, 238, 0.15);
-  border: 1px solid rgba(34, 211, 238, 0.4);
-  color: var(--neon-cyan);
-  border-radius: var(--r-sm);
-  padding: 0.25rem 0.45rem;
-  font-size: 0.7rem;
-  font-family: var(--f-mono);
-  font-weight: 700;
-  cursor: pointer;
-  transition: all 0.15s ease;
-}
-
-.btnRowScan:hover {
-  background: var(--neon-cyan);
-  color: #000;
-}
-
 /* Modal Overlay */
 .modalOverlay {
   position: fixed;

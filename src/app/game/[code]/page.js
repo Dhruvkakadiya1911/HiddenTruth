@@ -47,13 +47,6 @@ export default function GamePage({ params }) {
   // Special ability chat modes: 'chat' | 'anonymous' | 'rumor' | 'alibi'
   const [chatMode, setChatMode] = useState('chat');
 
-  // Detective Forensic Scan Ability
-  const [showScanModal, setShowScanModal] = useState(false);
-  const [scanTargetId, setScanTargetId] = useState('');
-  const [scanning, setScanning] = useState(false);
-  const [scanResult, setScanResult] = useState(null);
-  const [scanLogs, setScanLogs] = useState([]);
-
   const chatBottomRef = useRef(null);
   const chatMessagesRef = useRef(null);
 
@@ -143,41 +136,6 @@ export default function GamePage({ params }) {
       });
     } catch (err) {
       console.error('Failed to react:', err);
-    }
-  };
-
-  const handleOpenDetectiveScan = (presetTargetId) => {
-    const otherPlayers = players.filter((p) => p.id !== player?.id);
-    const initialId = presetTargetId || (otherPlayers.length > 0 ? otherPlayers[0].id : '');
-    setScanTargetId(initialId);
-    setShowScanModal(true);
-  };
-
-  const handleRunDetectiveScan = async (e) => {
-    e.preventDefault();
-    if (!scanTargetId || scanning || !room) return;
-    setScanning(true);
-    try {
-      const res = await fetch('/api/game/ability', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          roomId: room.id,
-          playerId: player.id,
-          targetSuspectId: scanTargetId,
-          abilityType: 'detective_scan',
-          round: room.current_round || 1,
-        }),
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || 'Scan failed.');
-      setScanResult(data.scanResult);
-      setScanLogs((prev) => [data.scanResult, ...prev]);
-    } catch (err) {
-      console.error('Scan error:', err);
-      alert(err.message || 'Forensic scan failed.');
-    } finally {
-      setScanning(false);
     }
   };
 
@@ -606,39 +564,6 @@ export default function GamePage({ params }) {
           </motion.div>
 
           {/* Role Special Power Action Card */}
-          {currentRole.toLowerCase().includes('detec') && (
-            <motion.div
-              className={s.roleAbilityCard}
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-            >
-              <div className={s.roleAbilityHeader}>
-                <span className={s.roleAbilityBadge}>🔍 Detective Forensic Power</span>
-                <span style={{ fontSize: '0.72rem', color: 'var(--neon-cyan)', fontFamily: 'var(--f-mono)' }}>
-                  Active Tool
-                </span>
-              </div>
-              <p style={{ fontSize: '0.78rem', color: 'var(--text-secondary)', margin: 0 }}>
-                Test any suspect’s physical traces and alibi against the hidden crime scene truth.
-              </p>
-              <button
-                type="button"
-                className={s.btnAbilityAction}
-                onClick={() => handleOpenDetectiveScan()}
-              >
-                <span>🔬</span>
-                <span>Run Forensic Scan on Suspect</span>
-              </button>
-
-              {scanLogs.length > 0 && (
-                <div style={{ marginTop: '0.4rem', padding: '0.5rem', background: 'rgba(0,0,0,0.3)', borderRadius: '4px', borderLeft: '2px solid var(--neon-cyan)' }}>
-                  <div style={{ fontSize: '0.72rem', fontWeight: 'bold', color: 'var(--neon-cyan)' }}>Latest Scan ({scanLogs[0].targetName}):</div>
-                  <div style={{ fontSize: '0.75rem', color: '#e2e8f0', marginTop: '0.2rem' }}>{scanLogs[0].finding}</div>
-                </div>
-              )}
-            </motion.div>
-          )}
-
           {currentRole.toLowerCase().includes('witn') && (
             <motion.div
               className={s.roleAbilityCard}
@@ -972,17 +897,6 @@ export default function GamePage({ params }) {
                         >
                           🤝
                         </button>
-                        {currentRole.toLowerCase().includes('detec') && (
-                          <button
-                            type="button"
-                            className={s.btnRowScan}
-                            style={{ background: 'rgba(34,211,238,0.15)', borderColor: 'var(--neon-cyan)', color: 'var(--neon-cyan)' }}
-                            onClick={() => handleOpenDetectiveScan(p.id)}
-                            title="Forensic Scan"
-                          >
-                            🔬
-                          </button>
-                        )}
                       </div>
                     )}
                   </div>
@@ -1074,101 +988,6 @@ export default function GamePage({ params }) {
                 </button>
               </div>
             </form>
-          </div>
-        </div>
-      )}
-
-      {/* Detective Forensic Scan Modal */}
-      {showScanModal && (
-        <div
-          className={s.modalOverlay}
-          onClick={() => !scanning && setShowScanModal(false)}
-        >
-          <div className={s.modalContent} onClick={(e) => e.stopPropagation()} style={{ borderColor: 'var(--neon-cyan)' }}>
-            <div className={s.modalHeader}>
-              <h3 className={s.modalTitle} style={{ color: 'var(--neon-cyan)' }}>🔬 Forensic Truth Probe</h3>
-              <button
-                type="button"
-                className={s.modalClose}
-                onClick={() => setShowScanModal(false)}
-                disabled={scanning}
-              >
-                ✕
-              </button>
-            </div>
-
-            {scanResult ? (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                <div style={{ padding: '1rem', background: 'rgba(34,211,238,0.1)', border: '1px solid var(--neon-cyan)', borderRadius: '8px' }}>
-                  <div style={{ fontSize: '0.8rem', fontFamily: 'var(--f-mono)', color: 'var(--neon-cyan)', marginBottom: '0.4rem' }}>
-                    CONFIDENTIAL FORENSIC DOSSIER // {scanResult.targetName}
-                  </div>
-                  <div style={{ fontSize: '0.95rem', color: '#fff', lineHeight: 1.5 }}>
-                    {scanResult.finding}
-                  </div>
-                  <div style={{ marginTop: '0.6rem', fontSize: '0.75rem', fontFamily: 'var(--f-mono)', color: scanResult.isSuspicious ? 'var(--neon-red)' : '#34d399' }}>
-                    ANALYSIS STATUS: {scanResult.confidence}
-                  </div>
-                </div>
-
-                <div className={s.modalActions}>
-                  <button
-                    type="button"
-                    className={s.btnSubmitAccuse}
-                    style={{ background: 'var(--neon-cyan)', color: '#000' }}
-                    onClick={() => {
-                      setScanResult(null);
-                      setShowScanModal(false);
-                    }}
-                  >
-                    Got It (Keep Confidential)
-                  </button>
-                </div>
-              </div>
-            ) : (
-              <form onSubmit={handleRunDetectiveScan}>
-                <div className={s.formGroup} style={{ marginBottom: '1rem' }}>
-                  <label className={s.formLabel}>Target Suspect for Forensic Testing:</label>
-                  <select
-                    className={s.accuseSelect}
-                    value={scanTargetId}
-                    onChange={(e) => setScanTargetId(e.target.value)}
-                    disabled={scanning}
-                  >
-                    {players
-                      .filter((p) => p.id !== player?.id)
-                      .map((p) => (
-                        <option key={p.id} value={p.id}>
-                          {p.name}
-                        </option>
-                      ))}
-                  </select>
-                </div>
-
-                <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', lineHeight: 1.4, margin: '0 0 1rem' }}>
-                  The crime lab will cross-reference this suspect's shoes, hands, clothing fibers, and timeline against the primary crime scene evidence. Only you will see the full forensic report.
-                </p>
-
-                <div className={s.modalActions}>
-                  <button
-                    type="button"
-                    className={s.btnCancel}
-                    onClick={() => setShowScanModal(false)}
-                    disabled={scanning}
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    type="submit"
-                    className={s.btnSubmitAccuse}
-                    style={{ background: 'linear-gradient(135deg, #06b6d4, #3b82f6)' }}
-                    disabled={scanning || !scanTargetId}
-                  >
-                    {scanning ? 'Analyzing Traces...' : 'Run Forensic Scan 🔬'}
-                  </button>
-                </div>
-              </form>
-            )}
           </div>
         </div>
       )}
