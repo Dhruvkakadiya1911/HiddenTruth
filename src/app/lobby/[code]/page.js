@@ -209,7 +209,7 @@ export default function LobbyPage({ params }) {
           </button>
 
           <p className={s.codeHint}>
-            Friends can join by visiting the app on their phone and entering this 4-letter code.
+            Share this 4-letter code with friends to join.
           </p>
         </div>
 

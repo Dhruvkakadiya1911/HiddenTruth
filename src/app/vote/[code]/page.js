@@ -441,12 +441,12 @@ export default function VotePage({ params }) {
             transition={{ duration: 0.4, delay: 0.2 }}
           >
             <div className={s.hostFinaleTitle}>
-              👑 Host Authority: Grand Finale
+              👑 Host Controls
             </div>
             <div className={s.hostFinaleSub}>
               {allVoted
-                ? 'All players have submitted their ballots! Ready to unmask the real killer and discover who got away with murder?'
-                : 'You can wait for all suspects to finish voting, or force the reveal now if everyone present has submitted.'}
+                ? 'All votes are locked in. Reveal the killer when ready!'
+                : 'Waiting for everyone to vote. You can also reveal now if ready.'}
             </div>
             <button
               type="button"

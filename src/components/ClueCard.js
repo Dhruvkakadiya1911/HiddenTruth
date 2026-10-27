@@ -6,6 +6,17 @@ import s from './ClueCard.module.css';
 export default function ClueCard({ clue, index = 0 }) {
   if (!clue) return null;
 
+  // Extract optional title from clue object or from start of text
+  let title = clue.title || null;
+  let text = clue.content || '';
+
+  // If text starts with "**Title:**" or "Title: "
+  const titleMatch = text.match(/^(?:\*\*)?(?:Title|Evidence|Clue):\s*([^*\n]+)(?:\*\*)?\n+/i);
+  if (!title && titleMatch) {
+    title = titleMatch[1].trim();
+    text = text.slice(titleMatch[0].length).trim();
+  }
+
   return (
     <motion.div
       className={s.card}
@@ -21,7 +32,16 @@ export default function ClueCard({ clue, index = 0 }) {
         <span className={s.timestamp}>Confidential Evidence</span>
       </div>
 
-      <div className={s.content}>{clue.content}</div>
+      {title && <h4 className={s.title}>{title}</h4>}
+
+      <div className={s.content}>{text}</div>
+
+      {clue.narratorComment && (
+        <div className={s.comment}>
+          <span className={s.commentIcon}>💡</span>
+          <span>{clue.narratorComment}</span>
+        </div>
+      )}
     </motion.div>
   );
 }

@@ -344,7 +344,15 @@ export default function GamePage({ params }) {
     : null;
 
   const currentRole = currentPlayer?.role || assignedFromScenario?.role || ROLES.SUSPECT;
-  const secretInfo = currentPlayer?.secret_info || assignedFromScenario?.secretInfo || 'Await your confidential briefing...';
+  const rawSecretInfo = currentPlayer?.secret_info || assignedFromScenario?.secretInfo || 'Await your confidential briefing...';
+  const cleanSecretInfo = (info) => {
+    if (!info) return 'Await your confidential briefing...';
+    return info
+      .replace(/^YOU ARE THE (DETECTIVE|KILLER|WITNESS|PRIME SUSPECT|SUSPECT)[.:\s-]*/i, '')
+      .replace(/^ROLE:\s*[A-Za-z\s]+[.:\s-]*/i, '')
+      .trim();
+  };
+  const secretInfo = cleanSecretInfo(rawSecretInfo);
   const isHost = player?.isHost && (player?.roomId === room?.id || player?.roomCode === roomCode);
 
   const currentRound = room.current_round || 1;
@@ -563,14 +571,13 @@ export default function GamePage({ params }) {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
           >
-            <span className={s.settingTag}>{scenario.setting || 'Classified Location'}</span>
+            <div className={s.scenarioMetaRow}>
+              <span className={s.settingTag}>📍 {scenario.setting || 'Classified Location'}</span>
+              {scenario.victim && (
+                <span className={s.victimPill}>💀 Victim: <strong>{scenario.victim}</strong></span>
+              )}
+            </div>
             <h1 className={s.mysteryTitle}>{scenario.title || 'Murder Mystery Investigation'}</h1>
-            {scenario.victim && (
-              <div className={s.victimBar}>
-                <span className={s.victimIcon}>💀</span>
-                <span>Victim: <strong>{scenario.victim}</strong></span>
-              </div>
-            )}
           </motion.div>
 
           {/* Revealed Evidence Clues */}

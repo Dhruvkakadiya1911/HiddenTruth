@@ -135,6 +135,7 @@ export default function RevealScene({
         <div className={s.tallyList}>
           {voteBreakdown.map((tally) => {
             const isKiller = tally.suspectName === finalKillerName;
+            const percentage = totalVotes > 0 ? Math.round((tally.count / totalVotes) * 100) : 0;
             return (
               <div key={tally.suspectId} className={s.tallyItem}>
                 <div className={s.tallyItemTop}>
@@ -143,9 +144,17 @@ export default function RevealScene({
                     {isKiller && <span className={s.tallyBadgeKiller}>REAL KILLER 🩸</span>}
                   </div>
                   <div className={s.tallyCount}>
-                    {tally.count} {tally.count === 1 ? 'Vote' : 'Votes'}
+                    {tally.count} {tally.count === 1 ? 'Vote' : 'Votes'} ({percentage}%)
                   </div>
                 </div>
+
+                <div className={s.tallyBarTrack}>
+                  <div
+                    className={`${s.tallyBarFill} ${isKiller ? s.tallyBarKiller : ''}`}
+                    style={{ width: `${percentage}%` }}
+                  />
+                </div>
+
                 {tally.voters && tally.voters.length > 0 && (
                   <div className={s.tallyVoters}>
                     Accused by: {tally.voters.join(', ')}
@@ -165,12 +174,26 @@ export default function RevealScene({
         transition={{ duration: 0.6, delay: 0.55 }}
       >
         <div className={s.sectionTitle}>
-          <span>🎭 Everyone's True Roles & Secret Agendas</span>
+          <span>🎭 Player Roles & Secret Identities</span>
         </div>
 
         <div className={s.rosterGrid}>
           {players.map((p) => {
             const meta = getRoleIconAndClass(p.role);
+            const roleLower = (p.role || '').toLowerCase();
+            const cleanSecret = (p.secret_info || '')
+              .replace(/^YOU ARE THE (DETECTIVE|KILLER|WITNESS|PRIME SUSPECT|SUSPECT)[.:\s-]*/i, '')
+              .replace(/^ROLE:\s*[A-Za-z\s]+[.:\s-]*/i, '')
+              .trim();
+
+            const roleSummary = roleLower.includes('kill')
+              ? 'Committed the murder and misled the room.'
+              : roleLower.includes('detec')
+              ? 'Analyzed the crime scene and led the interrogation.'
+              : roleLower.includes('witn')
+              ? 'Held crucial eyewitness testimony of the crime.'
+              : 'Defended their innocence and helped find the truth.';
+
             return (
               <div key={p.id} className={`${s.rosterCard} ${meta.cardClass}`}>
                 <div className={s.rosterCardModel}>
@@ -183,9 +206,10 @@ export default function RevealScene({
                   <div className={`${s.rosterCardRole} ${meta.colorClass}`}>
                     {meta.icon} {meta.label}
                   </div>
-                  {p.secret_info && (
+                  <p className={s.rosterCardSummary}>{roleSummary}</p>
+                  {cleanSecret && (
                     <div className={s.rosterCardSecret}>
-                      {p.secret_info}
+                      "{cleanSecret}"
                     </div>
                   )}
                 </div>

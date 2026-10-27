@@ -2,48 +2,27 @@
 
 import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { usePlayer } from '@/hooks/usePlayer';
 import { supabase } from '@/lib/supabase';
 import WatcherCanvas from '@/components/WatcherCanvas';
 import s from './page.module.css';
 
-
-/* Stagger children helper */
+/* Stagger animation helpers */
 const stagger = {
   hidden: {},
-  show: { transition: { staggerChildren: 0.12 } },
+  show: { transition: { staggerChildren: 0.1 } },
 };
 
 const fadeUp = {
-  hidden: { opacity: 0, y: 20 },
-  show: { opacity: 1, y: 0, transition: { duration: 0.55, ease: 'easeOut' } },
+  hidden: { opacity: 0, y: 16 },
+  show: { opacity: 1, y: 0, transition: { duration: 0.45, ease: 'easeOut' } },
 };
 
 const fadeScale = {
   hidden: { opacity: 0, scale: 0.96 },
-  show: { opacity: 1, scale: 1, transition: { duration: 0.5, ease: 'easeOut' } },
+  show: { opacity: 1, scale: 1, transition: { duration: 0.45, ease: 'easeOut' } },
 };
-
-/* Ticker content - repeated for continuous scroll */
-const TICKER = '⚠ CRIME SCENE — DO NOT CROSS  ◈  SUSPECT IDENTIFIED  ◈  AI NARRATOR ONLINE  ◈  TRUST NO ONE  ◈  ';
-
-/* Rotating typewriter taglines */
-const TAGLINES = [
-  'One room. One killer. Zero alibis.',
-  'The room knows who did it.',
-  'Every round reveals a lie.',
-  'Vote before the timer expires.',
-];
-
-/* Simulated live case snippets */
-const LIVE_SNIPPETS = [
-  { icon: '🎙️', sender: 'Narrator', text: 'The penthouse lights cut out at 11:41 PM. Julian Ross was shoved into the pool.' },
-  { icon: '🔍', sender: 'Detective', text: 'I found wet sneaker prints leading straight to the bar. Who was grabbing a drink?' },
-  { icon: '👁️', sender: 'Witness', text: 'I saw someone slipping through the patio curtains wearing a dark hoodie.' },
-  { icon: '🩸', sender: 'The Killer', text: 'I was in the kitchen getting ice the whole time. Ask Alex!' },
-  { icon: '⚖️', sender: 'The Room', text: 'Votes are locked in. The killer has nowhere left to hide.' },
-];
 
 export default function HomePage() {
   const sceneRef = useRef(null);
@@ -75,7 +54,6 @@ export default function HomePage() {
 
         if (!isMounted) return;
 
-        // If the game has concluded or room is not found, clear old session
         if (error || !data || data.status === 'finished') {
           clearPlayer();
           setIsRoomActive(false);
@@ -93,19 +71,7 @@ export default function HomePage() {
     };
   }, [player?.roomCode, clearPlayer]);
 
-  // Typewriter state
-  const [taglineIndex, setTaglineIndex] = useState(0);
-  const [currentText, setCurrentText] = useState('');
-  const [isDeleting, setIsDeleting] = useState(false);
-
-  // Live feed simulation snippet state
-  const [snippetIndex, setSnippetIndex] = useState(0);
-
-  // Secret card flip state
-  const [secretFlipped, setSecretFlipped] = useState(false);
-
-
-  // Mouse spotlight coordinates
+  // Mouse spotlight torch coordinates
   const handlePointerMove = (e) => {
     if (!sceneRef.current) return;
     const rect = sceneRef.current.getBoundingClientRect();
@@ -114,42 +80,6 @@ export default function HomePage() {
     sceneRef.current.style.setProperty('--mouse-x', `${x}px`);
     sceneRef.current.style.setProperty('--mouse-y', `${y}px`);
   };
-
-  // Typewriter effect logic
-  useEffect(() => {
-    const fullText = TAGLINES[taglineIndex];
-    const speed = isDeleting ? 30 : 60;
-
-    const timer = setTimeout(() => {
-      if (!isDeleting) {
-        if (currentText.length < fullText.length) {
-          setCurrentText(fullText.slice(0, currentText.length + 1));
-        } else {
-          // Pause before deleting
-          setTimeout(() => setIsDeleting(true), 2200);
-        }
-      } else {
-        if (currentText.length > 0) {
-          setCurrentText(fullText.slice(0, currentText.length - 1));
-        } else {
-          setIsDeleting(false);
-          setTaglineIndex((prev) => (prev + 1) % TAGLINES.length);
-        }
-      }
-    }, speed);
-
-    return () => clearTimeout(timer);
-  }, [currentText, isDeleting, taglineIndex]);
-
-  // Live snippet auto-cycling
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setSnippetIndex((prev) => (prev + 1) % LIVE_SNIPPETS.length);
-    }, 4000);
-    return () => clearInterval(interval);
-  }, []);
-
-  const activeSnippet = LIVE_SNIPPETS[snippetIndex];
 
   return (
     <div
@@ -165,7 +95,6 @@ export default function HomePage() {
         <WatcherCanvas />
         <div className={s.bgGrid} />
         <motion.div
-
           className={s.orbRed}
           animate={{ scale: [1, 1.15, 1], opacity: [0.65, 0.95, 0.65] }}
           transition={{ duration: 7, repeat: Infinity, ease: 'easeInOut' }}
@@ -183,102 +112,63 @@ export default function HomePage() {
         <div className={s.scanline} />
       </div>
 
-      {/* ── Crime Tape Ticker ── */}
-      <div className={s.tape}>
-        <div className={s.tapeTrack}>
-          <span className={s.tapeItem}>{TICKER}</span>
-          <span className={s.tapeItem}>{TICKER}</span>
-          <span className={s.tapeItem}>{TICKER}</span>
-          <span className={s.tapeItem}>{TICKER}</span>
-        </div>
-      </div>
-
-      {/* ── Main Content: two columns on desktop ── */}
+      {/* ── Main Content Grid ── */}
       <motion.div
         className={s.content}
         variants={stagger}
         initial="hidden"
         animate="show"
       >
-        {/* LEFT — Hero Text */}
+        {/* LEFT — Hero & Overview */}
         <motion.div className={s.hero} variants={stagger} initial="hidden" animate="show">
-          {/* Live AI badge with Animated Equalizer Bars */}
+          {/* Status Badge */}
           <motion.div className={s.liveBadge} variants={fadeUp}>
-            <div className={s.equalizer}>
-              {[0.4, 0.8, 0.5, 1, 0.6].map((rate, i) => (
-                <motion.span
-                  key={i}
-                  className={s.eqBar}
-                  animate={{ height: ['4px', `${12 * rate + 3}px`, '4px'] }}
-                  transition={{
-                    duration: 0.6 + i * 0.15,
-                    repeat: Infinity,
-                    ease: 'easeInOut',
-                  }}
-                />
-              ))}
-            </div>
-            <span className={s.liveText}>AI Narrator Online</span>
+            <span className={s.liveDot} />
+            <span className={s.liveText}>Live AI Murder Mystery</span>
           </motion.div>
 
           {/* Title */}
           <motion.div className={s.titleBlock} variants={fadeUp}>
-            <span className={s.titleSub}>Nothing is what it seems.</span>
+            <span className={s.titleSub}>Real-Time Party Investigation</span>
             <h1 className={s.title}>
-              <motion.span
-                className={s.titleWhite}
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.6 }}
-              >
-                Hidden
-              </motion.span>
-              <motion.span
-                className={s.titleRed}
-                initial={{ opacity: 0, x: 20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.6, delay: 0.1 }}
-              >
-                Truth
-              </motion.span>
+              <span className={s.titleWhite}>Hidden</span>
+              <span className={s.titleRed}>Truth</span>
             </h1>
           </motion.div>
 
-          {/* Interactive Typewriter Row */}
-          <motion.div className={s.typewriterRow} variants={fadeUp}>
-            <span>&gt; {currentText}</span>
-            <span className={s.cursorBlink} />
-          </motion.div>
-
-          {/* Description */}
+          {/* Short, Clear Description */}
           <motion.p className={s.desc} variants={fadeUp}>
-            A live murder mystery game for you and your friends. One person in your group committed the crime.
-            Uncover clues, question everyone's alibi, and vote out the killer before time runs out!
+            One of your friends committed the crime. Question alibis, uncover AI-generated clues,
+            and unmask the killer before time runs out.
           </motion.p>
 
-          {/* Feature tags with subtle floating pulse */}
-          <motion.div className={s.tags} variants={fadeUp}>
-            {[
-              { icon: '🎭', text: 'Secret Roles' },
-              { icon: '🤖', text: 'AI Narrated' },
-              { icon: '📱', text: 'Phone Controls' },
-              { icon: '⚡', text: 'Real-time' },
-            ].map((t, idx) => (
-              <motion.span
-                key={t.text}
-                className={s.tag}
-                whileHover={{ scale: 1.05, y: -2 }}
-                animate={{ y: [0, -3, 0] }}
-                transition={{ duration: 3.5, repeat: Infinity, delay: idx * 0.4 }}
-              >
-                <span className={s.tagIcon}>{t.icon}</span> {t.text}
-              </motion.span>
-            ))}
+          {/* 3 Simple Steps */}
+          <motion.div className={s.howItWorksGrid} variants={fadeUp}>
+            <div className={s.howStep}>
+              <span className={s.stepIcon}>📱</span>
+              <div>
+                <strong className={s.stepTitle}>1. Join with Code</strong>
+                <p className={s.stepSub}>Any phone or laptop, no app download.</p>
+              </div>
+            </div>
+            <div className={s.howStep}>
+              <span className={s.stepIcon}>🎭</span>
+              <div>
+                <strong className={s.stepTitle}>2. Secret Roles</strong>
+                <p className={s.stepSub}>Killer, Detective, Witness, or Suspect.</p>
+              </div>
+            </div>
+            <div className={s.howStep}>
+              <span className={s.stepIcon}>⚖️</span>
+              <div>
+                <strong className={s.stepTitle}>3. Vote & Unmask</strong>
+                <p className={s.stepSub}>Interrogate in real-time, then cast your ballot.</p>
+              </div>
+            </div>
           </motion.div>
         </motion.div>
 
-
-        {/* RIGHT — Action Panel & Live Teaser */}
+        {/* RIGHT — Action Panel */}
         <motion.div className={s.panel} variants={stagger} initial="hidden" animate="show">
           {/* Active Game in Progress Card */}
           {player?.roomCode && isRoomActive && (
@@ -300,13 +190,13 @@ export default function HomePage() {
               </div>
               <div className={s.resumeTitle}>Room {player.roomCode}</div>
               <p className={s.resumeText}>
-                You have an active investigation in progress as <strong>{player.name}</strong>.
+                You have an ongoing case as <strong>{player.name}</strong>.
               </p>
               <div className={s.resumeActions}>
-                <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.97 }} style={{ flex: 1 }}>
+                <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} style={{ flex: 1 }}>
                   <Link href={`/game/${player.roomCode}`} className={s.btnResume} id="btn-resume-game">
                     <span className={s.btnIcon}>⚡</span>
-                    Resume Investigation
+                    Resume Game
                   </Link>
                 </motion.div>
                 <button
@@ -323,11 +213,11 @@ export default function HomePage() {
             </motion.div>
           )}
 
-          {/* Glass card with buttons */}
+          {/* Action Card */}
           <motion.div className={s.card} variants={fadeScale}>
-            <span className={s.cardLabel}>Start Playing</span>
+            <span className={s.cardLabel}>Play Right Now</span>
 
-            <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.97 }}>
+            <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
               <Link href="/create" className={s.btnPrimary} id="btn-create-game">
                 <span className={s.btnIcon}>⚡</span>
                 Host a Game
@@ -340,7 +230,7 @@ export default function HomePage() {
               <span className={s.dividerLine} />
             </div>
 
-            <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.97 }}>
+            <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
               <Link href="/join" className={s.btnSecondary} id="btn-join-game">
                 <span className={s.btnIcon}>🔑</span>
                 Enter Room Code
@@ -348,7 +238,7 @@ export default function HomePage() {
             </motion.div>
           </motion.div>
 
-          {/* Stats row */}
+          {/* Stats Bar */}
           <motion.div className={s.stats} variants={fadeUp}>
             <div className={s.stat}>
               <div className={s.statValue}>3–10</div>
@@ -359,47 +249,20 @@ export default function HomePage() {
               <div className={s.statLabel}>Per Game</div>
             </div>
             <div className={s.stat}>
-              <div className={s.statValue}>∞</div>
-              <div className={s.statLabel}>Stories</div>
+              <div className={s.statValue}>0</div>
+              <div className={s.statLabel}>Downloads</div>
             </div>
-          </motion.div>
-
-          {/* Live Investigation Simulation Feed */}
-          <motion.div className={s.liveFeedCard} variants={fadeUp}>
-            <div className={s.liveFeedHeader}>
-              <span className={s.liveFeedLabel}>
-                <span style={{ color: 'var(--neon-red)' }}>●</span> Live Investigation Feed
-              </span>
-              <span className={s.feedPill}>SIMULATED CASE</span>
-            </div>
-
-            <AnimatePresence mode="wait">
-              <motion.div
-                key={snippetIndex}
-                className={s.feedMsg}
-                initial={{ opacity: 0, y: 8 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -8 }}
-                transition={{ duration: 0.35 }}
-              >
-                <span style={{ fontSize: '1.1rem' }}>{activeSnippet.icon}</span>
-                <div>
-                  <strong>{activeSnippet.sender}: </strong>
-                  <span>{activeSnippet.text}</span>
-                </div>
-              </motion.div>
-            </AnimatePresence>
           </motion.div>
         </motion.div>
       </motion.div>
 
       {/* ── Bottom Bar ── */}
       <div className={s.bottomBar}>
-        <span className={s.bottomItem}>No app download</span>
+        <span className={s.bottomItem}>Instant Browser Play</span>
         <span className={s.bottomDot} />
         <span className={s.bottomItem}>Join with 4-letter code</span>
         <span className={s.bottomDot} />
-        <span className={s.bottomItem}>Free to play</span>
+        <span className={s.bottomItem}>Powered by Google Gemini</span>
       </div>
     </div>
   );
