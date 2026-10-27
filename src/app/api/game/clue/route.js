@@ -34,13 +34,20 @@ export async function POST(request) {
     const maxRounds = room.max_rounds || 3;
     const nextRound = currentRound + 1;
 
-    // Concurrency Check 1: If client sent currentRound and it's already higher,
-    // another request already advanced this room. Do not run duplicate logic.
-    if (body.currentRound !== undefined && Number(body.currentRound) !== currentRound) {
+    // Concurrency Check 1: If client sent currentRound and the room is already at a higher round,
+    // another request already advanced this room. Return current room state and clues.
+    if (body.currentRound !== undefined && Number(body.currentRound) < currentRound) {
+      const { data: allClues } = await supabaseServer
+        .from('clues')
+        .select('*')
+        .eq('room_id', room.id)
+        .order('round', { ascending: true });
+
       return NextResponse.json({
         success: true,
         alreadyAdvanced: true,
         round: currentRound,
+        clues: allClues || [],
         room,
       });
     }

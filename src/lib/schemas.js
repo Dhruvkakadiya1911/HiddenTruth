@@ -9,6 +9,8 @@ export const playerRoleSchema = z.object({
   role: z.enum([ROLES.KILLER, ROLES.DETECTIVE, ROLES.WITNESS, ROLES.SUSPECT]),
   publicBio: z.string().optional().default('Present near the scene.'),
   secretInfo: z.string().optional().default('Await your briefing.'),
+  suspicionHook: z.string().optional(),
+  alibi: z.string().optional(),
 });
 
 // Zod schema for the complete mystery scenario
@@ -22,6 +24,13 @@ export const scenarioSchema = z.object({
   motive: z.string(),
   solution: z.string(),
   playerRoles: z.array(playerRoleSchema),
+  initialClue: z
+    .object({
+      title: z.string(),
+      content: z.string(),
+    })
+    .optional(),
+  redHerrings: z.array(z.string()).optional(),
 });
 
 // Zod schema for round clues

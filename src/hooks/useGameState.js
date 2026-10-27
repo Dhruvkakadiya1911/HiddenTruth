@@ -12,11 +12,13 @@ export function useGameState(roomCode, playerId) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  const fetchFullState = useCallback(async () => {
+  const fetchFullState = useCallback(async (isInitial = false) => {
     if (!roomCode) return;
 
     try {
-      setLoading(true);
+      if (isInitial) {
+        setLoading(true);
+      }
       setError(null);
 
       // 1. Fetch room
@@ -73,7 +75,7 @@ export function useGameState(roomCode, playerId) {
   }, [roomCode, playerId]);
 
   useEffect(() => {
-    fetchFullState();
+    fetchFullState(true);
   }, [fetchFullState]);
 
   // Realtime subscriptions
@@ -124,6 +126,9 @@ export function useGameState(roomCode, playerId) {
     messages,
     loading,
     error,
-    refreshState: fetchFullState,
+    refreshState: () => fetchFullState(false),
+    setRoom,
+    setClues,
+    setMessages,
   };
 }

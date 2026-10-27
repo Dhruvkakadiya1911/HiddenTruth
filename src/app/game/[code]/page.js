@@ -21,7 +21,7 @@ export default function GamePage({ params }) {
   const router = useRouter();
   const roomCode = (params.code || '').toUpperCase();
   const { player, clearPlayer } = usePlayer();
-  const { room, currentPlayer, players, clues, messages, loading, error, refreshState } =
+  const { room, currentPlayer, players, clues, messages, loading, error, refreshState, setRoom, setClues } =
     useGameState(roomCode, player?.id);
 
   const [hideSecret, setHideSecret] = useState(false);
@@ -29,6 +29,7 @@ export default function GamePage({ params }) {
   const [chatText, setChatText] = useState('');
   const [sendingChat, setSendingChat] = useState(false);
   const [showAccuseModal, setShowAccuseModal] = useState(false);
+  const [showCharacterModal, setShowCharacterModal] = useState(false);
   const [showGuide, setShowGuide] = useState(false);
 
   const handleLeaveGame = (e) => {
@@ -137,6 +138,17 @@ export default function GamePage({ params }) {
       if (data.finished || data.status === GAME_STATUS.VOTING) {
         router.push(`/vote/${roomCode}`);
       } else {
+        if (data.room) setRoom(data.room);
+        if (data.clue) {
+          setClues((prev) =>
+            prev.some((c) => c.id === data.clue.id || c.round === data.clue.round)
+              ? prev
+              : [...prev, data.clue]
+          );
+        }
+        if (Array.isArray(data.clues)) {
+          setClues(data.clues);
+        }
         refreshState();
       }
     } catch (err) {
@@ -289,7 +301,11 @@ export default function GamePage({ params }) {
 
   const currentRole = currentPlayer?.role || assignedFromScenario?.role || ROLES.SUSPECT;
   const secretInfo = currentPlayer?.secret_info || assignedFromScenario?.secretInfo || 'Await your confidential briefing...';
-  const isHost = player?.isHost && (player?.roomId === room?.id || player?.roomCode === roomCode);
+  const isHost = Boolean(
+    currentPlayer?.is_host ||
+    player?.isHost ||
+    (room?.host_id && (room.host_id === player?.id || room.host_id === currentPlayer?.id))
+  );
 
   const currentRound = room.current_round || 1;
   const maxRounds = room.max_rounds || 3;
@@ -370,8 +386,47 @@ export default function GamePage({ params }) {
 
   const roleMeta = getRoleBadge(currentRole);
 
+  const getRoleGoal = (role) => {
+    const r = (role || '').toLowerCase();
+    if (r.includes('kill')) return "You are the Killer. Don't get caught.";
+    if (r.includes('detec')) return "You are the Detective. Find the killer.";
+    if (r.includes('witn')) return "You are the Witness. Share what you saw when the time is right.";
+    return "You are a Suspect. Clear your name and find the real killer.";
+  };
+
+  const getWhatToDoText = () => {
+    if (room?.status === GAME_STATUS.VOTING || (isFinalRound && autoAdvanceSeconds !== null)) {
+      return 'Vote for the killer.';
+    }
+    if (showAccuseModal) {
+      return 'Pick who you think did it.';
+    }
+    if (currentRound >= 2) {
+      return 'New clue is out. Discuss it and find who is lying.';
+    }
+    return 'Read your role. Then ask others where they were at midnight.';
+  };
+
+  let activeStepName = 'Clue';
+  let activeStepIndex = 0;
+  if (room?.status === GAME_STATUS.VOTING || (isFinalRound && autoAdvanceSeconds !== null)) {
+    activeStepName = 'Vote';
+    activeStepIndex = 3;
+  } else if (showAccuseModal) {
+    activeStepName = 'Accuse';
+    activeStepIndex = 2;
+  } else if (currentRound >= 2) {
+    activeStepName = 'Discuss';
+    activeStepIndex = 1;
+  } else {
+    activeStepName = 'Clue';
+    activeStepIndex = 0;
+  }
+
+  const sortedClues = [...uniqueClues].sort((a, b) => (b.round || 0) - (a.round || 0));
+
   return (
-    <div className={s.page}>
+    <div className={`${s.page} ${isHost ? s.pageWithHost : ''}`}>
       {/* Background Ambience */}
       <div className={s.bgLayer}>
         <div className={s.bgGrid} />
@@ -379,10 +434,9 @@ export default function GamePage({ params }) {
         <div className={s.orbViolet} />
       </div>
 
-      {/* Top Nav */}
+      {/* Top Nav (Room code & Guide are in global Navbar; here we show round badge & timer) */}
       <header className={s.topNav}>
         <div className={s.navLeft}>
-          <span className={s.codeBadge}>ROOM {roomCode}</span>
           <span className={s.roundBadge}>ROUND {currentRound} OF {maxRounds}</span>
         </div>
         <Timer
@@ -393,23 +447,13 @@ export default function GamePage({ params }) {
           onTimeUp={handleRoundTimeUp}
           showExpiredBanner={false}
         />
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-          <button
-            type="button"
-            onClick={() => setShowGuide(true)}
-            className={s.leaveBtn}
-            style={{ color: 'var(--neon-cyan)', border: '1px solid rgba(34, 211, 238, 0.35)', background: 'rgba(34, 211, 238, 0.08)' }}
-          >
-            📖 Guide
-          </button>
-          <button
-            type="button"
-            onClick={handleLeaveGame}
-            className={s.leaveBtn}
-          >
-            Exit
-          </button>
-        </div>
+        <button
+          type="button"
+          onClick={handleLeaveGame}
+          className={s.leaveBtn}
+        >
+          Exit
+        </button>
       </header>
 
       {/* Auto-Advance Emergency Banner */}
@@ -446,17 +490,45 @@ export default function GamePage({ params }) {
                 onClick={handleAdvanceRound}
                 disabled={advancing}
               >
-                {advancing ? 'Loading...' : 'Next Round Now ⚡'}
+                {advancing ? 'Loading...' : 'Next clue ⚡'}
               </button>
             )}
           </motion.div>
         )}
       </AnimatePresence>
 
+      {/* Guidance Section: Progress Strip & "What to do now" Bar */}
+      <section className={s.guidanceSection} aria-label="Game Guidance">
+        {/* Step Progress Strip */}
+        <div className={s.progressStrip}>
+          {['Clue', 'Discuss', 'Accuse', 'Vote'].map((step, idx) => {
+            const isCurrent = activeStepName === step;
+            const isPast = activeStepIndex > idx;
+            return (
+              <div
+                key={step}
+                className={`${s.stepItem} ${isCurrent ? s.stepCurrent : ''} ${isPast ? s.stepPast : ''}`}
+              >
+                <div className={s.stepPill}>
+                  <span className={s.stepNumber}>{isPast ? '✓' : idx + 1}</span>
+                  <span className={s.stepLabel}>{step}</span>
+                </div>
+                {idx < 3 && <span className={s.stepArrow}>›</span>}
+              </div>
+            );
+          })}
+        </div>
 
-      {/* Main Dashboard */}
+        {/* "What to do now" Bar */}
+        <div className={s.whatToDoBar}>
+          <span className={s.whatToDoTag}>WHAT TO DO NOW</span>
+          <span className={s.whatToDoText}>{getWhatToDoText()}</span>
+        </div>
+      </section>
+
+      {/* Main Dashboard (On mobile: Role Card -> Latest Clue -> Chat -> Suspects List. On desktop: 2 Columns) */}
       <main className={s.dashboard}>
-        {/* Left Column: Role & AI Narrator */}
+        {/* Left Column (Desktop) */}
         <div className={s.leftCol}>
           {/* Scenario Overview */}
           <motion.div
@@ -475,115 +547,96 @@ export default function GamePage({ params }) {
             )}
           </motion.div>
 
-          {/* Secret Role Reveal Card */}
+          {/* Secret Role Card (Compact with bold goal line & small 3D thumbnail) */}
           <motion.div
             className={`${s.roleCard} ${roleMeta.cardClass}`}
             initial={{ opacity: 0, scale: 0.94 }}
             animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.6, delay: 0.15 }}
+            transition={{ duration: 0.5, delay: 0.1 }}
           >
-            <div className={s.roleHeader}>
-              <span className={s.roleTag}>Top Secret Dossier</span>
-              <button
-                type="button"
-                className={s.peekToggle}
-                onClick={() => setHideSecret(!hideSecret)}
-              >
-                <span>{hideSecret ? '👁️ Show' : '🙈 Hide'}</span>
-                <span>{hideSecret ? 'Peek' : 'Shield'}</span>
-              </button>
+            {/* Top of role card: bold goal line */}
+            <div className={s.roleGoalBanner}>
+              <strong className={s.roleGoalText}>{getRoleGoal(currentRole)}</strong>
             </div>
 
-            <div className={s.roleReveal}>
-              <RoleModelCanvas role={currentRole} size="large" hidden={hideSecret} />
-              <div className={s.roleTitleGroup}>
-                <span className={s.roleSubtitle}>Your Secret Identity</span>
-                <span className={`${s.roleTitle} ${roleMeta.titleClass}`}>
-                  {roleMeta.title}
-                </span>
+            <div className={s.roleHeader}>
+              <div className={s.roleIdentityGroup}>
+                <div
+                  className={s.thumbWrapper}
+                  onClick={() => setShowCharacterModal(true)}
+                  title="Tap to inspect 3D character"
+                >
+                  <RoleModelCanvas role={currentRole} size="thumb" hidden={hideSecret} />
+                  <span className={s.thumbZoomIcon}>🔍</span>
+                </div>
+                <div className={s.roleTitleGroup}>
+                  <span className={s.roleSubtitle}>Your Role</span>
+                  <span className={`${s.roleTitle} ${roleMeta.titleClass}`}>
+                    {hideSecret ? '••••••••' : roleMeta.title}
+                  </span>
+                  <button
+                    type="button"
+                    className={s.btnViewCharacter}
+                    onClick={() => setShowCharacterModal(true)}
+                  >
+                    View character
+                  </button>
+                </div>
+              </div>
+
+              <div className={s.hideRoleWrap}>
+                <button
+                  type="button"
+                  className={s.peekToggle}
+                  onClick={() => setHideSecret(!hideSecret)}
+                >
+                  {hideSecret ? '👁️ Show my role' : '🙈 Hide my role'}
+                </button>
+                <span className={s.hideRoleHint}>So others can&apos;t see your screen</span>
               </div>
             </div>
 
+            {/* Secret briefing / hint */}
             <div
               className={`${s.secretBox} ${hideSecret ? s.hiddenSecret : ''}`}
               onClick={() => hideSecret && setHideSecret(false)}
             >
               {hideSecret ? (
-                <span style={{ color: 'var(--text-muted)' }}>Tap to reveal your private briefing...</span>
+                <span className={s.secretHiddenPrompt}>Tap to reveal your private briefing...</span>
               ) : (
-                secretInfo
+                <div className={s.secretVisibleText}>
+                  <div className={s.secretLabel}>Private Intel & Alibi:</div>
+                  <div>{secretInfo}</div>
+                </div>
               )}
             </div>
           </motion.div>
-
-          {/* Host Round Controls */}
-          {isHost && (
-            <motion.div
-              className={s.hostControlBox}
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-            >
-              <div className={s.hostLabel}>
-                <span>👑 Host Authority</span>
-                <span>• Round {currentRound}/{maxRounds}</span>
-              </div>
-              <button
-                onClick={handleAdvanceRound}
-                disabled={advancing}
-                className={`${s.btnAdvance} ${isFinalRound ? s.btnVote : ''}`}
-                id="btn-advance-round"
-              >
-                {advancing ? (
-                  <>
-                    <div className={s.spinner} />
-                    <span>Analyzing Crime Scene...</span>
-                  </>
-                ) : isFinalRound ? (
-                  <>
-                    <span>🗳️</span>
-                    <span>Conclude Investigation & Vote</span>
-                  </>
-                ) : (
-                  <>
-                    <span>⚡</span>
-                    <span>Reveal Next Clue (Round {currentRound + 1})</span>
-                  </>
-                )}
-              </button>
-            </motion.div>
-          )}
-
-          {/* AI Narrator Monologue */}
-          <NarratorBubble
-            message={scenario.intro}
-            round={currentRound}
-          />
         </div>
 
-        {/* Right Column: Evidence, Chat Discussion & Suspects Roster */}
+        {/* Right Column (Desktop) */}
         <div className={s.rightCol}>
-          {/* Active Clues */}
+          {/* Active Clues (Latest Clue first) */}
           <motion.div
             className={s.cluesContainer}
             initial={{ opacity: 0, y: 15 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.25 }}
+            transition={{ duration: 0.5, delay: 0.2 }}
           >
             <div className={s.sectionTitle}>
               <span>📁 Revealed Evidence</span>
-              <span style={{ fontSize: '0.75rem', fontFamily: 'var(--f-mono)', color: 'var(--neon-cyan)' }}>
+              <span className={s.cluesCountBadge}>
                 {uniqueClues.length} Discovered
               </span>
             </div>
 
             <div className={s.cluesList}>
               <AnimatePresence>
-                {uniqueClues.length === 0 ? (
-                  <div style={{ color: 'var(--text-muted)', fontSize: '0.85rem' }}>
+                {sortedClues.length === 0 ? (
+                  <div className={s.cluesEmpty}>
                     Searching crime scene for initial clues...
                   </div>
                 ) : (
-                  uniqueClues.map((c, idx) => (
+                  sortedClues.map((c, idx) => (
                     <ClueCard key={c.id || idx} clue={c} index={idx} />
                   ))
                 )}
@@ -596,7 +649,7 @@ export default function GamePage({ params }) {
             className={s.chatContainer}
             initial={{ opacity: 0, y: 15 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.3 }}
+            transition={{ duration: 0.5, delay: 0.25 }}
           >
             <div className={s.sectionTitle}>
               <span>💬 Interrogation & Discussion</span>
@@ -605,13 +658,13 @@ export default function GamePage({ params }) {
                 className={s.btnAccuseTrigger}
                 onClick={handleOpenAccuse}
               >
-                🚨 Point Finger
+                🚨 Accuse someone
               </button>
             </div>
 
             <div ref={chatMessagesRef} className={s.chatFeed}>
               {messages.length === 0 ? (
-                <div style={{ color: 'var(--text-muted)', fontSize: '0.82rem', textAlign: 'center', padding: '1rem' }}>
+                <div className={s.chatEmpty}>
                   No messages yet. Ask someone where they were or defend yourself!
                 </div>
               ) : (
@@ -657,7 +710,6 @@ export default function GamePage({ params }) {
               <div ref={chatBottomRef} />
             </div>
 
-
             <form onSubmit={handleSendMessage} className={s.chatInputForm}>
               <input
                 type="text"
@@ -678,27 +730,76 @@ export default function GamePage({ params }) {
             </form>
           </motion.div>
 
-          {/* Suspects Roster */}
+          {/* Suspects Roster (Moved higher on page, with 'You' badge and 'Bot' tag) */}
           <motion.div
             className={s.rosterContainer}
             initial={{ opacity: 0, y: 15 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.35 }}
+            transition={{ duration: 0.5, delay: 0.3 }}
           >
             <div className={s.sectionTitle}>
-              <span>👥 Suspects Present</span>
+              <span>👥 Suspects ({players.length})</span>
             </div>
             <div className={s.rosterGrid}>
-              {players.map((p) => (
-                <div key={p.id} className={s.rosterChip}>
-                  {p.is_host && '👑 '}
-                  {p.name} {p.id === player?.id && '(You)'}
-                </div>
-              ))}
+              {players.map((p) => {
+                const isMe = p.id === player?.id;
+                const isBot = Boolean(
+                  p.is_bot ||
+                  (p.name && (p.name.includes('(Bot)') || p.name.includes('(Test)')))
+                );
+                const cleanName = p.name ? p.name.replace(/\s*\((Bot|Test)\)/gi, '') : 'Player';
+
+                return (
+                  <div
+                    key={p.id}
+                    className={`${s.rosterChip} ${isMe ? s.rosterChipMe : ''}`}
+                  >
+                    {p.is_host && <span className={s.hostCrown} title="Host">👑</span>}
+                    <span className={s.playerNameText}>{cleanName}</span>
+                    {isMe && <span className={s.badgeYou}>You</span>}
+                    {isBot && <span className={s.badgeBot}>Bot</span>}
+                  </div>
+                );
+              })}
             </div>
           </motion.div>
         </div>
       </main>
+
+      {/* Sticky Host Next Clue Button (Sticky at the bottom of the screen, only host sees it) */}
+      {isHost && (
+        <div className={s.hostStickyBar}>
+          <div className={s.hostStickyInner}>
+            <div className={s.hostStickyInfo}>
+              <span className={s.hostBadgeText}>👑 Host Authority</span>
+              <span className={s.hostRoundText}>Round {currentRound} of {maxRounds}</span>
+            </div>
+            <button
+              onClick={handleAdvanceRound}
+              disabled={advancing}
+              className={`${s.btnAdvance} ${isFinalRound ? s.btnVote : ''}`}
+              id="btn-advance-round"
+            >
+              {advancing ? (
+                <>
+                  <div className={s.spinner} />
+                  <span>Analyzing Crime Scene...</span>
+                </>
+              ) : isFinalRound ? (
+                <>
+                  <span>🗳️</span>
+                  <span>Start Vote</span>
+                </>
+              ) : (
+                <>
+                  <span>⚡</span>
+                  <span>Next clue</span>
+                </>
+              )}
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* Footer */}
       <footer className={s.footer}>
@@ -713,7 +814,7 @@ export default function GamePage({ params }) {
         >
           <div className={s.modalContent} onClick={(e) => e.stopPropagation()}>
             <div className={s.modalHeader}>
-              <h3 className={s.modalTitle}>🚨 Point the Finger</h3>
+              <h3 className={s.modalTitle}>🚨 Accuse someone</h3>
               <button
                 type="button"
                 className={s.modalClose}
@@ -758,7 +859,7 @@ export default function GamePage({ params }) {
               </div>
 
               {accuseError && (
-                <div style={{ color: 'var(--neon-red)', fontSize: '0.82rem', marginBottom: '0.75rem' }}>
+                <div style={{ color: 'var(--neon-red)', fontSize: '0.88rem', marginBottom: '0.75rem' }}>
                   {accuseError}
                 </div>
               )}
@@ -777,13 +878,56 @@ export default function GamePage({ params }) {
                   className={s.btnSubmitAccuse}
                   disabled={submittingAccusation || !accuseReason.trim() || !accusedId}
                 >
-                  {submittingAccusation ? 'Accusing...' : 'Declare Accusation 🚨'}
+                  {submittingAccusation ? 'Accusing...' : 'Accuse someone 🚨'}
                 </button>
               </div>
             </form>
           </div>
         </div>
       )}
+
+      {/* 3D Character Inspection Modal */}
+      {showCharacterModal && (
+        <div
+          className={s.modalOverlay}
+          onClick={() => setShowCharacterModal(false)}
+        >
+          <div
+            className={s.characterModalCard}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className={s.modalHeader}>
+              <div>
+                <h3 className={s.modalTitle} style={{ color: 'var(--text-primary)' }}>
+                  {roleMeta.title}
+                </h3>
+                <span className={s.modalSubtitle}>
+                  Drag around to inspect 3D character
+                </span>
+              </div>
+              <button
+                type="button"
+                className={s.modalClose}
+                onClick={() => setShowCharacterModal(false)}
+              >
+                ✕
+              </button>
+            </div>
+            <div className={s.characterCanvasWrap}>
+              <RoleModelCanvas role={currentRole} size="large" />
+            </div>
+            <button
+              type="button"
+              className={s.btnCancel}
+              onClick={() => setShowCharacterModal(false)}
+              style={{ width: '100%', marginTop: '0.75rem' }}
+            >
+              Close Character View
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* Beginner Guide Modal */}
       <HowToPlayModal isOpen={showGuide} onClose={() => setShowGuide(false)} />
     </div>

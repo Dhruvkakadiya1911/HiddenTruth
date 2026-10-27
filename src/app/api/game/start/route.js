@@ -93,10 +93,15 @@ export async function POST(request) {
     });
 
     // 6. Insert first crime scene clue
+    let round1ClueContent = `The mystery begins: ${scenario.victim} has been eliminated. The weapon found nearby was the ${scenario.weapon}. Who was near the scene?`;
+    if (scenario.initialClue && scenario.initialClue.title && scenario.initialClue.content) {
+      round1ClueContent = `[ROUND 1] ${scenario.initialClue.title.toUpperCase()}: ${scenario.initialClue.content}`;
+    }
+
     await supabaseServer.from('clues').insert({
       room_id: room.id,
       round: 1,
-      content: `The mystery begins: ${scenario.victim} has been eliminated. The weapon found nearby was the ${scenario.weapon}. Who was near the scene?`,
+      content: round1ClueContent,
       is_public: true,
     });
 

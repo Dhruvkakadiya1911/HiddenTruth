@@ -1688,15 +1688,16 @@ export default function RoleModelCanvas({ role = 'suspect', size = 'large', hidd
 
   const normRole = normalizeRole(role);
   const config = ROLE_CONFIGS[normRole] || ROLE_CONFIGS.suspect;
-  const wrapClass = `${s.canvasWrap}${size === 'small' ? ` ${s.canvasWrapSmall}` : ''} ${
-    hidden ? s.hiddenShield : s.visibleShield
-  }`;
+  const isThumb = size === 'thumb';
+  const wrapClass = `${s.canvasWrap}${size === 'small' ? ` ${s.canvasWrapSmall}` : ''}${
+    isThumb ? ` ${s.canvasWrapThumb}` : ''
+  } ${hidden ? s.hiddenShield : s.visibleShield}`;
 
   return (
     <div className={wrapClass}>
       <div ref={containerRef} style={{ width: '100%', height: '100%', position: 'relative' }} />
       <div className={`${s.roleGlow} ${config.glowClass}`} />
-      <span className={s.dragHint}>Drag to Inspect</span>
+      {!isThumb && <span className={s.dragHint}>Drag to Inspect</span>}
     </div>
   );
 }

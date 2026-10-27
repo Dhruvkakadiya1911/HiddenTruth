@@ -6,6 +6,14 @@ import s from './ClueCard.module.css';
 export default function ClueCard({ clue, index = 0 }) {
   if (!clue) return null;
 
+  const cleanContent = (clue.content || '')
+    .replace(/(^|[.!?]\s+)the\s+a\s+/gi, '$1A ')
+    .replace(/(^|[.!?]\s+)the\s+an\s+/gi, '$1An ')
+    .replace(/\bthe\s+a\s+/gi, 'a ')
+    .replace(/\bthe\s+an\s+/gi, 'an ')
+    .replace(/\ba\s+the\s+/gi, 'the ')
+    .replace(/\bthe\s+the\s+/gi, 'the ');
+
   return (
     <motion.div
       className={s.card}
@@ -21,7 +29,7 @@ export default function ClueCard({ clue, index = 0 }) {
         <span className={s.timestamp}>Confidential Evidence</span>
       </div>
 
-      <div className={s.content}>{clue.content}</div>
+      <div className={s.content}>{cleanContent}</div>
     </motion.div>
   );
 }
