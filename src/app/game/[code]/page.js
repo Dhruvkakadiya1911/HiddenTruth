@@ -390,50 +390,45 @@ export default function GamePage({ params }) {
   const roundStartedAt = getRoundStartTime();
 
   // Compute top suspect with highest net suspicion
-  const topSuspectId = useMemo(() => {
-    let maxScore = 0;
-    let maxId = null;
-    Object.entries(suspicionScores).forEach(([id, scores]) => {
-      if (scores.total > maxScore) {
-        maxScore = scores.total;
-        maxId = id;
-      }
-    });
-    return maxScore > 0 ? maxId : null;
-  }, [suspicionScores]);
+  let topSuspectId = null;
+  let maxSusScore = 0;
+  Object.entries(suspicionScores).forEach(([id, scores]) => {
+    if (scores.total > maxSusScore) {
+      maxSusScore = scores.total;
+      topSuspectId = id;
+    }
+  });
 
   // Contextual one-tap question starters tailored to role
-  const quickQuestionStarters = useMemo(() => {
-    const r = (currentRole || '').toLowerCase();
-    const victim = scenario?.victim || 'Julian';
-    if (r.includes('detec')) {
-      return [
-        { icon: '⏱️', label: 'Where were you?', text: `Where was everyone when ${victim} was killed? Can everyone state their exact location?` },
-        { icon: '🍸', label: 'Who was at the bar?', text: `Who was near the wet bar right before the lights flickered?` },
-        { icon: '👀', label: 'Anyone acting weird?', text: `Did anyone notice a guest whispering or acting unusually nervous earlier?` },
-        { icon: '💼', label: 'Check the timeline!', text: `Someone's story contradicts the crime scene evidence. Speak up now!` },
-      ];
-    }
-    if (r.includes('witn')) {
-      return [
-        { icon: '🕶️', label: 'Saw someone running', text: `I noticed someone wearing dark sleeves hurrying away right around the time of the death.` },
-        { icon: '❓', label: 'Who poured drinks?', text: `Did anyone actually see who served that drink to ${victim}?` },
-        { icon: '🚨', label: 'Check the bar!', text: `Look closely at who was standing next to the cocktail shaker before the toast!` },
-      ];
-    }
-    if (r.includes('kill')) {
-      return [
-        { icon: '🤷', label: 'I was in the lounge', text: `I was in the lounge chatting with other guests the entire time. Many people saw me!` },
-        { icon: '🤔', label: 'Marcus seems nervous', text: `Wait, why is everyone ignoring the fact that someone walked away from the bar right before?` },
-        { icon: '⚡', label: 'Anyone had a motive', text: `${victim} made a lot of enemies at this party. Anyone could have done this!` },
-      ];
-    }
-    return [
+  const rRole = (currentRole || '').toLowerCase();
+  const victimName = scenario?.victim || 'Julian';
+  let quickQuestionStarters = [];
+  if (rRole.includes('detec')) {
+    quickQuestionStarters = [
+      { icon: '⏱️', label: 'Where were you?', text: `Where was everyone when ${victimName} was killed? Can everyone state their exact location?` },
+      { icon: '🍸', label: 'Who was at the bar?', text: `Who was near the wet bar right before the lights flickered?` },
+      { icon: '👀', label: 'Anyone acting weird?', text: `Did anyone notice a guest whispering or acting unusually nervous earlier?` },
+      { icon: '💼', label: 'Check the timeline!', text: `Someone's story contradicts the crime scene evidence. Speak up now!` },
+    ];
+  } else if (rRole.includes('witn')) {
+    quickQuestionStarters = [
+      { icon: '🕶️', label: 'Saw someone running', text: `I noticed someone wearing dark sleeves hurrying away right around the time of the death.` },
+      { icon: '❓', label: 'Who poured drinks?', text: `Did anyone actually see who served that drink to ${victimName}?` },
+      { icon: '🚨', label: 'Check the bar!', text: `Look closely at who was standing next to the cocktail shaker before the toast!` },
+    ];
+  } else if (rRole.includes('kill')) {
+    quickQuestionStarters = [
+      { icon: '🤷', label: 'I was in the lounge', text: `I was in the lounge chatting with other guests the entire time. Many people saw me!` },
+      { icon: '🤔', label: 'Marcus seems nervous', text: `Wait, why is everyone ignoring the fact that someone walked away from the bar right before?` },
+      { icon: '⚡', label: 'Anyone had a motive', text: `${victimName} made a lot of enemies at this party. Anyone could have done this!` },
+    ];
+  } else {
+    quickQuestionStarters = [
       { icon: '🛡️', label: 'I am innocent!', text: `I am completely innocent! I was nowhere near the murder scene when it happened.` },
       { icon: '❓', label: 'Who had the shaker?', text: `Who had access to the silver cocktail shaker? Let's trace it back.` },
       { icon: '🤝', label: 'Check my alibi', text: `You can corroborate my timeline with anyone who was in the main room with me.` },
     ];
-  }, [currentRole, scenario?.victim]);
+  }
 
   // Role details with case-insensitive normalization & clear gameplay objectives
   const getRoleBadge = (role) => {
