@@ -5,126 +5,121 @@ import { GAME_STATUS } from '@/lib/constants';
 
 export const dynamic = 'force-dynamic';
 
-export async function GET(req) {
+async function processReveal(roomId, roomCode) {
+  let targetRoomId = roomId;
 
-  try {
-    const { searchParams } = new URL(req.url);
-    const roomCode = searchParams.get('roomCode');
-    const roomId = searchParams.get('roomId');
-
-    let targetRoomId = roomId;
-
-    if (!targetRoomId && roomCode) {
-      const { data: roomData, error: roomErr } = await supabaseServer
-        .from('rooms')
-        .select('*')
-        .eq('code', roomCode.toUpperCase())
-        .maybeSingle();
-
-      if (roomErr || !roomData) {
-        return NextResponse.json({ error: 'Room not found.' }, { status: 404 });
-      }
-      targetRoomId = roomData.id;
-    }
-
-    if (!targetRoomId) {
-      return NextResponse.json({ error: 'Missing roomCode or roomId.' }, { status: 400 });
-    }
-
-    // 1. Fetch room
-    const { data: room, error: roomFetchErr } = await supabaseServer
+  if (!targetRoomId && roomCode) {
+    const { data: roomData, error: roomErr } = await supabaseServer
       .from('rooms')
       .select('*')
-      .eq('id', targetRoomId)
-      .single();
+      .eq('code', roomCode.toUpperCase())
+      .maybeSingle();
 
-    if (roomFetchErr || !room) {
-      return NextResponse.json({ error: 'Room not found.' }, { status: 404 });
+    if (roomErr || !roomData) {
+      return { error: 'Room not found.', status: 404 };
     }
+    targetRoomId = roomData.id;
+  }
 
-    // Ensure status is marked finished
-    if (room.status !== GAME_STATUS.FINISHED) {
-      await supabaseServer
-        .from('rooms')
-        .update({ status: GAME_STATUS.FINISHED })
-        .eq('id', room.id);
-    }
+  if (!targetRoomId) {
+    return { error: 'Missing roomCode or roomId.', status: 400 };
+  }
 
-    // 2. Fetch all players
-    const { data: players, error: playersErr } = await supabaseServer
-      .from('players')
-      .select('id, name, role, secret_info, is_host')
-      .eq('room_id', targetRoomId);
+  // 1. Fetch room
+  const { data: room, error: roomFetchErr } = await supabaseServer
+    .from('rooms')
+    .select('*')
+    .eq('id', targetRoomId)
+    .single();
 
-    if (playersErr || !players) {
-      return NextResponse.json({ error: 'Failed to fetch players.' }, { status: 500 });
-    }
+  if (roomFetchErr || !room) {
+    return { error: 'Room not found.', status: 404 };
+  }
 
-    // 3. Fetch all votes
-    const { data: votes, error: votesErr } = await supabaseServer
-      .from('votes')
-      .select('id, voter_id, suspect_id')
-      .eq('room_id', targetRoomId);
+  // Ensure status is marked finished
+  if (room.status !== GAME_STATUS.FINISHED) {
+    await supabaseServer
+      .from('rooms')
+      .update({ status: GAME_STATUS.FINISHED })
+      .eq('id', room.id);
+  }
 
-    if (votesErr) {
-      console.error('Error fetching votes:', votesErr);
-    }
+  // 2. Fetch all players
+  const { data: players, error: playersErr } = await supabaseServer
+    .from('players')
+    .select('id, name, role, secret_info, is_host')
+    .eq('room_id', targetRoomId);
 
-    const votesList = votes || [];
-    const scenario = room.scenario || {};
+  if (playersErr || !players) {
+    return { error: 'Failed to fetch players.', status: 500 };
+  }
 
-    // 4. Find the actual killer
-    let killerPlayer = players.find((p) => (p.role || '').toLowerCase().includes('kill'));
-    if (!killerPlayer && scenario.killerName) {
-      killerPlayer = players.find(
-        (p) => p.name.trim().toLowerCase() === scenario.killerName.trim().toLowerCase()
-      );
-    }
+  // 3. Fetch all votes
+  const { data: votes, error: votesErr } = await supabaseServer
+    .from('votes')
+    .select('id, voter_id, suspect_id')
+    .eq('room_id', targetRoomId);
 
-    const killerName = killerPlayer ? killerPlayer.name : scenario.killerName || 'The Killer';
+  if (votesErr) {
+    console.error('Error fetching votes:', votesErr);
+  }
 
-    // 5. Calculate vote breakdown
-    const playerMap = new Map(players.map((p) => [p.id, p]));
-    const tallyMap = new Map();
+  const votesList = votes || [];
+  const scenario = room.scenario || {};
 
-    players.forEach((p) => {
-      tallyMap.set(p.id, {
-        suspectId: p.id,
-        suspectName: p.name,
-        role: p.role,
-        count: 0,
-        voters: [],
-      });
-    });
-
-    votesList.forEach((v) => {
-      const tally = tallyMap.get(v.suspect_id);
-      const voter = playerMap.get(v.voter_id);
-      if (tally) {
-        tally.count += 1;
-        if (voter) tally.voters.push(voter.name);
-      }
-    });
-
-    const voteBreakdown = Array.from(tallyMap.values()).sort((a, b) => b.count - a.count);
-
-    // Most voted suspect
-    const mostVoted = voteBreakdown.length > 0 && voteBreakdown[0].count > 0 ? voteBreakdown[0] : null;
-
-    // Did the group guess correctly?
-    const groupWon = Boolean(
-      mostVoted && killerPlayer && mostVoted.suspectId === killerPlayer.id
+  // 4. Find the actual killer
+  let killerPlayer = players.find((p) => (p.role || '').toLowerCase().includes('kill'));
+  if (!killerPlayer && scenario.killerName) {
+    killerPlayer = players.find(
+      (p) => p.name.trim().toLowerCase() === scenario.killerName.trim().toLowerCase()
     );
+  }
 
-    // 6. Generate AI narrator monologue
-    const aiResult = await generateRevealMonologue(
-      scenario,
-      killerName,
-      mostVoted?.suspectName,
-      groupWon
-    );
+  const killerName = killerPlayer ? killerPlayer.name : scenario.killerName || 'The Killer';
 
-    return NextResponse.json({
+  // 5. Calculate vote breakdown
+  const playerMap = new Map(players.map((p) => [p.id, p]));
+  const tallyMap = new Map();
+
+  players.forEach((p) => {
+    tallyMap.set(p.id, {
+      suspectId: p.id,
+      suspectName: p.name,
+      role: p.role,
+      count: 0,
+      voters: [],
+    });
+  });
+
+  votesList.forEach((v) => {
+    const tally = tallyMap.get(v.suspect_id);
+    const voter = playerMap.get(v.voter_id);
+    if (tally) {
+      tally.count += 1;
+      if (voter) tally.voters.push(voter.name);
+    }
+  });
+
+  const voteBreakdown = Array.from(tallyMap.values()).sort((a, b) => b.count - a.count);
+
+  // Most voted suspect
+  const mostVoted = voteBreakdown.length > 0 && voteBreakdown[0].count > 0 ? voteBreakdown[0] : null;
+
+  // Did the group guess correctly?
+  const groupWon = Boolean(
+    mostVoted && killerPlayer && mostVoted.suspectId === killerPlayer.id
+  );
+
+  // 6. Generate AI narrator monologue
+  const aiResult = await generateRevealMonologue(
+    scenario,
+    killerName,
+    mostVoted?.suspectName,
+    groupWon
+  );
+
+  return {
+    data: {
       success: true,
       room,
       scenario,
@@ -138,9 +133,42 @@ export async function GET(req) {
       players,
       narratorMonologue: aiResult.narratorMonologue,
       verdictSummary: aiResult.verdictSummary,
-    });
+    },
+  };
+}
+
+export async function GET(req) {
+  try {
+    const { searchParams } = new URL(req.url);
+    const roomCode = searchParams.get('roomCode');
+    const roomId = searchParams.get('roomId');
+
+    const result = await processReveal(roomId, roomCode);
+    if (result.error) {
+      return NextResponse.json({ error: result.error }, { status: result.status });
+    }
+    return NextResponse.json(result.data);
   } catch (err) {
-    console.error('Error in /api/reveal:', err);
+    console.error('Error in GET /api/reveal:', err);
+    return NextResponse.json(
+      { error: err.message || 'Failed to process grand finale reveal.' },
+      { status: 500 }
+    );
+  }
+}
+
+export async function POST(req) {
+  try {
+    const body = await req.json().catch(() => ({}));
+    const { roomId, roomCode } = body;
+
+    const result = await processReveal(roomId, roomCode);
+    if (result.error) {
+      return NextResponse.json({ error: result.error }, { status: result.status });
+    }
+    return NextResponse.json(result.data);
+  } catch (err) {
+    console.error('Error in POST /api/reveal:', err);
     return NextResponse.json(
       { error: err.message || 'Failed to process grand finale reveal.' },
       { status: 500 }

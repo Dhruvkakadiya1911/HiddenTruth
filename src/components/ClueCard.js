@@ -6,13 +6,19 @@ import s from './ClueCard.module.css';
 export default function ClueCard({ clue, index = 0 }) {
   if (!clue) return null;
 
+  // Extract embedded [IMAGE: /path/to/image.jpg] tag if present
+  const imageMatch = typeof clue.content === 'string' ? clue.content.match(/\[IMAGE:\s*([^\]]+)\]/i) : null;
+  const imageUrl = clue.imageUrl || (imageMatch ? imageMatch[1].trim() : null);
+
   const cleanContent = (clue.content || '')
+    .replace(/\[IMAGE:\s*[^\]]+\]/gi, '')
     .replace(/(^|[.!?]\s+)the\s+a\s+/gi, '$1A ')
     .replace(/(^|[.!?]\s+)the\s+an\s+/gi, '$1An ')
     .replace(/\bthe\s+a\s+/gi, 'a ')
     .replace(/\bthe\s+an\s+/gi, 'an ')
     .replace(/\ba\s+the\s+/gi, 'the ')
-    .replace(/\bthe\s+the\s+/gi, 'the ');
+    .replace(/\bthe\s+the\s+/gi, 'the ')
+    .trim();
 
   return (
     <motion.div
@@ -28,6 +34,17 @@ export default function ClueCard({ clue, index = 0 }) {
         </span>
         <span className={s.timestamp}>Confidential Evidence</span>
       </div>
+
+      {imageUrl && (
+        <div className={s.imageWrapper}>
+          <img
+            src={imageUrl}
+            alt={clue.title || `Clue #${index + 1}`}
+            className={s.clueImage}
+            loading="lazy"
+          />
+        </div>
+      )}
 
       <div className={s.content}>{cleanContent}</div>
     </motion.div>

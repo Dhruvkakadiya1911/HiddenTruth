@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { motion } from 'framer-motion';
+import AgentFigure from '@/components/AgentFigure';
 import s from './VotePanel.module.css';
 
 export default function VotePanel({
@@ -12,121 +12,206 @@ export default function VotePanel({
   onVote,
   voting = false,
   error = '',
+  votes = [],
+  isHost = false,
+  onReveal,
+  revealing = false,
+  roomCode = '',
 }) {
-  const [selectedId, setSelectedId] = useState(myVotedSuspectId || '');
+  const [pickedId, setPickedId] = useState(myVotedSuspectId || '');
 
-  // Filter suspects (allow voting for any player except yourself ideally, or allow all)
-  const suspects = players;
+  const activeSelectedId = myVotedSuspectId || pickedId;
+  const pickedSuspect = players.find((p) => p.id === activeSelectedId);
 
   const handleSelect = (id) => {
     if (hasVoted || voting) return;
     if (id === currentPlayer?.id) return;
-    setSelectedId(id);
+    setPickedId(id);
   };
 
-  const handleSubmit = () => {
-    if (!selectedId || hasVoted || voting) return;
-    if (selectedId === currentPlayer?.id) return;
-    onVote(selectedId);
+  const handleLockIn = () => {
+    if (!pickedId || hasVoted || voting) return;
+    if (pickedId === currentPlayer?.id) return;
+    onVote(pickedId);
   };
 
-  const votedTarget = players.find((p) => p.id === (myVotedSuspectId || selectedId));
+  const totalPlayers = players.length;
+  const votedCount = votes.length;
 
   return (
     <div className={s.container}>
-      <div className={s.suspectsGrid}>
-        {suspects.map((suspect, idx) => {
-          const isSelf = suspect.id === currentPlayer?.id;
-          const isSelected = selectedId === suspect.id;
-          const isMyVote = hasVoted && myVotedSuspectId === suspect.id;
+      {/* ── Suspect Lineup Wall matching 02_Lineup_Vote ── */}
+      <section aria-label="Suspect lineup" className={`rise d1 ${s.lineupWall}`}>
+        {/* Height measurement stripes */}
+        <div aria-hidden="true" className={s.heightStripes} />
 
-          let cardStyle = s.suspectCard;
-          if (isSelf) cardStyle += ` ${s.cardSelf}`;
-          else if (isMyVote) cardStyle += ` ${s.myVoteCard}`;
-          else if (isSelected) cardStyle += ` ${s.selectedCard}`;
-          if (hasVoted || isSelf) cardStyle += ` ${s.cardDisabled}`;
+        {/* Sweeping light bar */}
+        <div aria-hidden="true" className="sweep" />
 
-          return (
-            <motion.div
-              key={suspect.id}
-              className={cardStyle}
-              onClick={() => handleSelect(suspect.id)}
-              initial={{ opacity: 0, y: 15 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.35, delay: idx * 0.05 }}
-              whileHover={!hasVoted && !isSelf ? { scale: 1.02 } : {}}
-              whileTap={!hasVoted && !isSelf ? { scale: 0.98 } : {}}
-            >
-              <div className={s.avatar}>
-                {suspect.name ? suspect.name.charAt(0).toUpperCase() : '?'}
-              </div>
+        {/* Height ticks left & right */}
+        <div aria-hidden="true" className={s.ticksLeft}>
+          <span>7&apos;</span>
+          <span>6&apos;</span>
+          <span>5&apos;</span>
+          <span>4&apos;</span>
+          <span>3&apos;</span>
+          <span>2&apos;</span>
+        </div>
+        <div aria-hidden="true" className={s.ticksRight}>
+          <span>7&apos;</span>
+          <span>6&apos;</span>
+          <span>5&apos;</span>
+          <span>4&apos;</span>
+          <span>3&apos;</span>
+          <span>2&apos;</span>
+        </div>
 
-              <div className={s.info}>
-                <div className={s.name}>
-                  {suspect.name} {suspect.is_host && '👑'}
-                </div>
-                <div className={s.subtext}>
-                  {isSelf && <span className={s.badgeYou}>(You — Cannot accuse yourself)</span>}
-                  {isMyVote && <span className={s.badgeVoteTarget}>Accused: Your Vote ⚖️</span>}
-                  {!isSelf && !isMyVote && (isSelected ? 'Selected to accuse' : 'Click to accuse')}
-                </div>
-              </div>
+        {/* Floor gradient */}
+        <div aria-hidden="true" className={s.floorBar} />
 
-              <div
-                className={`${s.checkMark} ${
-                  isSelf
-                    ? s.checkMarkDisabled
-                    : isMyVote
-                    ? s.checkMarkMyVote
-                    : isSelected
-                    ? s.checkMarkSelected
-                    : ''
-                }`}
+        {/* Suspect Slots Grid */}
+        <div className={s.suspectsGrid}>
+          {players.map((suspect, idx) => {
+            const isSelf = suspect.id === currentPlayer?.id;
+            const isSelected = activeSelectedId === suspect.id;
+            const no = String(idx + 1).padStart(2, '0');
+
+            const isBot = Boolean(suspect.is_bot || suspect.name?.includes('(Bot)'));
+            const cleanName = suspect.name ? suspect.name.replace(/\s*\((Bot|Test)\)/gi, '') : 'Player';
+
+            let sub = 'Suspect';
+            if (isSelf) {
+              sub = 'You · Cannot accuse';
+            } else if (suspect.is_host) {
+              sub = 'Host';
+            } else if (isBot) {
+              sub = 'Bot';
+            }
+
+            return (
+              <button
+                key={suspect.id}
+                type="button"
+                className={`btn ${s.slotBtn} ${isSelf ? s.slotDisabled : ''}`}
+                onClick={() => handleSelect(suspect.id)}
+                disabled={isSelf || hasVoted}
+                aria-pressed={isSelected}
+                aria-label={isSelf ? 'You cannot accuse yourself' : `Accuse ${cleanName}`}
               >
-                {isSelf ? '✕' : isMyVote ? '✓' : isSelected ? '✓' : ''}
-              </div>
-            </motion.div>
-          );
-        })}
-      </div>
+                {/* Spotlight cone when selected */}
+                {isSelected && <span aria-hidden="true" className={`spot ${s.spotlightCone}`} />}
 
-      <div className={s.voteActionArea}>
-        {error && (
-          <div style={{ color: 'var(--neon-red)', fontSize: '0.85rem', textAlign: 'center' }}>
-            {error}
+                {/* Agent figure */}
+                <span className={s.figureWrapper}>
+                  <AgentFigure
+                    role={isSelf ? (currentPlayer?.role || 'unknown') : 'unknown'}
+                    tint={isSelected ? '#FF2D55' : isSelf ? '#2EE6FF' : '#A49CC4'}
+                    size={210}
+                    glow={isSelected}
+                    tilt={isSelected}
+                  />
+
+                  {/* ACCUSED Stamp when locked on this suspect */}
+                  {hasVoted && isSelected && (
+                    <span className={`stamp ${s.accusedStamp}`}>
+                      ACCUSED
+                    </span>
+                  )}
+                </span>
+
+                {/* Nameplate matching reference */}
+                <span className={`${s.nameplate} ${isSelected ? s.nameplateSelected : ''}`}>
+                  <span className={`${s.suspectNo} ${isSelected ? s.suspectNoSelected : ''}`}>
+                    No. {no}
+                  </span>
+                  <span className={s.suspectName}>
+                    {cleanName} {suspect.is_host && '👑'}
+                  </span>
+                  <span className={`${s.suspectSub} ${isSelf ? s.suspectSubMe : ''}`}>
+                    {sub}
+                  </span>
+                </span>
+              </button>
+            );
+          })}
+        </div>
+      </section>
+
+      {/* ── Decision Bar matching 02_Lineup_Vote ── */}
+      <section className={`glass rise d2 ${s.decisionBar}`}>
+        {/* Jury avatars */}
+        <div className={s.juryGroup}>
+          <div className={s.juryAvatars}>
+            {players.map((p) => {
+              const hasPloyVoted = votes.some((v) => v.voter_id === p.id);
+              const initial = p.name ? p.name.charAt(0).toUpperCase() : '?';
+              return (
+                <span
+                  key={p.id}
+                  title={`${p.name}: ${hasPloyVoted ? 'Voted' : 'Thinking...'}`}
+                  className={`${s.juryAvatar} ${hasPloyVoted ? s.juryAvatarVoted : ''}`}
+                >
+                  {initial}
+                </span>
+              );
+            })}
           </div>
-        )}
+          <span className={s.votedCountLabel}>
+            {votedCount} / {totalPlayers} voted
+          </span>
+        </div>
 
-        {hasVoted ? (
-          <motion.div
-            className={s.lockedBanner}
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-          >
-            <div className={s.lockedTitle}>
-              🔒 VOTE LOCKED IN
-            </div>
-            <div className={s.lockedDesc}>
-              You accused <strong>{votedTarget?.name || 'a player'}</strong>. Waiting for other players to cast their votes...
-            </div>
-          </motion.div>
-        ) : (
+        {/* Summary text */}
+        <div className={s.summaryText}>
+          {hasVoted ? (
+            <span>
+              Locked on <strong style={{ color: '#FF2D55' }}>{pickedSuspect?.name || 'suspect'}</strong>. Waiting for the jury…
+            </span>
+          ) : pickedSuspect ? (
+            <span>
+              You&apos;re pointing at <strong style={{ color: '#FF2D55' }}>{pickedSuspect.name}</strong>.
+            </span>
+          ) : (
+            <span>Tap a suspect in the lineup.</span>
+          )}
+        </div>
+
+        {error && <div className={s.errorText}>{error}</div>}
+
+        {/* CTA: Accuse Button / Locked Button */}
+        {!hasVoted ? (
           <button
             type="button"
-            className={s.btnLockVote}
-            onClick={handleSubmit}
-            disabled={!selectedId || voting || selectedId === currentPlayer?.id}
+            className={`btn ${pickedId ? 'shine' : ''} ${s.ctaAccuseBtn} ${!pickedId ? s.ctaDisabledBtn : ''}`}
+            onClick={handleLockIn}
+            disabled={!pickedId || voting}
           >
             {voting ? (
-              'Submitting Accusation...'
-            ) : selectedId && selectedId !== currentPlayer?.id ? (
-              `Accuse ${suspects.find((p) => p.id === selectedId)?.name || ''} ⚖️`
+              'Locking Vote...'
+            ) : pickedSuspect ? (
+              `Lock in on ${pickedSuspect.name}`
             ) : (
-              'Choose someone above to accuse'
+              'Choose a suspect'
             )}
           </button>
+        ) : (
+          <button type="button" className={`${s.ctaAccuseBtn} ${s.ctaLockedBtn}`} disabled>
+            ✓ Vote locked on {pickedSuspect?.name || 'suspect'}
+          </button>
         )}
-      </div>
+
+        {/* Host / Reveal Button */}
+        {isHost && onReveal && (
+          <button
+            type="button"
+            className={`btn shine ${s.ctaRevealBtn}`}
+            onClick={onReveal}
+            disabled={revealing}
+          >
+            {revealing ? 'Unmasking...' : 'Reveal the truth 🎬'}
+          </button>
+        )}
+      </section>
     </div>
   );
 }

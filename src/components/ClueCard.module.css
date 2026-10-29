@@ -1,15 +1,13 @@
-/* Clue Card — Neo-Noir Evidence Snippet */
+/* Clue Card — Minimal Carbon Evidence Snippet */
 
 .card {
   position: relative;
   padding: 1.1rem 1.25rem;
-  background: rgba(18, 20, 32, 0.75);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid var(--border-subtle);
-  border-left: 3px solid var(--neon-cyan);
-  border-radius: var(--r-md);
-  box-shadow: 0 10px 24px -6px rgba(0, 0, 0, 0.5), 0 0 15px rgba(34, 211, 238, 0.1);
+  background: #14111D;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-left: 3px solid #E5193A;
+  border-radius: 12px;
+  box-shadow: 0 8px 24px -6px rgba(0, 0, 0, 0.4);
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
@@ -17,10 +15,10 @@
 }
 
 .card:hover {
-  border-color: var(--border-glass);
-  border-left-color: var(--neon-cyan);
-  background: rgba(22, 25, 40, 0.85);
-  box-shadow: 0 12px 28px -4px rgba(0, 0, 0, 0.6), 0 0 20px rgba(34, 211, 238, 0.2);
+  border-color: rgba(255, 255, 255, 0.16);
+  border-left-color: #E5193A;
+  background: #181524;
+  box-shadow: 0 10px 28px -4px rgba(0, 0, 0, 0.5);
 }
 
 .header {
@@ -38,7 +36,7 @@
   font-weight: 700;
   letter-spacing: 0.1em;
   text-transform: uppercase;
-  color: var(--neon-cyan);
+  color: #E5193A;
 }
 
 .timestamp {
@@ -51,4 +49,27 @@
   font-size: 0.9rem;
   line-height: 1.55;
   color: var(--text-primary);
+}
+
+.imageWrapper {
+  width: 100%;
+  max-height: 200px;
+  overflow: hidden;
+  border-radius: 8px;
+  margin-top: 0.35rem;
+  margin-bottom: 0.25rem;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(0, 0, 0, 0.5);
+}
+
+.clueImage {
+  width: 100%;
+  height: 190px;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.25s ease;
+}
+
+.card:hover .clueImage {
+  transform: scale(1.02);
 }

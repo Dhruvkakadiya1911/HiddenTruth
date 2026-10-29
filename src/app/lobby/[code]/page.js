@@ -3,15 +3,27 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { motion, AnimatePresence } from 'framer-motion';
 import { usePlayer } from '@/hooks/usePlayer';
 import { useSupabaseRoom } from '@/hooks/useSupabaseRoom';
-import PlayerCard from '@/components/PlayerCard';
 import LoadingSpinner from '@/components/LoadingSpinner';
+import AgentFigure from '@/components/AgentFigure';
 import HowToPlayModal from '@/components/HowToPlayModal';
+import CaseWritingScreen from '@/components/CaseWritingScreen';
 import { MIN_PLAYERS, MAX_PLAYERS, GAME_STATUS } from '@/lib/constants';
 import s from './page.module.css';
 
+const LOBBY_TINTS = [
+  '#3FD0E8', // Cyan
+  '#9B6BFF', // Purple
+  '#F2B33D', // Amber
+  '#FF5C8A', // Pink
+  '#2EE6A8', // Mint
+  '#FF8A3D', // Orange
+  '#E5193A', // Crimson
+  '#6BE4FF', // Sky
+  '#FFB74D', // Gold
+  '#A49CC4', // Slate
+];
 
 export default function LobbyPage({ params }) {
   const router = useRouter();
@@ -21,12 +33,12 @@ export default function LobbyPage({ params }) {
 
   const [copied, setCopied] = useState(false);
   const [starting, setStarting] = useState(false);
+  const [caseReady, setCaseReady] = useState(false);
   const [addingBots, setAddingBots] = useState(false);
   const [botError, setBotError] = useState('');
   const [isTestEnv, setIsTestEnv] = useState(false);
   const [showGuide, setShowGuide] = useState(false);
 
-  // Detect test/local development environment (never displays in production)
   useEffect(() => {
     if (typeof window !== 'undefined') {
       const isLocalHost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
@@ -34,28 +46,23 @@ export default function LobbyPage({ params }) {
     }
   }, []);
 
-  // Guarantee Lobby screen always starts strictly at the top
   useEffect(() => {
     window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
-    if (document.documentElement) document.documentElement.scrollTop = 0;
-    if (document.body) document.body.scrollTop = 0;
   }, []);
 
   const handleLeaveLobby = (e) => {
     e.preventDefault();
-    const confirmed = window.confirm(
-      'Are you sure you want to leave this game room?'
-    );
+    const confirmed = window.confirm('Are you sure you want to leave this game room?');
     if (!confirmed) return;
     clearPlayer();
     router.push('/', { scroll: true });
   };
 
-  // Auto-redirect all players when game status changes
   useEffect(() => {
     if (!room) return;
     if (room.status === GAME_STATUS.PLAYING) {
-      router.push(`/game/${roomCode}`, { scroll: true });
+      setStarting(true);
+      setCaseReady(true);
     } else if (room.status === GAME_STATUS.VOTING) {
       router.push(`/vote/${roomCode}`, { scroll: true });
     } else if (room.status === GAME_STATUS.FINISHED) {
@@ -63,7 +70,6 @@ export default function LobbyPage({ params }) {
     }
   }, [room, room?.status, roomCode, router]);
 
-  // Guard: player must be part of this room
   useEffect(() => {
     if (loading || !room) return;
     if (!player?.id || (player?.roomCode && player.roomCode !== roomCode)) {
@@ -71,10 +77,10 @@ export default function LobbyPage({ params }) {
     }
   }, [loading, room, player, roomCode, router]);
 
-
   const handleCopyCode = async () => {
     try {
-      await navigator.clipboard.writeText(roomCode);
+      const shareUrl = typeof window !== 'undefined' ? `${window.location.origin}/join?code=${roomCode}` : roomCode;
+      await navigator.clipboard.writeText(shareUrl);
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     } catch (err) {
@@ -82,14 +88,14 @@ export default function LobbyPage({ params }) {
     }
   };
 
-  // Determine if current visitor is the room host
-  const isHost =
-    player?.isHost && (player?.roomId === room?.id || player?.roomCode === roomCode);
+  const isHost = Boolean(
+    player?.isHost && (player?.roomId === room?.id || player?.roomCode === roomCode)
+  );
 
   const playerCount = players.length;
   const canStart = playerCount >= MIN_PLAYERS;
+  const needed = Math.max(0, MIN_PLAYERS - playerCount);
 
-  // Handler to add mock test suspects in local development (eliminates needing multiple incognito windows)
   const handleAddTestBots = async () => {
     if (addingBots || !room || !isHost) return;
     setAddingBots(true);
@@ -116,47 +122,65 @@ export default function LobbyPage({ params }) {
     }
   };
 
-  // Placeholder handler for starting game (will call Step 6 AI scenario generation API)
   const handleStartGame = async () => {
     if (!canStart || starting) return;
     setStarting(true);
+    setCaseReady(false);
     try {
       const res = await fetch('/api/game/start', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ roomId: room.id, roomCode }),
       });
-      const data = await res.json();
+      let data;
+      try {
+        data = await res.json();
+      } catch {
+        throw new Error(`Server returned ${res.status}.`);
+      }
       if (!res.ok) {
         throw new Error(data.error || 'Failed to start game.');
       }
-      router.push(`/game/${roomCode}`, { scroll: true });
+      // Signal CaseWritingScreen that case generation is complete!
+      setCaseReady(true);
     } catch (err) {
       console.error('Start game error:', err);
-      // If Step 6 endpoint is not built yet, we notify the user
-      alert(err.message || 'Game start is being connected in Step 6.');
+      alert(err.message || 'Failed to start investigation.');
       setStarting(false);
+      setCaseReady(false);
     }
   };
 
+  // Full-screen narrative radar screen when game is starting / case being written
+  if (starting) {
+    return (
+      <CaseWritingScreen
+        roomCode={roomCode}
+        isComplete={caseReady || room?.status === GAME_STATUS.PLAYING}
+        onComplete={() => router.push(`/game/${roomCode}`, { scroll: true })}
+      />
+    );
+  }
+
   if (loading) {
     return (
-      <div className={s.page}>
-        <LoadingSpinner label="Connecting to encrypted room..." />
+      <div className={s.page} style={{ display: 'grid', placeItems: 'center' }}>
+        <LoadingSpinner label="Accessing secret waiting room..." />
       </div>
     );
   }
 
-
   if (error || !room) {
     return (
-      <div className={s.page}>
-        <div className={s.container} style={{ textAlign: 'center' }}>
-          <h2 style={{ color: 'var(--neon-red)', marginBottom: '1rem' }}>Room Not Found</h2>
-          <p style={{ color: 'var(--text-secondary)', marginBottom: '1.5rem' }}>
+      <div className={s.page} style={{ display: 'grid', placeItems: 'center' }}>
+        <div className="card" style={{ padding: '36px', textAlign: 'center', maxWidth: '440px' }}>
+          <h2 style={{ color: '#E5193A', marginBottom: '14px', fontFamily: "'Bebas Neue', sans-serif", fontSize: '42px' }}>
+            Room Not Found
+          </h2>
+          <p style={{ color: '#A9A5B4', marginBottom: '24px' }}>
             {error || `Room "${roomCode}" does not exist or has expired.`}
           </p>
-          <Link href="/" className={s.backLink}>
+          <Link href="/" className="b-red">
             Return Home
           </Link>
         </div>
@@ -164,158 +188,214 @@ export default function LobbyPage({ params }) {
     );
   }
 
+  // 10 slots
+  const slots = Array.from({ length: 10 }, (_, i) => {
+    const p = players[i] || null;
+    const isMe = p && p.id === player?.id;
+    const tint = LOBBY_TINTS[i % LOBBY_TINTS.length];
+    return {
+      index: i,
+      player: p,
+      isMe,
+      tint,
+    };
+  });
+
+  const codeLetters = [0, 1, 2, 3].map((i) => roomCode[i] || '•');
+
   return (
     <div className={s.page}>
-      {/* Background Ambience */}
-      <div className={s.bgLayer}>
-        <div className={s.bgGrid} />
-        <div className={s.orbRed} />
-        <div className={s.orbViolet} />
-      </div>
-
-      {/* Top Nav */}
-      <header className={s.topNav}>
-        <button
-          type="button"
-          onClick={handleLeaveLobby}
-          className={s.backLink}
-          style={{ background: 'transparent', border: 'none', cursor: 'pointer' }}
-        >
-          ← Leave Room
+      {/* Top Bar Navigation */}
+      <div className={s.topBar}>
+        <button type="button" onClick={handleLeaveLobby} className="ib" aria-label="Leave room">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+            <path d="M15 18l-6-6 6-6" />
+          </svg>
         </button>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
-          <button
-            type="button"
-            onClick={() => setShowGuide(true)}
-            className={s.backLink}
-            style={{ color: 'var(--neon-cyan)', borderColor: 'rgba(34, 211, 238, 0.35)', background: 'rgba(34, 211, 238, 0.08)', cursor: 'pointer' }}
-          >
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+          <button type="button" onClick={() => setShowGuide(true)} className="chip" style={{ borderColor: 'rgba(63,208,232,.3)', color: '#3FD0E8' }}>
             📖 Guide
           </button>
-          <div className={s.liveBadge}>
-            <span className={s.liveDot} />
+          <span className="chip" style={{ borderColor: 'rgba(229,25,58,.4)', color: '#E5193A' }}>
+            <span className="beat" style={{ width: 8, height: 8, borderRadius: '50%', background: '#E5193A', display: 'inline-block' }} />
             Lobby Live
-          </div>
+          </span>
         </div>
-      </header>
+      </div>
 
-      {/* Main Container */}
-      <motion.main
-        className={s.container}
-        initial={{ opacity: 0, y: 15 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.45 }}
-      >
-        {/* Room Code Showcase */}
-        <div className={s.codeBox}>
-          <span className={s.codeLabel}>Room Invitation Code</span>
-          <div className={s.codeDisplay}>{roomCode}</div>
+      <div className={s.wrap}>
+        {/* Left Card: Room Code & Action */}
+        <div className={`card rise ${s.codeCard}`}>
+          <span className="mono-tag" style={{ color: '#8E8A99' }}>Room code</span>
+          <div className={s.codeDisplay}>
+            {codeLetters.map((l, i) => (
+              <span
+                key={i}
+                className="disp flick"
+                style={{
+                  fontSize: 'clamp(80px, 12vw, 140px)',
+                  color: i === 3 ? '#E5193A' : '#ECE8E1',
+                  textShadow: i === 3 ? '0 0 40px rgba(229,25,58,.6)' : 'none',
+                  animationDelay: `${i * 0.6}s`,
+                }}
+              >
+                {l}
+              </span>
+            ))}
+          </div>
+          <p style={{ margin: 0, color: '#A9A5B4', fontSize: '15px' }}>
+            Everyone opens HiddenTruth on their device and enters this 4-letter code.
+          </p>
 
-          <button
-            onClick={handleCopyCode}
-            className={`${s.copyBtn} ${copied ? s.copied : ''}`}
-            id="btn-copy-code"
-          >
-            <span>{copied ? '✓' : '📋'}</span>
-            <span>{copied ? 'Copied Code!' : 'Copy Code'}</span>
+          <button type="button" onClick={handleCopyCode} className="chip" style={{ alignSelf: 'center' }}>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+              <rect x="9" y="9" width="12" height="12" rx="2" />
+              <path d="M5 15V5a2 2 0 0 1 2-2h10" />
+            </svg>
+            {copied ? 'Link Copied!' : 'Copy invite link'}
           </button>
 
-          <p className={s.codeHint}>
-            Friends can join by visiting the app on their phone and entering this 4-letter code.
-          </p>
+          <div style={{ marginTop: 'auto', display: 'flex', flexDirection: 'column', gap: '12px', width: '100%' }}>
+            {isHost ? (
+              <>
+                <button
+                  type="button"
+                  className="b-red"
+                  style={{ width: '100%' }}
+                  disabled={!canStart || starting}
+                  onClick={handleStartGame}
+                >
+                  {starting
+                    ? 'AI writing case dossier...'
+                    : !canStart
+                    ? `Need ${needed} more suspect${needed === 1 ? '' : 's'}`
+                    : 'Start the investigation'}
+                </button>
+
+                {isTestEnv && playerCount < 4 && (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', alignItems: 'center' }}>
+                    <button
+                      type="button"
+                      onClick={handleAddTestBots}
+                      disabled={addingBots}
+                      className="b-ghost"
+                      style={{ width: '100%', height: '46px', fontSize: '12px', borderColor: 'rgba(183,108,255,.4)', color: '#B76CFF' }}
+                    >
+                      🧪 {addingBots ? 'Summoning suspects...' : 'Fill Room to 4 Players (Dev Only)'}
+                    </button>
+                    {botError && <span style={{ color: '#FF7B92', fontSize: '12px' }}>{botError}</span>}
+                  </div>
+                )}
+              </>
+            ) : (
+              <div style={{ padding: '16px', borderRadius: '14px', background: 'rgba(255,255,255,.02)', border: '1px dashed #2A2A34', fontSize: '14px', color: '#8E8A99', textAlign: 'center' }}>
+                Waiting for host to start the case…
+              </div>
+            )}
+            <p className="mono-tag" style={{ margin: 0, textAlign: 'center', color: '#5C5966' }}>
+              3 to 10 players · 1 killer hidden among you
+            </p>
+          </div>
         </div>
 
-        {/* Players Section */}
-        <section className={s.playersSection}>
-          <div className={s.sectionHeader}>
-            <div className={s.sectionTitle}>
-              <span>Players Joined</span>
-              <span className={s.countBadge}>
-                {playerCount}/{MAX_PLAYERS}
+        {/* Right Card: Suspect Slots */}
+        <div className={`card rise r1 ${s.suspectsCard}`}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+              <span className="disp" style={{ fontSize: '32px' }}>Joined suspects</span>
+              <span className="chip" style={{ height: '24px', padding: '0 10px', fontSize: '11px', borderColor: 'rgba(63,208,232,.3)', color: '#3FD0E8' }}>
+                Live
               </span>
             </div>
-            <span className={s.minRequirement}>
-              Min. {MIN_PLAYERS} required
+            <span className="mono-tag" style={{ color: '#3FD0E8' }}>
+              {playerCount} / 10 joined
             </span>
           </div>
 
-          <div className={s.playerList}>
-            <AnimatePresence>
-              {players.map((p, idx) => (
-                <PlayerCard
-                  key={p.id}
-                  player={p}
-                  isCurrentPlayer={player?.id === p.id}
-                  index={idx}
-                />
-              ))}
-            </AnimatePresence>
+          <div className={s.slotsGrid}>
+            {slots.map((slot) => {
+              if (slot.player) {
+                const isMe = slot.isMe;
+                const isRoomHost = slot.player.is_host;
+                const cleanName = slot.player.name?.replace(/\s*\((Bot|Test)\)/gi, '') || 'Suspect';
 
-            {/* Hint slots if below minimum */}
-            {playerCount < MIN_PLAYERS && (
-              <div className={s.emptySlot}>
-                <span className={s.emptySlotDot} />
-                <span>Waiting for {MIN_PLAYERS - playerCount} more player{MIN_PLAYERS - playerCount > 1 ? 's' : ''} to join...</span>
-              </div>
-            )}
-          </div>
-        </section>
-
-        {/* Action Area: Host vs Guest */}
-        <div className={s.actionArea}>
-          {isHost ? (
-            <div>
-              <motion.button
-                onClick={handleStartGame}
-                disabled={!canStart || starting}
-                className={s.btnStart}
-                id="btn-start-game"
-                whileTap={{ scale: 0.98 }}
-              >
-                <span>⚡</span>
-                <span>{starting ? 'Preparing Investigation...' : 'Start Investigation ⚡'}</span>
-              </motion.button>
-
-              {/* Dev Only: Auto-fill test suspects to eliminate opening multiple incognito windows */}
-              {isTestEnv && playerCount < 4 && (
-                <div className={s.testDevBox}>
-                  <button
-                    type="button"
-                    onClick={handleAddTestBots}
-                    disabled={addingBots}
-                    className={s.btnTestBots}
+                return (
+                  <div
+                    key={slot.index}
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '14px',
+                      padding: '12px 14px',
+                      borderRadius: '16px',
+                      background: '#0E0E13',
+                      border: `1px solid ${isMe ? 'rgba(63,208,232,.45)' : '#22222C'}`,
+                      boxShadow: isMe ? '0 0 20px -6px rgba(63,208,232,.3)' : 'none',
+                    }}
                   >
-                    <span>🧪</span>
-                    <span>{addingBots ? 'Summoning Test Suspects...' : 'Add Test Suspects (Dev Only)'}</span>
-                  </button>
-                  <span className={s.testDevHint}>
-                    Fills room to 4 players for solo testing on localhost — hidden in production.
+                    <span
+                      style={{
+                        width: '48px',
+                        height: '48px',
+                        borderRadius: '50%',
+                        overflow: 'hidden',
+                        background: '#151520',
+                        border: `1.5px solid ${slot.tint}`,
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        flex: 'none',
+                      }}
+                    >
+                      <AgentFigure role="unknown" tint={slot.tint} size={48} variant="avatar" tilt={false} />
+                    </span>
+                    <div style={{ minWidth: 0, flex: 1 }}>
+                      <div style={{ fontWeight: 600, fontSize: '15px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                        {cleanName}
+                      </div>
+                      <div className="mono-tag" style={{ color: isMe ? '#3FD0E8' : isRoomHost ? '#F2B33D' : '#8E8A99', fontSize: '10px' }}>
+                        {isMe ? '· You' : isRoomHost ? '· Host' : '· Suspect'}
+                      </div>
+                    </div>
+                  </div>
+                );
+              }
+
+              return (
+                <div
+                  key={slot.index}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '14px',
+                    padding: '12px 14px',
+                    borderRadius: '16px',
+                    border: '1px dashed #22222C',
+                    color: '#5C5966',
+                  }}
+                >
+                  <span
+                    style={{
+                      width: '48px',
+                      height: '48px',
+                      borderRadius: '50%',
+                      border: '1px dashed #22222C',
+                      display: 'grid',
+                      placeItems: 'center',
+                      flex: 'none',
+                      fontSize: '18px',
+                    }}
+                  >
+                    ?
                   </span>
-                  {botError && <span className={s.testDevError}>{botError}</span>}
+                  <span className="mono-tag" style={{ fontSize: '11px' }}>Waiting…</span>
                 </div>
-              )}
-
-              {!canStart && (
-                <p className={s.stateNotice}>
-                  Need at least {MIN_PLAYERS} players to start the mystery.
-                </p>
-              )}
-            </div>
-          ) : (
-            <div className={s.waitingCard}>
-              <span className={s.pulseRadar} />
-              <span>Waiting for the Host to start the investigation...</span>
-            </div>
-          )}
+              );
+            })}
+          </div>
         </div>
-      </motion.main>
+      </div>
 
-      {/* Footer */}
-      <footer className={s.footer}>
-        HiddenTruth // Realtime Party Sync
-      </footer>
-
-      {/* Beginner Guide Modal */}
       <HowToPlayModal isOpen={showGuide} onClose={() => setShowGuide(false)} />
     </div>
   );

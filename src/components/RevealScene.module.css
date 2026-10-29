@@ -1,408 +1,494 @@
+/* ═════════════════════════════════════════════════════════════ */
+/*  HiddenTruth — RevealScene Component (03_The_Reveal)          */
+/* ═════════════════════════════════════════════════════════════ */
+
 .container {
   display: flex;
   flex-direction: column;
-  gap: 2rem;
+  gap: 44px;
   width: 100%;
 }
 
-/* Outcome Banner */
-.outcomeBanner {
-  padding: 1.8rem 2rem;
-  border-radius: var(--r-xl);
-  text-align: center;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.6rem;
+/* ── Section 1: The Killer Reveal Stage ── */
+.stageCard {
   position: relative;
+  border-radius: 16px;
   overflow: hidden;
-}
-
-.outcomeWon {
-  background: linear-gradient(135deg, rgba(16, 185, 129, 0.18), rgba(5, 150, 105, 0.3));
-  border: 1px solid var(--neon-emerald);
-  box-shadow: 0 0 40px rgba(16, 185, 129, 0.25);
-}
-
-.outcomeLost {
-  background: linear-gradient(135deg, rgba(239, 68, 68, 0.2), rgba(185, 28, 28, 0.35));
-  border: 1px solid var(--neon-red);
-  box-shadow: 0 0 40px rgba(239, 68, 68, 0.3);
-}
-
-.outcomeBadge {
-  font-family: var(--f-mono);
-  font-size: 0.8rem;
-  font-weight: 800;
-  letter-spacing: 0.15em;
-  text-transform: uppercase;
-}
-
-.outcomeWon .outcomeBadge {
-  color: var(--neon-emerald);
-}
-
-.outcomeLost .outcomeBadge {
-  color: var(--neon-red);
-}
-
-.outcomeHeading {
-  font-family: var(--f-display);
-  font-size: 2rem;
-  font-weight: 900;
-  color: #fff;
-  letter-spacing: -0.02em;
-  line-height: 1.15;
-}
-
-.outcomeSub {
-  font-size: 0.95rem;
-  color: var(--text-secondary);
-  max-width: 580px;
-}
-
-/* Killer Reveal Card */
-.killerCard {
-  padding: 2.2rem;
-  background: rgba(18, 20, 32, 0.9);
-  backdrop-filter: blur(25px);
-  -webkit-backdrop-filter: blur(25px);
-  border: 2px solid var(--neon-red);
-  border-radius: var(--r-2xl);
-  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.8), 0 0 45px rgba(255, 42, 81, 0.3);
+  border: 1px solid rgba(229, 25, 58, 0.35);
+  background: #100E17;
   display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-align: center;
-  gap: 1.5rem;
+  flex-wrap: wrap;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.6);
+}
+
+.stageStripes {
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.02) 0 2px, transparent 2px 46px);
+  pointer-events: none;
+}
+
+.stageVisual {
   position: relative;
-}
-
-.killerHeader {
+  flex: 1 1 380px;
+  min-height: 460px;
   display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.8rem;
-}
-
-.killerAvatar {
-  width: 80px;
-  height: 80px;
-  border-radius: var(--r-full);
-  background: linear-gradient(135deg, #ef4444, #7f1d1d);
-  border: 3px solid rgba(255, 255, 255, 0.2);
-  display: flex;
-  align-items: center;
+  align-items: flex-end;
   justify-content: center;
-  font-family: var(--f-display);
-  font-size: 2.2rem;
-  font-weight: 900;
-  color: #fff;
-  box-shadow: 0 0 30px rgba(239, 68, 68, 0.6);
+  padding-bottom: 24px;
+  z-index: 2;
 }
 
-.killerLabel {
-  font-family: var(--f-mono);
-  font-size: 0.8rem;
+.stageSpotlight {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  width: 440px;
+  margin-left: -220px;
+  height: 100%;
+  background: linear-gradient(180deg, rgba(229, 25, 58, 0.3) 0%, rgba(229, 25, 58, 0.08) 60%, transparent 95%);
+  clip-path: polygon(42% 0, 58% 0, 100% 100%, 0 100%);
+  pointer-events: none;
+}
+
+.unmaskedStamp {
+  position: absolute;
+  top: 48px;
+  right: 7%;
+  padding: 6px 14px;
+  border: 2px solid #E5193A;
+  border-radius: 6px;
+  color: #E5193A;
+  font-family: 'Unbounded', sans-serif;
   font-weight: 800;
-  letter-spacing: 0.15em;
-  color: var(--neon-red);
+  font-size: 16px;
+  letter-spacing: 0.14em;
+  background: rgba(8, 7, 12, 0.8);
+  box-shadow: 0 0 16px rgba(229, 25, 58, 0.4);
+  z-index: 5;
+}
+
+.stageContent {
+  position: relative;
+  flex: 1.2 1 440px;
+  padding: 48px 40px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 16px;
+  z-index: 2;
+}
+
+.outcomeTag {
+  font-size: 11px;
+  font-weight: 700;
+  color: #E5193A;
+  letter-spacing: 0.14em;
   text-transform: uppercase;
 }
 
-.killerName {
-  font-family: var(--f-display);
-  font-size: 2.4rem;
+.outcomeTitle {
+  margin: 0;
+  font-family: 'Bebas Neue', 'Unbounded', Impact, sans-serif;
+  font-size: clamp(42px, 6vw, 70px);
+  line-height: 0.92;
   font-weight: 900;
-  color: #fff;
-  letter-spacing: -0.02em;
+  letter-spacing: 0.02em;
+  color: #ECE8E1;
 }
 
-.caseDetails {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 1rem;
-  width: 100%;
-  padding-top: 1.25rem;
-  border-top: 1px solid var(--border-glass);
-  text-align: left;
+.killerHighlight {
+  color: #E5193A;
+  text-shadow: 0 0 24px rgba(229, 25, 58, 0.4);
 }
 
-.detailItem {
-  padding: 1rem;
-  background: rgba(8, 9, 14, 0.7);
-  border: 1px solid var(--border-subtle);
-  border-radius: var(--r-lg);
+.caveatQuote {
+  margin: 0;
+  font-family: 'Special Elite', monospace;
+  font-size: 16px;
+  font-weight: 500;
+  color: #D4CEDD;
+  line-height: 1.5;
+  max-width: 44ch;
+}
+
+.chipsRow {
   display: flex;
-  flex-direction: column;
-  gap: 0.3rem;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: 6px;
 }
 
-.detailLabel {
-  font-family: var(--f-mono);
-  font-size: 0.68rem;
+.chip {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 14px;
+  border-radius: 9999px;
+  font-size: 13px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  color: #ECE8E1;
+}
+
+.chipTag {
+  font-size: 10px;
+  color: #F5B82E;
   font-weight: 700;
   letter-spacing: 0.1em;
-  color: var(--neon-amber);
+}
+
+/* ── Section 2: Cast Unmasked (3D Flip Cards) ── */
+.castSection {
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+}
+
+.castHeader {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.castSub {
+  font-size: 11px;
+  color: #8E8A98;
+  letter-spacing: 0.14em;
   text-transform: uppercase;
 }
 
-.detailVal {
-  font-size: 0.9rem;
-  color: var(--text-primary);
-  line-height: 1.4;
+.castTitle {
+  margin: 6px 0 0;
+  font-family: 'Unbounded', sans-serif;
+  font-size: 24px;
+  font-weight: 800;
+  color: #ECE8E1;
 }
 
-/* Solution Box */
-.solutionBox {
-  width: 100%;
-  padding: 1.25rem 1.5rem;
-  background: rgba(255, 42, 81, 0.08);
-  border: 1px solid rgba(255, 42, 81, 0.3);
-  border-radius: var(--r-lg);
+.btnToggleAll {
+  height: 40px;
+  padding: 0 16px;
+  border-radius: 8px;
+  color: #ECE8E1;
+  font-family: 'Inter', sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.btnToggleAll:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+.castGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 20px;
+}
+
+/* 3D Flip Card Container */
+.castCard {
+  position: relative;
+  height: 380px;
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+  perspective: 1200px;
   text-align: left;
+}
+
+.flipInner {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+/* Front Face: Masked / Unknown */
+.faceFront {
   display: flex;
   flex-direction: column;
-  gap: 0.4rem;
+  align-items: center;
+  justify-content: flex-end;
+  padding-bottom: 22px;
+  gap: 12px;
+  background: #100E17;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 14px;
 }
 
-.solutionLabel {
-  font-family: var(--f-mono);
-  font-size: 0.72rem;
-  font-weight: 800;
+.classifiedTag {
+  position: absolute;
+  top: 16px;
+  left: 16px;
+  font-size: 10px;
+  color: #8E8A98;
+  letter-spacing: 0.14em;
+}
+
+.cardNameFront {
+  font-family: 'Unbounded', sans-serif;
+  font-size: 16px;
+  font-weight: 700;
+  color: #ECE8E1;
+}
+
+.unmaskHint {
+  font-size: 10px;
+  letter-spacing: 0.1em;
+}
+
+/* Back Face: Revealed Role */
+.faceBack {
+  transform: rotateY(180deg);
+  display: flex;
+  flex-direction: column;
+  border-radius: 14px;
+  overflow: hidden;
+  background: #100E17;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.backVisual {
+  position: relative;
+  height: 220px;
+  background: #14111D;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding-bottom: 4px;
+}
+
+.backRoleLabel {
+  position: absolute;
+  top: 16px;
+  left: 16px;
+  font-size: 10px;
   letter-spacing: 0.12em;
-  color: var(--neon-red);
-  text-transform: uppercase;
 }
 
-.solutionText {
-  font-size: 0.92rem;
-  color: var(--text-primary);
-  line-height: 1.55;
-}
-
-/* Narrator Monologue Box */
-.monologueBox {
-  padding: 1.8rem 2rem;
-  background: rgba(18, 20, 32, 0.7);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid var(--border-glass);
-  border-left: 4px solid var(--neon-cyan);
-  border-radius: var(--r-xl);
+.backContent {
+  padding: 16px;
   display: flex;
   flex-direction: column;
-  gap: 0.8rem;
-}
-
-.monologueHeader {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  font-family: var(--f-mono);
-  font-size: 0.78rem;
-  font-weight: 700;
-  letter-spacing: 0.1em;
-  color: var(--neon-cyan);
-  text-transform: uppercase;
-}
-
-.monologueText {
-  font-size: 1.05rem;
-  line-height: 1.65;
-  color: #fff;
-  font-style: italic;
-}
-
-/* Voting Breakdown Section */
-.sectionCard {
-  padding: 1.8rem;
-  background: rgba(18, 20, 32, 0.75);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border: 1px solid var(--border-subtle);
-  border-radius: var(--r-xl);
-  display: flex;
-  flex-direction: column;
-  gap: 1.25rem;
-}
-
-.sectionTitle {
-  font-family: var(--f-display);
-  font-size: 1.25rem;
-  font-weight: 800;
-  color: #fff;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.tallyList {
-  display: flex;
-  flex-direction: column;
-  gap: 0.85rem;
-}
-
-.tallyItem {
-  display: flex;
-  flex-direction: column;
-  gap: 0.4rem;
-  padding: 1rem 1.2rem;
-  background: rgba(8, 9, 14, 0.6);
-  border: 1px solid var(--border-subtle);
-  border-radius: var(--r-lg);
-}
-
-.tallyItemTop {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.tallyName {
-  font-family: var(--f-display);
-  font-weight: 700;
-  font-size: 1rem;
-  color: var(--text-primary);
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-
-.tallyBadgeKiller {
-  padding: 0.15rem 0.5rem;
-  background: rgba(239, 68, 68, 0.2);
-  border: 1px solid var(--neon-red);
-  color: var(--neon-red);
-  border-radius: var(--r-full);
-  font-family: var(--f-mono);
-  font-size: 0.68rem;
-  font-weight: 700;
-}
-
-.tallyCount {
-  font-family: var(--f-display);
-  font-weight: 800;
-  font-size: 0.95rem;
-  color: var(--neon-amber);
-}
-
-.tallyVoters {
-  font-family: var(--f-mono);
-  font-size: 0.75rem;
-  color: var(--text-muted);
-}
-
-/* Complete Roster Roles Grid */
-.rosterGrid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-  gap: 1rem;
-}
-
-.rosterCard {
-  padding: 1rem 1.2rem;
-  background: rgba(8, 9, 14, 0.7);
-  border: 1px solid var(--border-subtle);
-  border-radius: var(--r-lg);
-  display: flex;
-  flex-direction: row;
-  align-items: flex-start;
-  gap: 1rem;
-}
-
-.rosterCardModel {
-  flex-shrink: 0;
-}
-
-.rosterCardInfo {
-  display: flex;
-  flex-direction: column;
-  gap: 0.4rem;
-  min-width: 0;
+  gap: 6px;
   flex: 1;
 }
 
-.rosterRoleKiller {
-  border-color: rgba(239, 68, 68, 0.5);
-  background: rgba(239, 68, 68, 0.08);
-}
-
-.rosterRoleDetective {
-  border-color: rgba(34, 211, 238, 0.5);
-  background: rgba(34, 211, 238, 0.08);
-}
-
-.rosterRoleWitness {
-  border-color: rgba(251, 191, 36, 0.5);
-  background: rgba(251, 191, 36, 0.08);
-}
-
-.rosterCardName {
-  font-family: var(--f-display);
+.cardNameBack {
+  font-family: 'Unbounded', sans-serif;
+  font-size: 16px;
   font-weight: 700;
-  font-size: 1.05rem;
-  color: #fff;
+  color: #ECE8E1;
 }
 
-.rosterCardRole {
-  font-family: var(--f-mono);
-  font-size: 0.75rem;
+.cardTextBack {
+  font-size: 12px;
+  color: #B5B1BE;
+  line-height: 1.5;
+}
+
+/* ── Section 3: Timeline + Jury Verdict ── */
+.timelineAndVerdictRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  align-items: stretch;
+}
+
+.timelineBox {
+  flex: 999 1 520px;
+  min-width: 0;
+  padding: 24px 28px;
+  border-radius: 16px;
+  background: #100E17;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.timelineHeading {
+  margin: 0 0 20px;
+  font-family: 'Unbounded', sans-serif;
+  font-size: 16px;
   font-weight: 700;
+  color: #ECE8E1;
+  letter-spacing: 0.04em;
   text-transform: uppercase;
 }
 
-.roleColorKiller {
-  color: var(--neon-red);
+.timelineList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
 }
 
-.roleColorDetective {
-  color: var(--neon-cyan);
-}
-
-.roleColorWitness {
-  color: var(--neon-amber);
-}
-
-.roleColorSuspect {
-  color: var(--neon-violet);
-}
-
-.rosterCardSecret {
-  font-size: 0.78rem;
-  color: var(--text-secondary);
-  line-height: 1.4;
-  margin-top: 0.25rem;
-}
-
-/* Actions */
-.actionArea {
+.timelineItem {
   display: flex;
-  justify-content: center;
-  margin-top: 1rem;
+  gap: 18px;
 }
 
-.btnHome {
-  padding: 1.1rem 2.5rem;
-  background: linear-gradient(135deg, var(--neon-cyan), #8b5cf6);
-  color: #fff;
-  font-family: var(--f-display);
-  font-size: 1rem;
+.timelineDotCol {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.timelineDot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  margin-top: 5px;
+  flex-shrink: 0;
+  background: #E5193A;
+  box-shadow: 0 0 8px rgba(229, 25, 58, 0.4);
+}
+
+.timelineLine {
+  flex: 1;
+  width: 1px;
+  background: rgba(255, 255, 255, 0.1);
+  margin: 4px 0;
+}
+
+.timelineContent {
+  padding-bottom: 22px;
+}
+
+.timelineTime {
+  display: block;
+  font-size: 11px;
+  font-family: 'Inter', monospace;
+  color: #8E8A98;
+  letter-spacing: 0.06em;
+}
+
+.timelineText {
+  display: block;
+  font-size: 14px;
+  color: #ECE8E1;
+  line-height: 1.5;
+  margin-top: 2px;
+}
+
+/* Verdict Box */
+.verdictBox {
+  flex: 1 1 280px;
+  padding: 24px 24px;
+  border-radius: 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  text-align: center;
+  background: #100E17;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.verdictIconBox {
+  width: 56px;
+  height: 56px;
+  border-radius: 14px;
+  background: rgba(229, 25, 58, 0.1);
+  display: grid;
+  place-items: center;
+  border: 1px solid rgba(229, 25, 58, 0.3);
+  color: #E5193A;
+}
+
+.verdictTitle {
+  margin: 0;
+  font-family: 'Unbounded', sans-serif;
+  font-size: 16px;
+  font-weight: 700;
+  color: #ECE8E1;
+  letter-spacing: 0.02em;
+}
+
+.verdictDesc {
+  margin: 0;
+  color: #8E8A98;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+/* ── Section 4: Action Buttons ── */
+.actionsRow {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-top: 10px;
+}
+
+.btnPlayAnother {
+  height: 52px;
+  padding: 0 32px;
+  border-radius: 12px;
+  background: #E5193A;
+  color: #ECE8E1;
+  font-family: 'Unbounded', sans-serif;
   font-weight: 800;
+  font-size: 13px;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  border: none;
-  border-radius: var(--r-lg);
-  cursor: pointer;
-  box-shadow: 0 10px 30px rgba(34, 211, 238, 0.3);
-  text-decoration: none;
-  transition: all 0.2s ease;
-  display: inline-flex;
+  border: 1px solid #FF3355;
+  box-shadow: 0 8px 24px -6px rgba(229, 25, 58, 0.4);
+  display: flex;
   align-items: center;
-  gap: 0.6rem;
+  cursor: pointer;
+  text-decoration: none;
+  transition: transform 0.15s ease, background 0.15s ease, box-shadow 0.15s ease;
 }
 
-.btnHome:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 15px 40px rgba(34, 211, 238, 0.5);
+.btnPlayAnother:hover {
+  background: #F02849;
+  transform: translateY(-1px);
+  box-shadow: 0 10px 28px -6px rgba(229, 25, 58, 0.5);
+}
+
+.btnReturnHome {
+  height: 52px;
+  padding: 0 24px;
+  border-radius: 12px;
+  color: #ECE8E1;
+  font-family: 'Inter', sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  background: #14111D;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  text-decoration: none;
+  cursor: pointer;
+  transition: border-color 0.15s ease, background 0.15s ease;
+}
+
+.btnReturnHome:hover {
+  background: #191624;
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+@media (max-width: 768px) {
+  .stageContent {
+    padding: 24px 18px;
+  }
+  .stageVisual {
+    min-height: 320px;
+  }
+  .btnPlayAnother,
+  .btnReturnHome {
+    width: 100%;
+    justify-content: center;
+  }
 }

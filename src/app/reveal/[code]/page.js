@@ -6,7 +6,6 @@ import RevealScene from '@/components/RevealScene';
 import LoadingSpinner from '@/components/LoadingSpinner';
 import s from './page.module.css';
 
-
 export default function RevealPage({ params }) {
   const roomCode = (params.code || '').toUpperCase();
 
@@ -17,8 +16,6 @@ export default function RevealPage({ params }) {
   // Guarantee Reveal screen always starts strictly at the top
   useEffect(() => {
     window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
-    if (document.documentElement) document.documentElement.scrollTop = 0;
-    if (document.body) document.body.scrollTop = 0;
   }, []);
 
   useEffect(() => {
@@ -50,22 +47,23 @@ export default function RevealPage({ params }) {
 
   if (loading) {
     return (
-      <div className={s.page}>
-        <LoadingSpinner label="Tallying the votes... Let's see who did it!" />
+      <div className={s.page} style={{ alignItems: 'center', justifyContent: 'center' }}>
+        <LoadingSpinner label="Tallying the jury ballots... Unmasking the truth!" />
       </div>
     );
   }
 
-
   if (error || !revealData) {
     return (
-      <div className={s.page}>
-        <div style={{ textAlign: 'center', margin: 'auto', maxWidth: '420px', padding: '1.5rem' }}>
-          <h2 style={{ color: 'var(--neon-red)', marginBottom: '1rem' }}>Game Results Unavailable</h2>
-          <p style={{ color: 'var(--text-secondary)', marginBottom: '1.5rem' }}>
+      <div className={s.page} style={{ alignItems: 'center', justifyContent: 'center', padding: '2rem' }}>
+        <div style={{ textAlign: 'center', maxWidth: '420px' }}>
+          <h2 style={{ color: '#FF2D55', marginBottom: '1rem', fontFamily: 'Unbounded, sans-serif' }}>
+            Results Offline
+          </h2>
+          <p style={{ color: '#A49CC4', marginBottom: '1.5rem' }}>
             {error || 'Could not load the case results.'}
           </p>
-          <Link href="/" style={{ color: 'var(--neon-cyan)', textDecoration: 'underline' }}>
+          <Link href="/" className="btn glass" style={{ padding: '10px 20px', borderRadius: '12px' }}>
             Return Home
           </Link>
         </div>
@@ -75,17 +73,30 @@ export default function RevealPage({ params }) {
 
   return (
     <div className={s.page}>
-      {/* Background Ambience */}
-      <div className={s.bgOrb1} />
-      <div className={s.bgOrb2} />
+      {/* Background Atmosphere */}
+      <div className={s.bgLayer} aria-hidden="true" />
 
-      {/* Header */}
+      {/* ── Header matching Reference ── */}
       <header className={s.header}>
-        <span className={s.titleBadge}>HiddenTruth // THE REVEAL</span>
-        <span className={s.roomTag}>ROOM: {roomCode}</span>
+        <div className={s.headerInner}>
+          <div className={s.brandGroup}>
+            <span className={s.brandDot} />
+            <span className={s.brandTitle}>
+              HIDDEN<span className={s.brandRed}>TRUTH</span>
+            </span>
+          </div>
+
+          <span className={s.caseClosedPill}>CASE CLOSED</span>
+
+          <div style={{ flex: 1 }} />
+
+          <span className={s.roomPill}>
+            Room <span className={s.roomCode}>{roomCode}</span>
+          </span>
+        </div>
       </header>
 
-      {/* Main Content */}
+      {/* ── Main Reveal Scene ── */}
       <main className={s.main}>
         <RevealScene
           scenario={revealData.scenario}
@@ -98,13 +109,9 @@ export default function RevealPage({ params }) {
           players={revealData.players}
           narratorMonologue={revealData.narratorMonologue}
           verdictSummary={revealData.verdictSummary}
+          roomCode={roomCode}
         />
       </main>
-
-      {/* Footer */}
-      <footer className={s.footer}>
-        HiddenTruth // Nothing Is What It Seems.
-      </footer>
     </div>
   );
 }

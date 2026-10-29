@@ -35,6 +35,11 @@ export default function Navbar() {
 
   const phaseMeta = currentPhaseRoute ? getPhaseMeta(currentPhaseRoute) : null;
 
+  // The Landing, Game, Vote, and Reveal screens feature dedicated bespoke headers/HUDs from the redesign
+  if (pathname === '/' || currentPhaseRoute === 'game' || currentPhaseRoute === 'vote' || currentPhaseRoute === 'reveal') {
+    return null;
+  }
+
   // Protect running game: Never redirect away from an active investigation on brand click
   const hasActiveGameInUrl = Boolean(activeCode && currentPhaseRoute && currentPhaseRoute !== 'reveal');
   const brandHref = hasActiveGameInUrl
@@ -76,8 +81,8 @@ export default function Navbar() {
           className={s.brand}
           title={hasActiveGameInUrl ? 'Investigation in Progress' : 'HiddenTruth Home'}
         >
-          <span className={s.brandLogo}>HiddenTruth</span>
           <span className={s.brandDot} />
+          <span className={s.brandLogo}>HiddenTruth</span>
           <span className={s.brandSub}>
             {hasActiveGameInUrl ? 'CASE IN PROGRESS' : 'NOTHING IS WHAT IT SEEMS.'}
           </span>
@@ -88,7 +93,7 @@ export default function Navbar() {
       <div className={s.center}>
         {activeCode && (
           <div className={s.roomPill}>
-            <span>ROOM</span>
+            <span>Room</span>
             <span className={s.roomCode}>{activeCode}</span>
           </div>
         )}

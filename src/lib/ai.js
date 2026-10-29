@@ -123,17 +123,21 @@ export function generateDynamicFallbackClue(scenario, round, existingClues = [])
 
   if (round === 2) {
     // MANDATORY RED HERRING: Points suspicion at an innocent player! Killer is NOT named!
+    const isPenthouse = scenario?.title?.toLowerCase()?.includes('penthouse') || scenario?.setting?.toLowerCase()?.includes('penthouse');
+    const imageTag = isPenthouse ? ' [IMAGE: /scenarios/midnight-penthouse/clue-2.jpg]' : '';
     return {
       title: 'Torn Note & Conflicting Alibi',
-      content: `An unsent crumpled message found in the hallway trash reads: "I won't let you ruin me tonight." Security logs confirm ${innocentA} slipped into the corridor right around the time the lights cut out.`,
+      content: `An unsent crumpled message found in the hallway trash reads: "I won't let you ruin me tonight." Security logs confirm ${innocentA} slipped into the corridor right around the time the lights cut out.${imageTag}`,
       narratorComment: `Looks like ${innocentA} has some serious explaining to do! Or are they being set up?`,
     };
   }
 
   // Round 3: Subtle physical breakthrough that narrows down between killer and an innocent
+  const isPenthouse = scenario?.title?.toLowerCase()?.includes('penthouse') || scenario?.setting?.toLowerCase()?.includes('penthouse');
+  const imageTag = isPenthouse ? ' [IMAGE: /scenarios/midnight-penthouse/clue-3.jpg]' : '';
   return {
     title: 'Hidden Residue & The Locked Latch',
-    content: `Traces of dust and scrape marks on the private back exit reveal that the latch was barred from the inside. Whoever struck ${victim} had to retreat through the main hallway where both ${innocentB} and ${killerName} claimed to be waiting.`,
+    content: `Traces of dust and scrape marks on the private back exit reveal that the latch was barred from the inside. Whoever struck ${victim} had to retreat through the main hallway where both ${innocentB} and ${killerName} claimed to be waiting.${imageTag}`,
     narratorComment: `The circle is closing in. Compare their alibis carefully before casting your vote!`,
   };
 }
@@ -143,6 +147,7 @@ function generateFallbackScenario(players) {
   const PRESET_THEMES = [
     {
       title: 'The Midnight Penthouse Mystery',
+      imageUrl: '/scenarios/midnight-penthouse/cover.jpg',
       setting: 'A glamorous 40th-floor rooftop penthouse during a summer thunderstorm.',
       victim: 'Julian Ross, flashy tech investor and party host',
       weapon: 'Heavy brass ice tongs from the cocktail bar',
@@ -152,7 +157,7 @@ function generateFallbackScenario(players) {
       initialClue: {
         title: 'Broken Cocktail Flute & Balcony Latch',
         content:
-          'Julian Ross was found lifeless beside the rooftop pool at 11:35 PM, the heavy brass ice tongs discarded in a nearby planter. An overturned drink and an unlatched balcony door indicate a sudden, violent scuffle.',
+          'Julian Ross was found lifeless beside the rooftop pool at 11:35 PM, the heavy brass ice tongs discarded in a nearby planter. An overturned drink and an unlatched balcony door indicate a sudden, violent scuffle. [IMAGE: /scenarios/midnight-penthouse/clue-1.jpg]',
       },
       redHerrings: [
         'An innocent guest was seen frantically washing red wine off their cuffs right after the blackout.',
@@ -394,6 +399,7 @@ function generateFallbackScenario(players) {
 
   return {
     title: theme.title,
+    imageUrl: theme.imageUrl,
     setting: theme.setting,
     victim: theme.victim,
     intro: `Lights cut out for a few moments, and now ${theme.victim} is dead. The doors are locked, nobody is leaving, and the killer is standing among you right now.`,

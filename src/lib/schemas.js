@@ -23,6 +23,7 @@ export const scenarioSchema = z.object({
   weapon: z.string(),
   motive: z.string(),
   solution: z.string(),
+  imageUrl: z.string().optional(),
   playerRoles: z.array(playerRoleSchema),
   initialClue: z
     .object({

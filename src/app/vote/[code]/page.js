@@ -12,8 +12,6 @@ import LoadingSpinner from '@/components/LoadingSpinner';
 import { GAME_STATUS, TIMER_CONFIG } from '@/lib/constants';
 import s from './page.module.css';
 
-
-
 export default function VotePage({ params }) {
   const router = useRouter();
   const roomCode = (params.code || '').toUpperCase();
@@ -32,8 +30,6 @@ export default function VotePage({ params }) {
   // Guarantee Vote screen always starts strictly at the top
   useEffect(() => {
     window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
-    if (document.documentElement) document.documentElement.scrollTop = 0;
-    if (document.body) document.body.scrollTop = 0;
   }, []);
 
   // Fetch initial room, players & votes
@@ -73,7 +69,6 @@ export default function VotePage({ params }) {
         return;
       }
 
-
       // 2. Players
       const { data: playersData, error: playersErr } = await supabase
         .from('players')
@@ -103,7 +98,7 @@ export default function VotePage({ params }) {
     } finally {
       setLoading(false);
     }
-  }, [roomCode, player?.id, router]);
+  }, [roomCode, player?.id, player?.roomCode, router]);
 
   useEffect(() => {
     fetchData();
@@ -150,7 +145,7 @@ export default function VotePage({ params }) {
     if (!room || !player?.id || voting || myVote) return;
 
     if (suspectId === player?.id) {
-      setVoteError('You cannot vote for yourself! Choose another suspect.');
+      setVoteError('You cannot vote for yourself.');
       return;
     }
 
@@ -173,13 +168,46 @@ export default function VotePage({ params }) {
         throw new Error(data.error || 'Failed to submit vote.');
       }
 
-      setMyVote(data.vote);
-      setVotes((prev) => (prev.some((v) => v.id === data.vote.id) ? prev : [...prev, data.vote]));
+      setMyVote(data.vote || { voter_id: player.id, suspect_id: suspectId });
+
+      if (data.finished || data.allVoted) {
+        setTimeout(() => {
+          router.push(`/reveal/${roomCode}`);
+        }, 1200);
+      }
     } catch (err) {
-      console.error('Error casting vote:', err);
+      console.error('Error submitting vote:', err);
       setVoteError(err.message || 'Failed to submit vote.');
     } finally {
       setVoting(false);
+    }
+  };
+
+  // Host manual reveal trigger
+  const handleTriggerReveal = async () => {
+    if (!room || revealing) return;
+    setRevealing(true);
+
+    try {
+      const res = await fetch('/api/reveal', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          roomId: room.id,
+          roomCode,
+        }),
+      });
+
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.error || 'Failed to trigger reveal.');
+      }
+
+      router.push(`/reveal/${roomCode}`);
+    } catch (err) {
+      console.error('Error triggering reveal:', err);
+      alert(err.message || 'Failed to trigger reveal.');
+      setRevealing(false);
     }
   };
 
@@ -187,55 +215,7 @@ export default function VotePage({ params }) {
   const [autoRevealSeconds, setAutoRevealSeconds] = useState(null);
   const autoRevealTimerRef = useRef(null);
 
-  // Clear countdown if room status changes
-  useEffect(() => {
-    if (room?.status === GAME_STATUS.FINISHED) {
-      setAutoRevealSeconds(null);
-      if (autoRevealTimerRef.current) {
-        clearInterval(autoRevealTimerRef.current);
-        autoRevealTimerRef.current = null;
-      }
-    }
-  }, [room?.status]);
-
-  // Clean up on unmount
-  useEffect(() => {
-    return () => {
-      if (autoRevealTimerRef.current) {
-        clearInterval(autoRevealTimerRef.current);
-      }
-    };
-  }, []);
-
-  // Host triggers final reveal
-  const handleTriggerReveal = async () => {
-    if (!room || revealing) return;
-    if (autoRevealTimerRef.current) {
-      clearInterval(autoRevealTimerRef.current);
-      autoRevealTimerRef.current = null;
-    }
-    setAutoRevealSeconds(null);
-    setRevealing(true);
-
-    try {
-      // Update room status to 'finished'
-      const { error: updateErr } = await supabase
-        .from('rooms')
-        .update({ status: GAME_STATUS.FINISHED })
-        .eq('id', room.id);
-
-      if (updateErr) throw updateErr;
-
-      router.push(`/reveal/${roomCode}`, { scroll: true });
-    } catch (err) {
-      console.error('Error triggering reveal:', err);
-      alert(err.message || 'Failed to initiate reveal sequence.');
-      setRevealing(false);
-    }
-  };
-
-  // Triggered when ballot Timer hits 00:00
-  const handleVoteTimeUp = useCallback(() => {
+  const handleVoteTimeUp = () => {
     if (autoRevealTimerRef.current || revealing) return;
 
     let countdown = 5;
@@ -251,36 +231,41 @@ export default function VotePage({ params }) {
         if (player?.isHost) {
           handleTriggerReveal();
         } else {
-          setTimeout(() => {
-            if (room?.status === GAME_STATUS.VOTING) {
-              handleTriggerReveal();
-            }
-          }, 3500);
+          router.push(`/reveal/${roomCode}`);
         }
       } else {
         setAutoRevealSeconds(countdown);
       }
     }, 1000);
-  }, [revealing, player?.isHost, room?.status]);
+  };
+
+  useEffect(() => {
+    return () => {
+      if (autoRevealTimerRef.current) {
+        clearInterval(autoRevealTimerRef.current);
+      }
+    };
+  }, []);
 
   if (loading) {
     return (
-      <div className={s.page}>
-        <LoadingSpinner label="Preparing the voting room..." />
+      <div className={s.page} style={{ alignItems: 'center', justifyContent: 'center' }}>
+        <LoadingSpinner label="Preparing the suspect lineup..." />
       </div>
     );
   }
 
-
   if (error || !room) {
     return (
-      <div className={s.page}>
-        <div style={{ textAlign: 'center', margin: 'auto', maxWidth: '400px' }}>
-          <h2 style={{ color: 'var(--neon-red)', marginBottom: '1rem' }}>Room Unavailable</h2>
-          <p style={{ color: 'var(--text-secondary)', marginBottom: '1.5rem' }}>
+      <div className={s.page} style={{ alignItems: 'center', justifyContent: 'center', padding: '2rem' }}>
+        <div style={{ textAlign: 'center', maxWidth: '400px' }}>
+          <h2 style={{ color: '#FF2D55', marginBottom: '1rem', fontFamily: 'Unbounded, sans-serif' }}>
+            Room Unavailable
+          </h2>
+          <p style={{ color: '#A49CC4', marginBottom: '1.5rem' }}>
             {error || 'Could not locate room.'}
           </p>
-          <Link href="/" style={{ color: 'var(--neon-cyan)', textDecoration: 'underline' }}>
+          <Link href="/" className="btn glass" style={{ padding: '10px 20px', borderRadius: '12px' }}>
             Return Home
           </Link>
         </div>
@@ -290,10 +275,6 @@ export default function VotePage({ params }) {
 
   const scenario = room.scenario || {};
   const isHost = player?.isHost && (player?.roomId === room?.id || player?.roomCode === roomCode);
-  const totalPlayers = players.length;
-  const totalVotes = votes.length;
-  const allVoted = totalPlayers > 0 && totalVotes >= totalPlayers;
-  const progressPercent = totalPlayers > 0 ? Math.min(100, Math.round((totalVotes / totalPlayers) * 100)) : 0;
 
   const getVotingStartTime = () => {
     if (scenario?.voting_started_at) {
@@ -314,51 +295,55 @@ export default function VotePage({ params }) {
 
   return (
     <div className={s.page}>
-      {/* Ambience */}
-      <div className={s.bgOrbRed} />
-      <div className={s.bgOrbAmber} />
+      {/* Background Atmosphere */}
+      <div className={s.bgLayer} aria-hidden="true" />
 
-      {/* Header */}
+      {/* ── Header matching Reference ── */}
       <header className={s.header}>
-        <div className={s.headerLeft}>
-          <span className={s.titleBadge}>HiddenTruth // FINAL ACCUSATION</span>
-          <span className={s.roomTag}>ROOM: {roomCode}</span>
+        <div className={s.headerInner}>
+          <Link href={`/game/${roomCode}`} className={s.backLink}>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              <path d="M15 18l-6-6 6-6" />
+            </svg>
+            Back to the board
+          </Link>
+
+          <div style={{ flex: 1 }} />
+
+          <div className={s.brandGroup}>
+            <span className={s.brandDot} />
+            <span className={s.brandTitle}>
+              HIDDEN<span className={s.brandRed}>TRUTH</span>
+            </span>
+          </div>
+
+          <div style={{ flex: 1 }} />
+
+          <span className={s.roomPill}>
+            Room <span className={s.roomCode}>{roomCode}</span>
+          </span>
         </div>
-        <Timer
-          totalSeconds={TIMER_CONFIG.VOTE_DURATION_SECONDS}
-          startedAt={votingStartedAt}
-          label="VOTING TIME"
-          onTimeUp={handleVoteTimeUp}
-          showExpiredBanner={false}
-        />
-        <Link href={`/game/${roomCode}`} style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
-          ← Back to Game
-        </Link>
       </header>
 
-      {/* Auto-Reveal Countdown Banner */}
+      {/* ── Auto-Reveal Emergency Banner ── */}
       <AnimatePresence>
         {autoRevealSeconds !== null && (
           <motion.div
             className={s.autoRevealBanner}
+            style={{ maxWidth: '1240px', margin: '16px auto 0' }}
             initial={{ opacity: 0, y: -15, scale: 0.98 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: -15, scale: 0.98 }}
             transition={{ duration: 0.25 }}
           >
-            <div className={s.autoRevealGlow} />
-            <span className={s.autoRevealIcon}>⚖️</span>
-            <div className={s.autoRevealText}>
-              <div className={s.autoRevealTitle}>
-                VOTING TIME IS UP!
-              </div>
+            <span style={{ fontSize: '24px' }}>⚖️</span>
+            <div>
+              <div className={s.autoRevealTitle}>VOTING TIME IS UP!</div>
               <div className={s.autoRevealSub}>
                 All votes are locked. Revealing the killer in {autoRevealSeconds}s...
               </div>
             </div>
-            <div className={s.autoRevealCountdownPill}>
-              {autoRevealSeconds}s
-            </div>
+            <div className={s.countdownPill}>{autoRevealSeconds}s</div>
             {isHost && (
               <button
                 type="button"
@@ -373,55 +358,29 @@ export default function VotePage({ params }) {
         )}
       </AnimatePresence>
 
-
-      {/* Main Body */}
+      {/* ── Main Lineup Content ── */}
       <main className={s.main}>
-        {/* Scenario Recall */}
-        <motion.div
-          className={s.scenarioCard}
-          initial={{ opacity: 0, y: 15 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-        >
-          <span className={s.scenarioPre}>Cast Your Final Accusation</span>
-          <h1 className={s.scenarioTitle}>{scenario.title || 'The Murder Mystery'}</h1>
-          <div className={s.scenarioMeta}>
-            <div className={s.scenarioMetaItem}>
-              Victim: <strong>{scenario.victim || 'Unknown'}</strong>
-            </div>
-            <div className={s.scenarioMetaItem}>
-              Weapon: <strong>{scenario.weapon || 'Unknown'}</strong>
-            </div>
-            <div className={s.scenarioMetaItem}>
-              Location: <strong>{scenario.setting || 'Unknown'}</strong>
-            </div>
+        {/* Title & Timer matching 02_Lineup_Vote */}
+        <section className={`rise ${s.headlineRow}`}>
+          <div className={s.headlineText}>
+            <span className={s.preTitle}>The lineup · Final accusation</span>
+            <h1 className={s.mainTitle}>
+              Point at the <span className="grad-txt">killer.</span>
+            </h1>
+            <p className={s.mainSub}>
+              Tap a suspect to put them in the spotlight, then lock it in. Most accused gets arrested.
+            </p>
           </div>
-        </motion.div>
 
-        {/* Live Vote Progress Bar */}
-        <motion.div
-          className={s.progressCard}
-          initial={{ opacity: 0, y: 15 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.1 }}
-        >
-          <div className={s.progressHeader}>
-            <span className={s.progressLabel}>
-              {allVoted ? '✨ ALL PLAYERS HAVE VOTED!' : 'WAITING FOR VOTES'}
-            </span>
-            <span className={s.progressCount}>
-              {totalVotes} of {totalPlayers} Voted ({progressPercent}%)
-            </span>
-          </div>
-          <div className={s.progressBarTrack}>
-            <div
-              className={s.progressBarFill}
-              style={{ width: `${progressPercent}%` }}
-            />
-          </div>
-        </motion.div>
+          <Timer
+            totalSeconds={TIMER_CONFIG.VOTE_DURATION_SECONDS}
+            startedAt={votingStartedAt}
+            onTimeUp={handleVoteTimeUp}
+            variant="lineup"
+          />
+        </section>
 
-        {/* Voting Panel */}
+        {/* Voting Panel: Police Lineup Wall & Decision Bar */}
         <VotePanel
           players={players}
           currentPlayer={player}
@@ -430,40 +389,13 @@ export default function VotePage({ params }) {
           onVote={handleCastVote}
           voting={voting}
           error={voteError}
+          votes={votes}
+          isHost={isHost}
+          onReveal={handleTriggerReveal}
+          revealing={revealing}
+          roomCode={roomCode}
         />
-
-        {/* Host Reveal Button Area */}
-        {isHost && (
-          <motion.div
-            className={s.hostFinaleBox}
-            initial={{ opacity: 0, scale: 0.96 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.4, delay: 0.2 }}
-          >
-            <div className={s.hostFinaleTitle}>
-              👑 Host Authority: Grand Finale
-            </div>
-            <div className={s.hostFinaleSub}>
-              {allVoted
-                ? 'All players have submitted their ballots! Ready to unmask the real killer and discover who got away with murder?'
-                : 'You can wait for all suspects to finish voting, or force the reveal now if everyone present has submitted.'}
-            </div>
-            <button
-              type="button"
-              className={s.btnReveal}
-              onClick={handleTriggerReveal}
-              disabled={revealing}
-            >
-              {revealing ? 'Unmasking Killer...' : 'Reveal the Killer 🎬'}
-            </button>
-          </motion.div>
-        )}
       </main>
-
-      {/* Footer */}
-      <footer className={s.footer}>
-        HiddenTruth // Justice Shall Be Served
-      </footer>
     </div>
   );
 }

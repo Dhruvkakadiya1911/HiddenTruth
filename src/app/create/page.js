@@ -3,7 +3,6 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { motion } from 'framer-motion';
 import { usePlayer } from '@/hooks/usePlayer';
 import s from './page.module.css';
 
@@ -15,11 +14,8 @@ export default function CreateRoomPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
-  // Guarantee Create page always loads from the very top
   useEffect(() => {
     window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
-    if (document.documentElement) document.documentElement.scrollTop = 0;
-    if (document.body) document.body.scrollTop = 0;
   }, []);
 
   const handleSubmit = async (e) => {
@@ -57,7 +53,6 @@ export default function CreateRoomPage() {
         throw new Error(data.error || 'Failed to create room.');
       }
 
-      // Save player session in context & localStorage
       setPlayer({
         id: data.player.id,
         name: data.player.name,
@@ -66,7 +61,6 @@ export default function CreateRoomPage() {
         isHost: true,
       });
 
-      // Redirect host to room lobby
       router.push(`/lobby/${data.room.code}`, { scroll: true });
     } catch (err) {
       console.error('Error creating room:', err);
@@ -75,106 +69,91 @@ export default function CreateRoomPage() {
     }
   };
 
+  const isComplete = hostName.trim().length >= 2;
+
   return (
     <div className={s.page}>
-      {/* Background Ambience */}
-      <div className={s.bgLayer}>
-        <div className={s.bgGrid} />
-        <div className={s.orbRed} />
-        <div className={s.orbViolet} />
-      </div>
-
-      {/* Top Nav */}
-      <header className={s.topNav}>
-        <Link href="/" className={s.backLink}>
-          ← Back
-        </Link>
-        <span className={s.badge}>Host Setup</span>
-      </header>
-
-      {/* Main Container */}
-      <motion.main
-        className={s.container}
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5, ease: 'easeOut' }}
-      >
-        <div className={s.header}>
-          <div className={s.tagline}>Create Investigation</div>
-          <h1 className={s.title}>
-            HOST A <span className={s.titleRed}>MYSTERY</span>
+      <div className={s.wrap}>
+        {/* Left Column / Heading */}
+        <div className={s.heroCol}>
+          <Link href="/" className="ib" aria-label="Back">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+              <path d="M15 18l-6-6 6-6" />
+            </svg>
+          </Link>
+          <span className="mono-tag rise" style={{ color: '#E5193A' }}>
+            Host a new case
+          </span>
+          <h1 className="disp rise r1" style={{ fontSize: 'clamp(64px, 9vw, 130px)' }}>
+            Create<br />the room
           </h1>
-          <p className={s.subtitle}>
-            Create a room, get a 4-letter code, and invite your friends!
+          <p className="rise r2" style={{ margin: 0, color: '#A9A5B4', fontSize: '18px', maxWidth: '440px' }}>
+            Start a new murder mystery session. You will receive a 4-letter room code to invite your friends.
           </p>
         </div>
 
-        {/* Form Card */}
-        <div className={s.card}>
-          <form onSubmit={handleSubmit} style={{ display: 'contents' }}>
-            <div className={s.fieldGroup}>
-              <label htmlFor="hostName" className={s.label}>
-                <span>Your Name or Nickname</span>
-                <span className={s.charCount}>{hostName.length}/20</span>
+        {/* Right Column / Card */}
+        <div className={`card rise r2 ${s.createCard}`}>
+          <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+              <label htmlFor="hostalias" className="mono-tag" style={{ color: '#8E8A99' }}>
+                Your host alias
               </label>
-              <div className={s.inputWrapper}>
-                <input
-                  id="hostName"
-                  type="text"
-                  className={s.input}
-                  placeholder="e.g. Alex or Sherlock"
-                  value={hostName}
-                  onChange={(e) => {
-                    setHostName(e.target.value);
-                    if (error) setError('');
-                  }}
-                  maxLength={20}
-                  autoComplete="off"
-                  disabled={loading}
-                />
-              </div>
+              <input
+                id="hostalias"
+                type="text"
+                value={hostName}
+                onChange={(e) => {
+                  setHostName(e.target.value);
+                  if (error) setError('');
+                }}
+                placeholder="e.g. Detective Miller"
+                maxLength={20}
+                autoComplete="off"
+                disabled={loading}
+                style={{
+                  height: '58px',
+                  padding: '0 18px',
+                  borderRadius: '14px',
+                  border: '1px solid #2A2A34',
+                  background: '#0E0E13',
+                  color: '#ECE8E1',
+                  font: '500 17px Inter, sans-serif',
+                  outline: 'none',
+                }}
+              />
             </div>
 
             {error && (
-              <motion.div
-                className={s.errorMessage}
-                initial={{ opacity: 0, height: 0 }}
-                animate={{ opacity: 1, height: 'auto' }}
+              <div
+                style={{
+                  padding: '12px 16px',
+                  borderRadius: '12px',
+                  background: 'rgba(229,25,58,0.12)',
+                  border: '1px solid rgba(229,25,58,0.4)',
+                  color: '#FF7B92',
+                  fontSize: '14px',
+                }}
               >
                 {error}
-              </motion.div>
+              </div>
             )}
 
-            <motion.button
+            <button
               type="submit"
-              className={s.btnSubmit}
-              disabled={loading || !hostName.trim()}
-              whileTap={{ scale: 0.98 }}
+              className="b-red"
+              style={{ width: '100%' }}
+              disabled={loading || !isComplete}
             >
-              {loading ? (
-                <>
-                  <div className={s.spinner} />
-                  <span>Generating Crime Scene...</span>
-                </>
-              ) : (
-                <>
-                  <span>⚡</span>
-                  <span>Create Room</span>
-                </>
-              )}
-            </motion.button>
+              {loading ? 'Generating crime scene...' : 'Launch case lobby'}
+            </button>
+
+            <p className="mono-tag" style={{ margin: 0, textAlign: 'center', color: '#5C5966' }}>
+              Host controls round pacing and progression
+            </p>
           </form>
-
-          <p className={s.infoNote}>
-            Once created, a 4-letter room code will be generated for your friends to join on their phones.
-          </p>
         </div>
-      </motion.main>
-
-      {/* Footer */}
-      <footer className={s.footer}>
-        HiddenTruth // AI Party Game
-      </footer>
+      </div>
     </div>
   );
 }

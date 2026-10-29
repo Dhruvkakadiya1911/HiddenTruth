@@ -1,11 +1,46 @@
 'use client';
 
+import { useState } from 'react';
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { motion } from 'framer-motion';
 import { usePlayer } from '@/hooks/usePlayer';
-import { ROLES } from '@/lib/constants';
-import RoleModelCanvas from '@/components/RoleModelCanvas';
+import AgentFigure from '@/components/AgentFigure';
 import s from './RevealScene.module.css';
+
+const ROLE_META = {
+  killer: {
+    name: 'The Killer',
+    color: '#FF2D55',
+    tint: '#B76CFF',
+    border: 'rgba(255, 45, 85, 0.55)',
+    spot: 'rgba(255, 45, 85, 0.38)',
+    bg: 'linear-gradient(180deg, #2A0A1E, #150818)',
+  },
+  detective: {
+    name: 'The Detective',
+    color: '#2EE6FF',
+    tint: '#2EE6FF',
+    border: 'rgba(46, 230, 255, 0.5)',
+    spot: 'rgba(46, 230, 255, 0.32)',
+    bg: 'linear-gradient(180deg, #0A2232, #0C1020)',
+  },
+  witness: {
+    name: 'The Witness',
+    color: '#FFC93C',
+    tint: '#FFC93C',
+    border: 'rgba(255, 201, 60, 0.5)',
+    spot: 'rgba(255, 201, 60, 0.3)',
+    bg: 'linear-gradient(180deg, #2A1E08, #140E10)',
+  },
+  suspect: {
+    name: 'The Suspect',
+    color: '#B76CFF',
+    tint: '#FF6BB5',
+    border: 'rgba(183, 108, 255, 0.55)',
+    spot: 'rgba(183, 108, 255, 0.34)',
+    bg: 'linear-gradient(180deg, #22103E, #120A22)',
+  },
+};
 
 export default function RevealScene({
   scenario = {},
@@ -18,198 +53,299 @@ export default function RevealScene({
   players = [],
   narratorMonologue = '',
   verdictSummary = '',
+  roomCode = '',
 }) {
   const router = useRouter();
-  const { clearPlayer } = usePlayer();
+  const { clearPlayer, player } = usePlayer();
+
+  // Cards start unmasked by default (empty maskedState)
+  const [maskedState, setMaskedState] = useState({});
+
+  const finalKillerName = killer?.name || killerName || scenario?.killerName || 'The Killer';
 
   const handlePlayAgain = () => {
     clearPlayer();
     router.push('/', { scroll: true });
   };
 
-  const finalKillerName = killer?.name || killerName || scenario?.killerName || 'The Killer';
-
-  const getRoleIconAndClass = (role) => {
+  const getNormRole = (role) => {
     const r = (role || '').toLowerCase();
-    if (r.includes('kill')) {
-      return { icon: '🩸', label: 'The Killer', colorClass: s.roleColorKiller, cardClass: s.rosterRoleKiller };
-    }
-    if (r.includes('detec')) {
-      return { icon: '🔍', label: 'Detective', colorClass: s.roleColorDetective, cardClass: s.rosterRoleDetective };
-    }
-    if (r.includes('witn')) {
-      return { icon: '👁️', label: 'Witness', colorClass: s.roleColorWitness, cardClass: s.rosterRoleWitness };
-    }
-    return { icon: '🎭', label: 'Suspect', colorClass: s.roleColorSuspect, cardClass: '' };
+    if (r.includes('kill')) return 'killer';
+    if (r.includes('detec')) return 'detective';
+    if (r.includes('witn')) return 'witness';
+    return 'suspect';
   };
+
+  // Build cast data
+  const castList = players.map((p) => {
+    const roleKey = getNormRole(p.role);
+    const meta = ROLE_META[roleKey] || ROLE_META.suspect;
+    const isMe = p.id === player?.id;
+    const isMasked = !!maskedState[p.id];
+
+    return {
+      id: p.id,
+      name: p.name || 'Player',
+      role: roleKey,
+      roleName: isMe ? `${meta.name} · you` : meta.name,
+      color: meta.color,
+      tint: meta.tint,
+      bg: meta.bg,
+      border: meta.border,
+      spot: meta.spot,
+      text: p.secret_info || 'Present at the scene of the crime.',
+      isMasked,
+    };
+  });
+
+  const anyMasked = Object.values(maskedState).some(Boolean);
+
+  const toggleAllMasks = () => {
+    if (anyMasked) {
+      setMaskedState({});
+    } else {
+      const allTrue = {};
+      players.forEach((p) => {
+        allTrue[p.id] = true;
+      });
+      setMaskedState(allTrue);
+    }
+  };
+
+  const toggleSingleMask = (id) => {
+    setMaskedState((prev) => ({
+      ...prev,
+      [id]: !prev[id],
+    }));
+  };
+
+  // Build timeline events from scenario or defaults
+  const timelineEvents = scenario.timeline && scenario.timeline.length > 0
+    ? scenario.timeline
+    : [
+        {
+          time: '11:15 PM',
+          text: `An intense argument breaks out near the terrace over missing financial records.`,
+          dot: '#B76CFF',
+        },
+        {
+          time: '11:30 PM',
+          text: `${scenario.victim || 'Julian'} threatens to expose the betrayal to the entire board.`,
+          dot: '#FFC93C',
+        },
+        {
+          time: '11:33 PM',
+          text: 'The terrace lights flicker and briefly cut out. Rain blows through the curtains.',
+          dot: '#2EE6FF',
+        },
+        {
+          time: '11:35 PM',
+          text: `${finalKillerName} strikes down ${scenario.victim || 'Julian'}, dumps the evidence, and slips away leaving wet footprints.`,
+          dot: '#FF2D55',
+        },
+      ];
+
+  const caveatQuote = groupWon
+    ? `“Caught red-handed. The jury connected every clue, and ${finalKillerName} was handcuffed on the spot.”`
+    : `“The jury couldn't agree. ${finalKillerName} just smiled, adjusted their collar, and walked out free.”`;
 
   return (
     <div className={s.container}>
-      {/* 1. Outcome Banner */}
-      <motion.div
-        className={`${s.outcomeBanner} ${groupWon ? s.outcomeWon : s.outcomeLost}`}
-        initial={{ opacity: 0, scale: 0.9 }}
-        animate={{ opacity: 1, scale: 1 }}
-        transition={{ duration: 0.6 }}
-      >
-        <span className={s.outcomeBadge}>
-          {groupWon ? '🏆 THE INNOCENTS WIN!' : '💀 THE KILLER WINS!'}
-        </span>
-        <h1 className={s.outcomeHeading}>
-          {groupWon ? 'The Killer Was Caught!' : 'The Killer Escaped!'}
-        </h1>
-        <p className={s.outcomeSub}>
-          {verdictSummary || (
-            groupWon
-              ? `You found the truth: ${finalKillerName} was the killer all along!`
-              : `The room voted for ${mostVoted?.suspectName || 'an innocent friend'}, letting ${finalKillerName} walk away with the crime!`
-          )}
-        </p>
-      </motion.div>
+      {/* ── Section 1: The Killer Reveal Stage matching 03_The_Reveal ── */}
+      <section className={`rise ${s.stageCard}`}>
+        <div aria-hidden="true" className={s.stageStripes} />
 
-      {/* 2. Unmasking The Killer */}
-      <motion.div
-        className={s.killerCard}
-        initial={{ opacity: 0, y: 30 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.7, delay: 0.2 }}
-      >
-        <div className={s.killerHeader}>
-          <RoleModelCanvas role="killer" size="large" />
-          <span className={s.killerLabel}>The True Killer</span>
-          <h2 className={s.killerName}>{finalKillerName}</h2>
+        {/* Left Side: Spotlight + Agent Figure + UNMASKED Stamp */}
+        <div className={s.stageVisual}>
+          <span aria-hidden="true" className={`spot ${s.stageSpotlight}`} />
+          <AgentFigure role="killer" size={310} glow={true} tilt={true} />
+          <span className={`stamp ${s.unmaskedStamp}`}>UNMASKED</span>
         </div>
 
-        <div className={s.caseDetails}>
-          <div className={s.detailItem}>
-            <span className={s.detailLabel}>The Victim</span>
-            <span className={s.detailVal}>{scenario.victim || 'Unknown'}</span>
-          </div>
-          <div className={s.detailItem}>
-            <span className={s.detailLabel}>The Weapon</span>
-            <span className={s.detailVal}>{scenario.weapon || 'Unknown'}</span>
-          </div>
-          <div className={s.detailItem}>
-            <span className={s.detailLabel}>The Motive</span>
-            <span className={s.detailVal}>{scenario.motive || 'Secret grudge'}</span>
-          </div>
-        </div>
-
-        {scenario.solution && (
-          <div className={s.solutionBox}>
-            <span className={s.solutionLabel}>How It Happened</span>
-            <p className={s.solutionText}>{scenario.solution}</p>
-          </div>
-        )}
-      </motion.div>
-
-      {/* 3. Narrator Closing Monologue */}
-      {narratorMonologue && (
-        <motion.div
-          className={s.monologueBox}
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.35 }}
-        >
-          <div className={s.monologueHeader}>
-            <span>🎙️ Game Master // Final Story</span>
-          </div>
-          <p className={s.monologueText}>"{narratorMonologue}"</p>
-        </motion.div>
-      )}
-
-      {/* 4. Jury Vote Breakdown */}
-      <motion.div
-        className={s.sectionCard}
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6, delay: 0.45 }}
-      >
-        <div className={s.sectionTitle}>
-          <span>⚖️ Jury Vote Breakdown</span>
-          <span style={{ fontSize: '0.8rem', fontFamily: 'var(--f-mono)', color: 'var(--text-muted)' }}>
-            {totalVotes} total votes cast
+        {/* Right Side: Verdict Info */}
+        <div className={s.stageContent}>
+          <span className={`mono rise d1 ${s.outcomeTag}`}>
+            {groupWon ? 'The jury caught the killer' : 'The killer wins'}
           </span>
+
+          <h1 className={`rise d2 ${s.outcomeTitle}`}>
+            It was<br />
+            <span className={s.killerHighlight}>{finalKillerName}.</span>
+          </h1>
+
+          <p className={`rise d3 ${s.caveatQuote}`}>
+            {narratorMonologue || caveatQuote}
+          </p>
+
+          <div className={`rise d4 ${s.chipsRow}`}>
+            <span className={s.chip}>
+              <span className={`mono ${s.chipTag}`}>Victim</span>
+              {scenario.victim || 'Julian Ross'}
+            </span>
+            <span className={s.chip}>
+              <span className={`mono ${s.chipTag}`}>Weapon</span>
+              {scenario.weapon || 'Ice tongs'}
+            </span>
+            <span className={s.chip}>
+              <span className={`mono ${s.chipTag}`}>Motive</span>
+              {scenario.motive || 'Blackmail & betrayal'}
+            </span>
+          </div>
+        </div>
+      </section>
+
+      {/* ── Section 2: Cast Unmasked (3D Flip Cards) ── */}
+      <section className={s.castSection}>
+        <div className={s.castHeader}>
+          <div>
+            <span className={`mono ${s.castSub}`}>Masks off · tap a card to flip it</span>
+            <h2 className={s.castTitle}>Who was really who</h2>
+          </div>
+          <button
+            type="button"
+            className={`btn glass ${s.btnToggleAll}`}
+            onClick={toggleAllMasks}
+          >
+            {anyMasked ? 'Unmask everyone' : 'Replay the unmasking'}
+          </button>
         </div>
 
-        <div className={s.tallyList}>
-          {voteBreakdown.map((tally) => {
-            const isKiller = tally.suspectName === finalKillerName;
-            return (
-              <div key={tally.suspectId} className={s.tallyItem}>
-                <div className={s.tallyItemTop}>
-                  <div className={s.tallyName}>
-                    {tally.suspectName}
-                    {isKiller && <span className={s.tallyBadgeKiller}>REAL KILLER 🩸</span>}
+        <div className={s.castGrid}>
+          {castList.map((r, idx) => (
+            <button
+              key={r.id}
+              type="button"
+              className={`rise ${s.castCard}`}
+              onClick={() => toggleSingleMask(r.id)}
+              style={{ animationDelay: `${idx * 0.1}s` }}
+              title={r.isMasked ? `Tap to unmask ${r.name}` : `${r.name} was ${r.roleName}`}
+            >
+              <div
+                className={`flip ${s.flipInner}`}
+                style={{
+                  transform: r.isMasked ? 'rotateY(0deg)' : 'rotateY(180deg)',
+                }}
+              >
+                {/* Front Face: Masked */}
+                <div className={`face glass ${s.faceFront}`}>
+                  <span className={`mono ${s.classifiedTag}`}>CLASSIFIED</span>
+                  <AgentFigure
+                    role="unknown"
+                    size={180}
+                    tint="#A49CC4"
+                    glow={false}
+                    tilt={false}
+                  />
+                  <span className={s.cardNameFront}>{r.name}</span>
+                  <span className={`mono ${s.unmaskHint}`} style={{ color: r.tint }}>
+                    Tap to unmask
+                  </span>
+                </div>
+
+                {/* Back Face: Revealed Role */}
+                <div
+                  className={`face ${s.faceBack}`}
+                  style={{
+                    background: r.bg,
+                    border: `1.5px solid ${r.border}`,
+                    boxShadow: `0 30px 60px -30px ${r.color}`,
+                  }}
+                >
+                  <div
+                    className={s.backVisual}
+                    style={{
+                      background: `radial-gradient(220px 220px at 50% 15%, ${r.spot} 0%, transparent 72%)`,
+                    }}
+                  >
+                    <span className={`mono ${s.backRoleLabel}`} style={{ color: r.color }}>
+                      {r.roleName}
+                    </span>
+                    <AgentFigure
+                      role={r.role}
+                      size={172}
+                      tint={r.color}
+                      glow={true}
+                      tilt={true}
+                    />
                   </div>
-                  <div className={s.tallyCount}>
-                    {tally.count} {tally.count === 1 ? 'Vote' : 'Votes'}
+
+                  <div className={s.backContent} style={{ borderColor: r.border }}>
+                    <span className={s.cardNameBack}>{r.name}</span>
+                    <span className={s.cardTextBack}>{r.text}</span>
                   </div>
                 </div>
-                {tally.voters && tally.voters.length > 0 && (
-                  <div className={s.tallyVoters}>
-                    Accused by: {tally.voters.join(', ')}
-                  </div>
-                )}
               </div>
-            );
-          })}
+            </button>
+          ))}
         </div>
-      </motion.div>
+      </section>
 
-      {/* 5. Complete Character Dossiers Unlocked */}
-      <motion.div
-        className={s.sectionCard}
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6, delay: 0.55 }}
-      >
-        <div className={s.sectionTitle}>
-          <span>🎭 Everyone's True Roles & Secret Agendas</span>
-        </div>
-
-        <div className={s.rosterGrid}>
-          {players.map((p) => {
-            const meta = getRoleIconAndClass(p.role);
-            return (
-              <div key={p.id} className={`${s.rosterCard} ${meta.cardClass}`}>
-                <div className={s.rosterCardModel}>
-                  <RoleModelCanvas role={p.role || 'suspect'} size="small" />
-                </div>
-                <div className={s.rosterCardInfo}>
-                  <div className={s.rosterCardName}>
-                    {p.name} {p.is_host && '👑'}
-                  </div>
-                  <div className={`${s.rosterCardRole} ${meta.colorClass}`}>
-                    {meta.icon} {meta.label}
-                  </div>
-                  {p.secret_info && (
-                    <div className={s.rosterCardSecret}>
-                      {p.secret_info}
-                    </div>
+      {/* ── Section 3: Timeline + Jury Verdict ── */}
+      <section className={s.timelineAndVerdictRow}>
+        {/* Timeline */}
+        <div className={`glass rise ${s.timelineBox}`}>
+          <h2 className={s.timelineHeading}>What really happened</h2>
+          <ol className={s.timelineList}>
+            {timelineEvents.map((e, idx) => (
+              <li key={idx} className={s.timelineItem}>
+                <div className={s.timelineDotCol}>
+                  <span
+                    className={s.timelineDot}
+                    style={{
+                      background: e.dot || '#2EE6FF',
+                      boxShadow: `0 0 14px ${e.dot || '#2EE6FF'}`,
+                    }}
+                  />
+                  {idx < timelineEvents.length - 1 && (
+                    <span className={s.timelineLine} />
                   )}
                 </div>
-              </div>
-            );
-          })}
+                <div className={s.timelineContent}>
+                  <span
+                    className={`mono ${s.timelineTime}`}
+                    style={{ color: e.dot || '#2EE6FF' }}
+                  >
+                    {e.time}
+                  </span>
+                  <span className={s.timelineText}>{e.text}</span>
+                </div>
+              </li>
+            ))}
+          </ol>
         </div>
-      </motion.div>
 
-      {/* 6. Return Home / Play Again */}
-      <motion.div
-        className={s.actionArea}
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 0.5, delay: 0.65 }}
-      >
+        {/* Verdict Box */}
+        <div className={`glass rise d1 ${s.verdictBox}`}>
+          <div className={s.verdictIconBox}>
+            <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#D9A6FF" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              <path d="M12 3v18M5 7h14M5 7l-3 7a3 3 0 0 0 6 0zM19 7l-3 7a3 3 0 0 0 6 0z" />
+            </svg>
+          </div>
+          <h2 className={s.verdictTitle}>
+            {groupWon ? 'The killer was convicted!' : 'No majority on the killer'}
+          </h2>
+          <p className={s.verdictDesc}>
+            {verdictSummary ||
+              (groupWon
+                ? `The jury successfully identified ${finalKillerName}. Justice was delivered at midnight.`
+                : `Not enough votes landed on ${finalKillerName} before the jury closed — the killer walks.`)}
+          </p>
+        </div>
+      </section>
+
+      {/* ── Section 4: Action Buttons ── */}
+      <section className={s.actionsRow}>
         <button
           type="button"
+          className={`btn shine ${s.btnPlayAnother}`}
           onClick={handlePlayAgain}
-          className={s.btnHome}
         >
-          Play Another Mystery 🕵️
+          Play another mystery
         </button>
-      </motion.div>
+        <Link href="/" className={`btn glass ${s.btnReturnHome}`}>
+          Return home
+        </Link>
+      </section>
     </div>
   );
 }
