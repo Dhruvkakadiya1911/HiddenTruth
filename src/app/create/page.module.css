@@ -6,13 +6,110 @@
   min-height: 100dvh;
   width: 100%;
   display: flex;
-  align-items: center;
-  justify-content: center;
+  flex-direction: column;
   background: radial-gradient(1200px 600px at 30% 20%, #1A0A10 0%, transparent 60%), #060608;
   color: #ECE8E1;
-  padding: 40px 24px;
   box-sizing: border-box;
   overflow-x: hidden;
+}
+
+/* ── Fixed Clean Header matching Design System ── */
+.header {
+  position: sticky;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 68px;
+  z-index: 50;
+  border-bottom: 1px solid #16161D;
+  background: rgba(6, 6, 8, 0.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  width: 100%;
+}
+
+.headerInner {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 0 24px;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  box-sizing: border-box;
+}
+
+.brandGroup {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  text-decoration: none;
+}
+
+.brandDot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #E5193A;
+  box-shadow: 0 0 10px #E5193A;
+  animation: beat 1.1s ease-in-out infinite;
+  flex-shrink: 0;
+}
+
+.brandTitle {
+  font-family: 'Bebas Neue', Impact, sans-serif;
+  font-size: 26px;
+  letter-spacing: 0.05em;
+  line-height: 0.9;
+  color: #ECE8E1;
+}
+
+.brandRed {
+  color: #E5193A;
+}
+
+.headerNav {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.chipNav {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 34px;
+  padding: 0 14px;
+  border-radius: 999px;
+  border: 1px solid #2A2A34;
+  font-family: 'Inter', sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  color: #B8B3C2;
+  background: transparent;
+  text-decoration: none;
+  transition: all 0.2s ease;
+}
+.chipNav:hover {
+  border-color: #4A4A58;
+  color: #ECE8E1;
+}
+
+@keyframes beat {
+  0%, 100% { transform: scale(1); }
+  14% { transform: scale(1.35); }
+  28% { transform: scale(1); }
+  42% { transform: scale(1.2); }
+}
+
+.main {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 24px 60px;
+  box-sizing: border-box;
 }
 
 .wrap {
@@ -57,9 +154,27 @@
   }
 }
 
-@media (max-width: 480px) {
-  .page {
-    padding: 20px 16px;
+@media (max-width: 640px) {
+  .header {
+    height: 58px;
+  }
+
+  .headerInner {
+    padding: 0 16px;
+  }
+
+  .brandTitle {
+    font-size: 22px;
+  }
+
+  .chipNav {
+    height: 30px;
+    padding: 0 12px;
+    font-size: 12px;
+  }
+
+  .main {
+    padding: 20px 16px 40px;
     align-items: flex-start;
   }
 

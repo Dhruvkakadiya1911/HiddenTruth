@@ -351,7 +351,7 @@
   position: absolute;
   left: -5%;
   right: -5%;
-  top: 46%;
+  top: 50%;
   transform: rotate(-4deg);
   background: #F2B33D;
   color: #140C00;
@@ -518,6 +518,38 @@
   display: flex;
   gap: 8px;
   flex-wrap: wrap;
+  position: relative;
+  z-index: 2;
+}
+
+.featureChip,
+.chipList .chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 34px;
+  padding: 0 14px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  background: rgba(14, 14, 20, 0.96);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  font-family: 'Inter', sans-serif;
+  font-weight: 500;
+  font-size: 13px;
+  color: #ECE8E1;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.75);
+  white-space: nowrap;
+  user-select: none;
+  cursor: default;
+  transition: all 0.2s ease;
+}
+
+.featureChip:hover,
+.chipList .chip:hover {
+  border-color: rgba(255, 255, 255, 0.32);
+  background: rgba(24, 24, 34, 0.98);
+  color: #FFFFFF;
 }
 
 /* ── Hero Right: Killer Figure & Badges ── */
@@ -531,6 +563,15 @@
   justify-content: center;
   padding-bottom: 70px;
   box-sizing: border-box;
+}
+
+.figureWrap {
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  position: relative;
+  z-index: 2;
+  transition: transform 0.3s ease;
 }
 
 /* ── Overhead Interrogation Lamp & Sweeping Light Beam ── */
@@ -815,20 +856,81 @@
   }
   .heroRight {
     flex: 1 1 auto;
-    min-height: 440px;
-    padding-bottom: 40px;
+    min-height: 520px;
+    padding-top: 40px;
+    padding-bottom: 30px;
+    overflow: visible;
+  }
+  .figureWrap {
+    transform: scale(0.84);
+    transform-origin: bottom center;
+  }
+  .lampRig {
+    top: -10px;
+    width: 360px;
+    margin-left: -180px;
+    height: calc(100% + 10px);
+  }
+  .lampCord {
+    height: 32px;
+  }
+  .lampFixture {
+    top: 34px;
+  }
+  .lampGlowAura {
+    top: 66px;
+  }
+  .sweepBeam {
+    top: 70px;
+    width: 360px;
+    height: calc(100% - 70px);
   }
   .tapeWrap {
-    top: 48%;
+    top: 56%;
   }
 }
 
 @media (max-width: 640px) {
+  .tapeWrap {
+    top: 58%;
+    padding: 8px 0;
+  }
   .wrap {
     padding: 0 20px;
   }
+  .header {
+    height: 58px;
+  }
   .headerInner {
-    padding: 0 16px;
+    padding: 0 14px;
+    gap: 8px;
+  }
+  .brandTitle {
+    font-size: 24px;
+  }
+  .headerNav {
+    gap: 6px;
+  }
+  .chip {
+    height: 32px;
+    padding: 0 12px;
+    font-size: 12px;
+  }
+  .featureChip,
+  .chipList .chip {
+    height: 32px;
+    padding: 0 12px;
+    font-size: 12px;
+  }
+  .chipHost {
+    height: 32px;
+    padding: 0 12px;
+    font-size: 12px;
+  }
+  .chipResume {
+    height: 32px;
+    padding: 0 10px;
+    font-size: 11px;
   }
   .heroScr {
     min-height: auto;
@@ -846,30 +948,55 @@
     font-size: 13px;
     flex: 1 1 100%;
   }
+  .heroRight {
+    min-height: 480px;
+    padding-top: 30px;
+    padding-bottom: 20px;
+  }
+  .figureWrap {
+    transform: scale(0.74);
+    transform-origin: bottom center;
+  }
+  .lampRig {
+    top: -6px;
+    width: 300px;
+    margin-left: -150px;
+    height: calc(100% + 6px);
+  }
+  .lampCord {
+    height: 22px;
+  }
+  .lampFixture {
+    top: 24px;
+    transform: translateX(-50%) scale(0.88);
+  }
+  .lampGlowAura {
+    top: 52px;
+    width: 100px;
+  }
+  .sweepBeam {
+    top: 56px;
+    width: 300px;
+    height: calc(100% - 56px);
+  }
+  .typewriterNote {
+    right: 2%;
+    top: 5%;
+    font-size: 11.5px;
+    padding: 6px 10px;
+    max-width: 155px;
+  }
   .badgeTod {
     left: 2%;
-    top: 10%;
-    padding: 8px 12px;
-    font-size: 12px;
+    top: 18%;
+    padding: 6px 10px;
+    font-size: 11px;
   }
   .badgeExhibit {
     right: 2%;
-    top: 24%;
-    padding: 8px 12px;
-    font-size: 12px;
-  }
-  .typewriterNote {
-    right: 4%;
-    top: 2%;
-    font-size: 13px;
-    padding: 8px 12px;
-  }
-  .lampRig {
-    width: 320px;
-    margin-left: -160px;
-  }
-  .sweepBeam {
-    width: 320px;
+    top: 48%;
+    padding: 6px 10px;
+    font-size: 11px;
   }
   .sweep {
     width: 320px;

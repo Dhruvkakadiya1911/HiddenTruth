@@ -1193,12 +1193,38 @@
 }
 
 @media (max-width: 640px) {
+  .hud {
+    height: 58px;
+  }
   .hudInner {
-    padding: 10px 16px;
-    gap: 12px;
+    padding: 0 12px;
+    gap: 8px;
+    height: 100%;
+  }
+  .hudLeft {
+    gap: 8px;
+  }
+  .brandTitle {
+    font-family: 'Bebas Neue', Impact, sans-serif;
+    font-size: 22px;
+    letter-spacing: 0.04em;
+    line-height: 0.9;
+  }
+  .roomPill {
+    padding: 3px 8px;
+    font-size: 10px;
+    letter-spacing: 0.08em;
   }
   .stepperList {
     display: none;
+  }
+  .hudRight {
+    gap: 6px;
+  }
+  .iconBtn {
+    width: 32px;
+    height: 32px;
+    border-radius: 10px;
   }
   .boardGrid {
     grid-template-columns: 1fr;
@@ -1207,6 +1233,7 @@
     grid-column: 1;
   }
   .mainLayout {
-    padding: 16px 12px 40px;
+    padding: 12px 10px 36px;
+    gap: 16px;
   }
 }

@@ -218,8 +218,37 @@
 }
 
 @media (max-width: 640px) {
+  .header {
+    height: 58px;
+  }
+  .headerInner {
+    padding: 0 12px;
+    gap: 8px;
+    flex-wrap: nowrap;
+    height: 100%;
+  }
+  .backLink {
+    width: 32px;
+    height: 32px;
+    padding: 0;
+    justify-content: center;
+    border-radius: 10px;
+    border: 1px solid #22222C;
+    background: rgba(255, 255, 255, 0.03);
+    flex-shrink: 0;
+  }
+  .backText {
+    display: none;
+  }
+  .brandTitle {
+    font-size: 22px;
+  }
+  .roomPill {
+    padding: 3px 8px;
+    font-size: 10px;
+  }
   .main {
-    padding: 20px 16px 36px;
-    gap: 20px;
+    padding: 16px 12px 36px;
+    gap: 16px;
   }
 }

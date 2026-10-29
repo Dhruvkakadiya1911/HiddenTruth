@@ -117,8 +117,28 @@
 }
 
 @media (max-width: 640px) {
+  .header {
+    height: 58px;
+  }
+  .headerInner {
+    padding: 0 12px;
+    gap: 8px;
+    flex-wrap: nowrap;
+    height: 100%;
+  }
+  .brandTitle {
+    font-size: 22px;
+  }
+  .caseClosedPill {
+    padding: 4px 8px;
+    font-size: 10px;
+  }
+  .roomPill {
+    padding: 3px 8px;
+    font-size: 10px;
+  }
   .main {
-    padding: 20px 16px 40px;
-    gap: 32px;
+    padding: 16px 12px 40px;
+    gap: 24px;
   }
 }

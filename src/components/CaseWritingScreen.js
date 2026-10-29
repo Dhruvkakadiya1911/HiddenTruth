@@ -77,22 +77,21 @@ export default function CaseWritingScreen({
       <header className={s.header}>
         <div className={s.brandGroup}>
           <span className={s.brandDot} />
-          <span className={s.brandTitle}>HIDDENTRUTH</span>
+          <span className={s.brandTitle}>
+            Hidden<span className={s.brandRed}>Truth</span>
+          </span>
         </div>
 
         <div className={s.headerNav}>
           {roomCode && (
-            <span className={s.resumePill}>
-              <span className={s.resumeDot} />
-              Resume {roomCode}
+            <span className={s.roomPill}>
+              Room <b className={s.roomCode}>{roomCode}</b>
             </span>
           )}
-          <Link href="/join" className={s.navBtn}>
-            Join
-          </Link>
-          <Link href="/create" className={s.navBtnActive}>
-            Host
-          </Link>
+          <span className={s.generatingPill}>
+            <span className={s.statusDot} />
+            <span className={s.statusText}>Writing Case</span>
+          </span>
         </div>
       </header>
 

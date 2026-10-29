@@ -86,48 +86,14 @@ export default function Timer({
     const pct = totalSeconds > 0 ? Math.max(0, Math.min(100, Math.round((timeLeft / totalSeconds) * 100))) : 0;
     const ringGradient = `conic-gradient(#FF2D55 0% ${pct}%, rgba(255,45,85,.15) ${pct}% 100%)`;
     return (
-      <div
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          gap: '10px',
-          height: '46px',
-          padding: '0 16px 0 6px',
-          borderRadius: '999px',
-          background: 'linear-gradient(135deg, rgba(255,45,85,.22), rgba(255,122,61,.12))',
-          border: '1px solid rgba(255,45,85,.45)',
-          boxShadow: '0 0 24px -6px rgba(255,45,85,.6)',
-        }}
-      >
+      <div className={s.hudTimer}>
         <span
-          style={{
-            width: '34px',
-            height: '34px',
-            borderRadius: '50%',
-            background: ringGradient,
-            display: 'grid',
-            placeItems: 'center',
-            transition: 'background .9s linear',
-          }}
+          className={s.hudRing}
+          style={{ background: ringGradient }}
         >
-          <span
-            style={{
-              width: '26px',
-              height: '26px',
-              borderRadius: '50%',
-              background: '#1B0C1E',
-            }}
-          />
+          <span className={s.hudRingInner} />
         </span>
-        <span
-          style={{
-            fontFamily: "'JetBrains Mono', monospace",
-            fontSize: '20px',
-            fontWeight: 600,
-            color: '#FF6B8A',
-            letterSpacing: '.02em',
-          }}
-        >
+        <span className={s.hudDigits}>
           {isExpired ? expiredText : formattedTime}
         </span>
       </div>

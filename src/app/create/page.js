@@ -73,14 +73,33 @@ export default function CreateRoomPage() {
 
   return (
     <div className={s.page}>
-      <div className={s.wrap}>
-        {/* Left Column / Heading */}
-        <div className={s.heroCol}>
-          <Link href="/" className="ib" aria-label="Back">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
-              <path d="M15 18l-6-6 6-6" />
-            </svg>
+      {/* ── Fixed Clean Header matching Design System ── */}
+      <header className={s.header}>
+        <div className={s.headerInner}>
+          <Link href="/" className={s.brandGroup}>
+            <span className={s.brandDot} />
+            <span className={s.brandTitle}>
+              Hidden<span className={s.brandRed}>Truth</span>
+            </span>
           </Link>
+
+          <div className={s.headerNav}>
+            <Link href="/join" className={s.chipNav}>
+              Join
+            </Link>
+          </div>
+        </div>
+      </header>
+
+      <main className={s.main}>
+        <div className={s.wrap}>
+          {/* Left Column / Heading */}
+          <div className={s.heroCol}>
+            <Link href="/" className="ib" aria-label="Back">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+                <path d="M15 18l-6-6 6-6" />
+              </svg>
+            </Link>
           <span className="mono-tag rise" style={{ color: '#E5193A' }}>
             Host a new case
           </span>
@@ -154,6 +173,7 @@ export default function CreateRoomPage() {
           </form>
         </div>
       </div>
+      </main>
     </div>
   );
 }

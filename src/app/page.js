@@ -138,10 +138,10 @@ export default function HomePage() {
             </div>
 
             <div className={`${s.rise} ${s.r4} ${s.chipList}`}>
-              <span className={s.chip} style={{ cursor: 'default' }}>3–10 players</span>
-              <span className={s.chip} style={{ cursor: 'default' }}>~15 minutes</span>
-              <span className={s.chip} style={{ cursor: 'default' }}>No download</span>
-              <span className={s.chip} style={{ cursor: 'default' }}>New story every game</span>
+              <span className={s.featureChip}>3–10 players</span>
+              <span className={s.featureChip}>~15 minutes</span>
+              <span className={s.featureChip}>No download</span>
+              <span className={s.featureChip}>New story every game</span>
             </div>
           </div>
 
@@ -191,7 +191,9 @@ export default function HomePage() {
               <div className={s.lampGlowAura} />
               <div className={s.sweepBeam} />
             </div>
-            <AgentFigure role="killer" size={400} glow={false} tilt={false} />
+            <div className={s.figureWrap}>
+              <AgentFigure role="killer" size={400} glow={false} tilt={false} />
+            </div>
 
             <span className={`${s.card} ${s.float1} ${s.badgeTod}`}>
               <span className={s.mono} style={{ color: '#F2B33D' }}>T.O.D.</span>

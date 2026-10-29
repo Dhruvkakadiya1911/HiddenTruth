@@ -301,11 +301,11 @@ export default function VotePage({ params }) {
       {/* ── Header matching Reference ── */}
       <header className={s.header}>
         <div className={s.headerInner}>
-          <Link href={`/game/${roomCode}`} className={s.backLink}>
+          <Link href={`/game/${roomCode}`} className={s.backLink} title="Back to the board">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
               <path d="M15 18l-6-6 6-6" />
             </svg>
-            Back to the board
+            <span className={s.backText}>Back to the board</span>
           </Link>
 
           <div style={{ flex: 1 }} />
